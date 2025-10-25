@@ -1,4 +1,3 @@
-
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -67,6 +66,7 @@ public class PlayerMovement : MonoBehaviour
 
     [SerializeField] private float animDamp = 0.05f;
     private float velXCur, velYCur;
+    private float velXVelocity, velYVelocity; // Variables para SmoothDamp
 
     private void Awake()
     {
@@ -302,7 +302,7 @@ public class PlayerMovement : MonoBehaviour
     {
         if (anim == null) return;
 
-        // Blend Tree (velX, velY)
+        // Blend Tree (velX, velY) - Corregido: usar Lerp en lugar de SmoothDamp
         velXCur = Mathf.Lerp(velXCur, moveInput.x, animDamp);
         velYCur = Mathf.Lerp(velYCur, moveInput.y, animDamp);
         anim.SetFloat(VelX, velXCur);
@@ -364,7 +364,7 @@ public class PlayerMovement : MonoBehaviour
     /// <summary>
     /// Obtiene si el jugador está en el suelo
     /// </summary>
-    public bool IsGrounded()
+    public bool GetIsGrounded()
     {
         return isGrounded;
     }
@@ -388,4 +388,4 @@ public class PlayerMovement : MonoBehaviour
         Gizmos.DrawWireSphere(rayOrigin, 0.1f);
         Gizmos.DrawLine(rayOrigin, rayOrigin + Vector3.down * groundCheckDistance);
     }
-}               
+}

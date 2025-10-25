@@ -145,7 +145,7 @@ AudioListener:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330585543}
-  m_Enabled: 1
+  m_Enabled: 0
 --- !u!20 &330585545
 Camera:
   m_ObjectHideFlags: 0
@@ -608,7 +608,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: cd38da41ab8240f44855237c44b601af, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1000
+      value: 1000.515
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: cd38da41ab8240f44855237c44b601af, type: 3}
       propertyPath: m_LocalPosition.z
@@ -744,7 +744,19 @@ MonoBehaviour:
     m_ActionId: 9ceb316e-bffd-4d8e-b480-2cc2f19045db
     m_ActionName: 'Player/Move[/Keyboard/w,/Keyboard/s,/Keyboard/a,/Keyboard/d]'
   - m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 484076925}
+        m_TargetAssemblyTypeName: PlayerMovement, Assembly-CSharp
+        m_MethodName: OnJump
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_ActionId: 3cb189dc-639a-4ced-a610-b011a45b9a01
     m_ActionName: 'Player/Jump[/Keyboard/space]'
   m_NeverAutoSwitchControlSchemes: 0
@@ -766,8 +778,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 5
   rotationSpeed: 720
+  jumpHeight: 2
+  doubleJumpHeight: 1.5
+  canDoubleJump: 1
+  coyoteTime: 0.15
+  jumpBufferTime: 0.2
+  groundCheckDistance: 0.2
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  groundCheckOffset: {x: 0, y: 0.1, z: 0}
   gravity: -9.81
+  fallMultiplier: 2.5
   mouseOrbitCamera: {fileID: 330585545}
+  jumpSound: {fileID: 0}
+  doubleJumpSound: {fileID: 0}
+  landSound: {fileID: 0}
   animDamp: 0.05
 --- !u!4 &484076927 stripped
 Transform:
