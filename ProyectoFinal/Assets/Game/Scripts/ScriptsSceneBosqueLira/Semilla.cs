@@ -2,15 +2,22 @@ using UnityEngine;
 
 public class Semilla : MonoBehaviour
 {
-    public ControllerSceneLira controller;
+    private ControllerSceneLira controller;
     private bool recolectada = false;
 
-    void OnTriggerEnter(Collider other)
+    void Start()
     {
-        if (!recolectada && other.CompareTag("Player"))
+        controller = FindObjectOfType<ControllerSceneLira>();
+    }
+
+    void OnMouseDown()
+    {
+        if (!recolectada)
         {
             recolectada = true;
             controller.RecogerSemilla();
+
+            // Desaparece o emite un efecto
             gameObject.SetActive(false);
         }
     }
