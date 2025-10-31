@@ -11,6 +11,7 @@ public class Controlador : MonoBehaviour
     public float Speed;
     private Vector3 MovePlayer;
     public float gravity = 9.8f;
+    public float Caida;
 
     public Camera MainCam;
     public Vector3 CameraAdelante;
@@ -57,11 +58,13 @@ public class Controlador : MonoBehaviour
     {
         if (Player.isGrounded)
         {
-            MovePlayer.y = -gravity * Time.deltaTime;
+            Caida = -gravity * Time.deltaTime;
+            MovePlayer.y = Caida;
         }
         else
         {
-            MovePlayer.y -= gravity * Time.deltaTime;
+            Caida -= gravity * Time.deltaTime;
+            MovePlayer.y = Caida;
         }
     }
 }
