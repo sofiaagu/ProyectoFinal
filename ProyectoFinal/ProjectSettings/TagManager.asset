@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Ground
   - Fragmento
+  - Prohibido
   layers:
   - Default
   - TransparentFX
