@@ -10,6 +10,8 @@ public class Controlador : MonoBehaviour
 
     public float Speed;
     private Vector3 MovePlayer;
+    public float gravity = 9.8f;
+    public float Caida;
 
     public Camera MainCam;
     public Vector3 CameraAdelante;
@@ -31,10 +33,13 @@ public class Controlador : MonoBehaviour
 
         DireccionCamara();
             MovePlayer = playerInput.x * CameraRight + playerInput.z * CameraAdelante;
+        MovePlayer = MovePlayer * Speed;
 
         Player.transform.LookAt(Player.transform.position + MovePlayer);
 
-        Player.Move(MovePlayer * Speed * Time.deltaTime);
+        setGravity();
+
+        Player.Move(MovePlayer * Time.deltaTime);
         Debug.Log(Player.velocity.magnitude);   
     }
 
@@ -48,6 +53,19 @@ public class Controlador : MonoBehaviour
 
         CameraAdelante = CameraAdelante.normalized;
         CameraRight = CameraRight.normalized;
+    }
+    void setGravity()
+    {
+        if (Player.isGrounded)
+        {
+            Caida = -gravity * Time.deltaTime;
+            MovePlayer.y = Caida;
+        }
+        else
+        {
+            Caida -= gravity * Time.deltaTime;
+            MovePlayer.y = Caida;
+        }
     }
 }
 

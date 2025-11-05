@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 public class ArbolCentral : MonoBehaviour
 {
@@ -18,6 +19,13 @@ public class ArbolCentral : MonoBehaviour
         else
         {
             controlador.mensajeUI.text = "Aún te faltan semillas...";
+            StartCoroutine(LimpiarMensaje());
         }
+    }
+
+    IEnumerator LimpiarMensaje()
+    {
+        yield return new WaitForSeconds(3f); // Espera 3 segundos
+        controlador.mensajeUI.text = "";     // Limpia el texto
     }
 }
