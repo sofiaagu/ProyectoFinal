@@ -1,5 +1,12 @@
 fileFormatVersion: 2
 guid: d8d157ebfb23cdf4ba94e99d8458f7d2
+AssetOrigin:
+  serializedVersion: 1
+  productId: 282498
+  packageName: Medieval Castle - Modular
+  packageVersion: 1.0
+  assetPath: Assets/Advance Studios/Medieval Castle/Art/Model/Castle.fbx
+  uploadId: 657949
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
@@ -16,8 +23,6 @@ ModelImporter:
     optimizeGameObjects: 0
     removeConstantScaleCurves: 0
     motionNodeName: 
-    rigImportErrors: 
-    rigImportWarnings: 
     animationImportErrors: 
     animationImportWarnings: 
     animationRetargetingWarnings: 
@@ -90,7 +95,7 @@ ModelImporter:
     armStretch: 0.05
     legStretch: 0.05
     feetSpacing: 0
-    globalScale: 1
+    globalScale: 100
     rootMotionBoneName: 
     hasTranslationDoF: 0
     hasExtraRoot: 1
@@ -107,10 +112,3 @@ ModelImporter:
   userData: 
   assetBundleName: 
   assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 282498
-  packageName: Medieval Castle - Modular
-  packageVersion: 1.0
-  assetPath: Assets/Advance Studios/Medieval Castle/Art/Model/Castle.fbx
-  uploadId: 657949
