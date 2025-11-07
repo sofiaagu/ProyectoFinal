@@ -1,5 +1,6 @@
 using UnityEngine;
 using TMPro;
+using System.Collections;
 
 public class AbilityPickup : MonoBehaviour
 {
@@ -16,10 +17,23 @@ public class AbilityPickup : MonoBehaviour
     [Header("Efectos")]
     public GameObject efectoRecoleccion;
 
+    // Singleton para mantener la referencia al UI Manager
+    private static AbilityUIManager uiManager;
+
     private void Start()
     {
         if (notificacionUI != null)
             notificacionUI.SetActive(false);
+
+        // Crear UI Manager si no existe
+        if (uiManager == null)
+        {
+            GameObject managerObj = new GameObject("AbilityUIManager");
+            uiManager = managerObj.AddComponent<AbilityUIManager>();
+            uiManager.notificacionUI = notificacionUI;
+            uiManager.textoHabilidad = textoHabilidad;
+            DontDestroyOnLoad(managerObj);
+        }
     }
 
     private void Update()
@@ -43,21 +57,28 @@ public class AbilityPickup : MonoBehaviour
     private void OtorgarHabilidad(GameObject player)
     {
         PlayerAbilities abilities = player.GetComponent<PlayerAbilities>();
-
         if (abilities == null)
         {
             abilities = player.AddComponent<PlayerAbilities>();
         }
 
+        string mensaje = "";
+
         if (habilidad == AbilityType.Luminiscencia)
         {
             abilities.tieneLuminiscencia = true;
-            /*MostrarNotificacion("¡Habilidad Adquirida!\nLuminiscencia\n[Click en cristales]")*/;
+            mensaje = "¡Habilidad Adquirida!\nLuminiscencia\n[Click en cristales]";
         }
         else if (habilidad == AbilityType.Equilibrio)
         {
             abilities.tieneEquilibrio = true;
-            //MostrarNotificacion("¡Habilidad Adquirida!\nEquilibrio\n[Presiona E para cam  biar plano]");
+            mensaje = "¡Habilidad Adquirida!\nEquilibrio\n[Presiona E para cambiar plano]";
+        }
+
+        // Mostrar notificación ANTES de destruir
+        if (uiManager != null)
+        {
+            uiManager.MostrarNotificacion(mensaje, duracionNotificacion);
         }
 
         // Efecto visual
@@ -71,24 +92,32 @@ public class AbilityPickup : MonoBehaviour
         // Destruir el pickup
         Destroy(gameObject);
     }
+}
 
-    //private void MostrarNotificacion(string mensaje)
-    //{
-    //    if (notificacionUI != null && textoHabilidad != null)
-    //    {
-    //        textoHabilidad.text = mensaje;
-    //        notificacionUI.SetActive(true);
+// Clase separada para manejar el UI persistente
+public class AbilityUIManager : MonoBehaviour
+{
+    public GameObject notificacionUI;
+    public TextMeshProUGUI textoHabilidad;
 
-    //        // Cancelar invocación anterior si existe
-    //        CancelInvoke("OcultarNotificacion");
-
-    //        // Programar ocultación
-    //        Invoke("OcultarNotificacion", duracionNotificacion);
-    //    }
-    //}
-
-    private void OcultarNotificacion()
+    public void MostrarNotificacion(string mensaje, float duracion)
     {
+        if (notificacionUI != null && textoHabilidad != null)
+        {
+            textoHabilidad.text = mensaje;
+            notificacionUI.SetActive(true);
+            Debug.Log("Panel mostrado: " + mensaje);
+
+            // Usar Coroutine en lugar de Invoke
+            StopAllCoroutines();
+            StartCoroutine(OcultarDespuesDe(duracion));
+        }
+    }
+
+    private IEnumerator OcultarDespuesDe(float segundos)
+    {
+        yield return new WaitForSeconds(segundos);
+
         if (notificacionUI != null)
         {
             notificacionUI.SetActive(false);
