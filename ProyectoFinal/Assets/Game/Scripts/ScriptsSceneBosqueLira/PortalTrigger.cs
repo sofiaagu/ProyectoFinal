@@ -3,12 +3,14 @@
 [RequireComponent(typeof(Collider))]
 public class PortalTrigger : MonoBehaviour
 {
-    [Header("Destino del portal")]
-    [Tooltip("Objeto vacío o punto donde aparecerá el jugador al usar el portal.")]
-    public Transform puntoLlegada; // Asigna aquí el objeto ZonaLlegada
+    [Header("Configuración del Portal")]
+    [Tooltip("Arrastra aquí el objeto que representa el plano actual (por ejemplo, 'PlanoAgua')")]
+    public GameObject planoActualObj;
 
-    [Header("Efecto opcional")]
-    [Tooltip("Partículas o efecto visual al teletransportarse (opcional).")]
+    [Tooltip("Punto donde aparecerá el jugador al usar el portal (opcional, si es teletransporte local).")]
+    public Transform puntoLlegada;
+
+    [Tooltip("Partículas o efecto visual al usar el portal (opcional).")]
     public ParticleSystem efectoPortal;
 
     private void Reset()
@@ -20,34 +22,36 @@ public class PortalTrigger : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        // Solo reacciona si el objeto tiene el tag Player
+        // Solo reacciona si el objeto tiene el tag "Player"
         if (!other.CompareTag("Player"))
             return;
 
-        if (puntoLlegada == null)
-        {
-            Debug.LogWarning("⚠️ PortalTrigger: No se ha asignado el punto de llegada.");
-            return;
-        }
-
-        // Intenta obtener el CharacterController
-        CharacterController controller = other.GetComponent<CharacterController>();
-
-        // 🔄 Desactiva temporalmente el CharacterController para evitar conflictos
-        if (controller != null)
-            controller.enabled = false;
-
-        // Teletransporta al jugador
-        other.transform.position = puntoLlegada.position;
-
-        // Rehabilita el CharacterController si existía
-        if (controller != null)
-            controller.enabled = true;
-
-        // Activa efecto visual si existe
         if (efectoPortal != null)
             efectoPortal.Play();
 
-        Debug.Log($" Jugador teletransportado a: {puntoLlegada.position}");
+        // Si hay un punto de llegada dentro del mismo plano, teletransporta localmente
+        if (puntoLlegada != null)
+        {
+            CharacterController controller = other.GetComponent<CharacterController>();
+            if (controller != null) controller.enabled = false;
+
+            other.transform.position = puntoLlegada.position;
+
+            if (controller != null) controller.enabled = true;
+
+            Debug.Log($"🌀 Teletransportado dentro del plano a {puntoLlegada.position}");
+        }
+
+        // Si hay un plano asignado, busca su nombre para pasar al GameFlowManager
+        if (planoActualObj != null && GameFlowManager.Instance != null)
+        {
+            string nombrePlano = planoActualObj.name;
+            Debug.Log($"🌍 Portal desde: {nombrePlano}");
+            GameFlowManager.Instance.IrASiguientePlano(nombrePlano);
+        }
+        else
+        {
+            Debug.LogWarning("⚠️ PortalTrigger: No se asignó el plano actual o falta GameFlowManager.");
+        }
     }
 }

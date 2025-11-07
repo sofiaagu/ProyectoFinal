@@ -1,10 +1,14 @@
+﻿using TMPro;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
-using TMPro;
 
 public class ControllerSceneLira : MonoBehaviour
 {
     public int semillasTotales = 3;
     private int semillasRecolectadas = 0;
+
+    [Header("Portal")]
+    public GameObject portal;
 
     [Header("Referencias UI")]
     public TextMeshProUGUI textoSemillas;
@@ -26,6 +30,22 @@ public class ControllerSceneLira : MonoBehaviour
     {
         semillasRecolectadas++;
         textoSemillas.text = "Semillas recolectadas: " + semillasRecolectadas + "/" + semillasTotales;
+
+        // Si se recolectaron todas las semillas, activar el portal
+        if (TieneTodasLasSemillas())
+        {
+            ActivarPortal();
+        }
+    }
+
+    private void ActivarPortal()
+    {
+        if (portal != null && !portal.activeSelf)
+        {
+            portal.SetActive(true);
+            mensajeUI.text = "🌌 ¡El portal del bosque ha aparecido!";
+            Debug.Log("Portal activado");
+        }
     }
 
     public bool TieneTodasLasSemillas()
@@ -38,7 +58,7 @@ public class ControllerSceneLira : MonoBehaviour
         if (bosqueRestaurado) return;
 
         bosqueRestaurado = true;
-        mensajeUI.text = "�Has restaurado el Bosque de Lira!";
+        mensajeUI.text = "¡Has restaurado el Bosque de Lira!";
 
         if (efectoRestauracion != null) efectoRestauracion.Play();
 

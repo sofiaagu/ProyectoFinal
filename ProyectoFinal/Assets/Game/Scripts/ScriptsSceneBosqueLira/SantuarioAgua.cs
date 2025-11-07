@@ -3,17 +3,24 @@ using UnityEngine;
 
 public class SantuarioAgua : MonoBehaviour
 {
-    [Header("Referencias")]
-    public GameObject semillaAgua;          // Arrastra aquí la semilla del agua
-    public ParticleSystem efectoAparicion;  // Efecto cuando se completa el puzzle
-    public GameObject portalAgua;           // Portal que se activará después de recoger la semilla
+    [Header("Referencias principales")]
+    public GameObject semillaAgua;          // 🌱 Semilla que aparece al completar el puzzle
+    public GameObject portalAgua;           // 🌀 Portal que se activa después
+    public ParticleSystem efectoAparicion;  // ✨ Efecto al aparecer la semilla
+
+    [Header("Prefabs a alternar")]
+    public GameObject prefabDesaparecer;    // 🔹 Prefab que se desactiva
+    public GameObject prefabAparecer;       // 🔹 Prefab que se activa
+
+    [Header("Efectos adicionales")]
+    public ParticleSystem particulasDesaparecer; // 💨 Efecto que debe apagarse al completar el puzzle
 
     [Header("Configuración del puzzle")]
     public int[] ordenCorrecto = { 1, 3, 2 };
     private int indiceActual = 0;
     private bool completado = false;
 
-    private List<PiedraPuzzle> piedrasActivadas = new List<PiedraPuzzle>();
+    private PiedraPuzzle[] todasLasPiedras;
 
     void Start()
     {
@@ -22,42 +29,40 @@ public class SantuarioAgua : MonoBehaviour
 
         if (portalAgua != null)
             portalAgua.SetActive(false);
+
+        if (prefabAparecer != null)
+            prefabAparecer.SetActive(false);
+
+        todasLasPiedras = FindObjectsOfType<PiedraPuzzle>();
     }
 
-    public bool ClickEnPiedra(int id, PiedraPuzzle piedra)
+    public void ClickEnPiedra(int id, PiedraPuzzle piedra)
     {
-        if (completado) return false;
+        if (completado || piedra == null) return;
 
         if (id == ordenCorrecto[indiceActual])
         {
-            if (piedra != null && !piedrasActivadas.Contains(piedra))
-                piedrasActivadas.Add(piedra);
-
+            piedra.Desactivar();
             indiceActual++;
-            Debug.Log($"✅ Piedra correcta: {id}");
 
             if (indiceActual >= ordenCorrecto.Length)
                 Completado();
-
-            return true;
         }
         else
         {
-            Debug.Log("❌ Secuencia incorrecta. Reiniciando...");
-            indiceActual = 0;
-            RestaurarPiedras();
-            return false;
+            ReiniciarPuzzle();
         }
     }
 
-    private void RestaurarPiedras()
+    private void ReiniciarPuzzle()
     {
-        foreach (var p in piedrasActivadas)
+        indiceActual = 0;
+
+        foreach (var piedra in todasLasPiedras)
         {
-            if (p != null)
-                p.Reactivar();
+            if (piedra != null)
+                piedra.Reactivar();
         }
-        piedrasActivadas.Clear();
     }
 
     private void Completado()
@@ -65,23 +70,33 @@ public class SantuarioAgua : MonoBehaviour
         completado = true;
         Debug.Log("🌊 ¡Puzzle completado! Aparece la semilla...");
 
-        piedrasActivadas.Clear();
-
         if (efectoAparicion != null)
             efectoAparicion.Play();
 
-        // Activa la semilla para que el jugador pueda recogerla
         if (semillaAgua != null)
             semillaAgua.SetActive(true);
+
+        // 🔹 Desactiva prefab antiguo y activa el nuevo
+        if (prefabDesaparecer != null)
+            prefabDesaparecer.SetActive(false);
+
+        if (prefabAparecer != null)
+            prefabAparecer.SetActive(true);
+
+        // 💨 Apaga o desaparece las partículas decorativas
+        if (particulasDesaparecer != null)
+        {
+            particulasDesaparecer.Stop();
+            particulasDesaparecer.gameObject.SetActive(false);
+        }
     }
 
-    // Este método lo llamará la semilla cuando el jugador la recoja
     public void ActivarPortal()
     {
         if (portalAgua != null)
         {
             portalAgua.SetActive(true);
-            Debug.Log("🌀 El portal del agua ha sido activado");
+            Debug.Log("🌀 Portal del agua activado");
         }
     }
 }
