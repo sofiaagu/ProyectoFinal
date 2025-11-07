@@ -1602,8 +1602,8 @@ Transform:
   m_GameObject: {fileID: 430285416}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -5.66, y: 1000.93, z: -4.51}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: -5.4884, y: 1000.93, z: -4.51}
+  m_LocalScale: {x: 1.1007, y: 1.1007, z: 1.1007}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -2094,7 +2094,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Actions: {fileID: -944628639613478452, guid: 73a506ecd3491744c93e2bf665cfc9a3, type: 3}
-  m_NotificationBehavior: 2
+  m_NotificationBehavior: 0
   m_UIInputModule: {fileID: 0}
   m_DeviceLostEvent:
     m_PersistentCalls:
@@ -2154,6 +2154,10 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: e352283e-2bc8-45af-aebf-fab765142b91
     m_ActionName: 'Player/Look[/Mouse/delta]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 5853e0ca-335c-4631-9f6b-0ce1a54c8798
+    m_ActionName: 'Player/RightClick[/Mouse/rightButton]'
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player
@@ -2175,7 +2179,7 @@ MonoBehaviour:
   gravity: -9.81
   jumpHeight: 2
   cameraPivot: {fileID: 510694210}
-  mouseSensitivity: 2
+  mouseSensitivity: 0.5
   verticalClamp: 80
 --- !u!4 &484076927 stripped
 Transform:

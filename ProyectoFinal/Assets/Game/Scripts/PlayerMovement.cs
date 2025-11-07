@@ -1,4 +1,4 @@
-using UnityEngine;
+Ôªøusing UnityEngine;
 using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(CharacterController))]
@@ -9,8 +9,8 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float gravity = -20f;
     [SerializeField] private float jumpHeight = 2f;
 
-    [Header("C·mara")]
-    [SerializeField] private Transform cameraPivot; // Punto donde est· la c·mara (usualmente hijo del player)
+    [Header("C√°mara")]
+    [SerializeField] private Transform cameraPivot; // Punto donde est√° la c√°mara (hijo del player)
     [SerializeField] private float mouseSensitivity = 2f;
     [SerializeField] private float verticalClamp = 80f;
 
@@ -21,12 +21,15 @@ public class PlayerMovement : MonoBehaviour
     private float xRotation = 0f;
     private bool jumpPressed;
     private bool isGrounded;
+    private bool rightClickHeld = false;
 
     private void Awake()
     {
         controller = GetComponent<CharacterController>();
-        Cursor.lockState = CursorLockMode.Locked; // Oculta y bloquea el cursor
-        Cursor.visible = false;
+
+        // Cursor libre al inicio (puedes cambiarlo si quieres que empiece bloqueado)
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
 
     // --- INPUT SYSTEM ---
@@ -46,17 +49,37 @@ public class PlayerMovement : MonoBehaviour
             jumpPressed = true;
     }
 
+    // üîπ Nuevo: se llama desde la acci√≥n "RightClick"
+    public void OnRightClick(InputAction.CallbackContext ctx)
+    {
+        if (ctx.performed)
+        {
+            rightClickHeld = true;
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
+        else if (ctx.canceled)
+        {
+            rightClickHeld = false;
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
+    }
+
     private void Update()
     {
-        HandleLook();
         HandleMovement();
+
+        // Solo mirar mientras el clic derecho est√© presionado
+        if (rightClickHeld)
+            HandleLook();
     }
 
     private void HandleMovement()
     {
         isGrounded = controller.isGrounded;
 
-        // Movimiento horizontal relativo a la c·mara
+        // Movimiento horizontal relativo a la c√°mara
         Vector3 move = transform.right * moveInput.x + transform.forward * moveInput.y;
         controller.Move(move * moveSpeed * Time.deltaTime);
 
@@ -81,12 +104,12 @@ public class PlayerMovement : MonoBehaviour
         float mouseX = lookInput.x * mouseSensitivity;
         float mouseY = lookInput.y * mouseSensitivity;
 
-        // RotaciÛn vertical de la c·mara (eje X)
+        // Rotaci√≥n vertical de la c√°mara (eje X)
         xRotation -= mouseY;
         xRotation = Mathf.Clamp(xRotation, -verticalClamp, verticalClamp);
         cameraPivot.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
 
-        // RotaciÛn horizontal del jugador (eje Y)
+        // Rotaci√≥n horizontal del jugador (eje Y)
         transform.Rotate(Vector3.up * mouseX);
     }
 }
