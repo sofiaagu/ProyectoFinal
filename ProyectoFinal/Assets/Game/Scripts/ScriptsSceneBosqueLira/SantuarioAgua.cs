@@ -5,7 +5,7 @@ public class SantuarioAgua : MonoBehaviour
 {
     [Header("Referencias principales")]
     public GameObject semillaAgua;          // 🌱 Semilla que aparece al completar el puzzle
-    public GameObject portalAgua;           // 🌀 Portal que se activa después
+    public GameObject portelAgua;           // 🌀 Portal que se activa después
     public ParticleSystem efectoAparicion;  // ✨ Efecto al aparecer la semilla
 
     [Header("Prefabs a alternar")]
@@ -27,8 +27,8 @@ public class SantuarioAgua : MonoBehaviour
         if (semillaAgua != null)
             semillaAgua.SetActive(false);
 
-        if (portalAgua != null)
-            portalAgua.SetActive(false);
+        if (portelAgua != null)
+            portelAgua.SetActive(false);
 
         if (prefabAparecer != null)
             prefabAparecer.SetActive(false);
@@ -91,11 +91,11 @@ public class SantuarioAgua : MonoBehaviour
         }
     }
 
-    public void ActivarPortal()
+    public void ActivarPortel()
     {
-        if (portalAgua != null)
+        if (portelAgua != null)
         {
-            portalAgua.SetActive(true);
+            portelAgua.SetActive(true);
             Debug.Log("🌀 Portal del agua activado");
         }
     }
