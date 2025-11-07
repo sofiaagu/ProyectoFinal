@@ -1,57 +1,87 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 public class SantuarioAgua : MonoBehaviour
 {
     [Header("Referencias")]
-    public GameObject semillaAgua;          // Arrastra aquí la semilla desde la jerarquía
-    public ParticleSystem efectoAparicion;  // Efecto visual que se reproduce al completar el puzzle
+    public GameObject semillaAgua;          // Arrastra aquí la semilla del agua
+    public ParticleSystem efectoAparicion;  // Efecto cuando se completa el puzzle
+    public GameObject portalAgua;           // Portal que se activará después de recoger la semilla
 
     [Header("Configuración del puzzle")]
-    public int[] ordenCorrecto = { 1, 3, 2 }; // Puedes cambiar el orden si quieres
+    public int[] ordenCorrecto = { 1, 3, 2 };
     private int indiceActual = 0;
     private bool completado = false;
 
-    // Método llamado por cada piedra cuando se hace clic
-    public void ClickEnPiedra(int id)
-    {
-        if (completado) return;
+    private List<PiedraPuzzle> piedrasActivadas = new List<PiedraPuzzle>();
 
-        // Si el jugador hace clic en la piedra correcta
+    void Start()
+    {
+        if (semillaAgua != null)
+            semillaAgua.SetActive(false);
+
+        if (portalAgua != null)
+            portalAgua.SetActive(false);
+    }
+
+    public bool ClickEnPiedra(int id, PiedraPuzzle piedra)
+    {
+        if (completado) return false;
+
         if (id == ordenCorrecto[indiceActual])
         {
-            indiceActual++;
-            Debug.Log($"Piedra correcta: {id}");
+            if (piedra != null && !piedrasActivadas.Contains(piedra))
+                piedrasActivadas.Add(piedra);
 
-            // Si completó toda la secuencia
+            indiceActual++;
+            Debug.Log($"✅ Piedra correcta: {id}");
+
             if (indiceActual >= ordenCorrecto.Length)
-            {
                 Completado();
-            }
+
+            return true;
         }
         else
         {
-            // Si se equivoca, reinicia la secuencia
+            Debug.Log("❌ Secuencia incorrecta. Reiniciando...");
             indiceActual = 0;
-            Debug.Log("Secuencia incorrecta. Reiniciando...");
+            RestaurarPiedras();
+            return false;
         }
     }
 
-    // Se ejecuta al completar el puzzle correctamente
+    private void RestaurarPiedras()
+    {
+        foreach (var p in piedrasActivadas)
+        {
+            if (p != null)
+                p.Reactivar();
+        }
+        piedrasActivadas.Clear();
+    }
+
     private void Completado()
     {
         completado = true;
-        Debug.Log("¡Puzzle del Santuario del Agua completado! 🌊");
+        Debug.Log("🌊 ¡Puzzle completado! Aparece la semilla...");
 
-        // Mostrar semilla
-        if (semillaAgua != null)
-        {
-            semillaAgua.SetActive(true);
-        }
+        piedrasActivadas.Clear();
 
-        // Activar efecto visual
         if (efectoAparicion != null)
-        {
             efectoAparicion.Play();
+
+        // Activa la semilla para que el jugador pueda recogerla
+        if (semillaAgua != null)
+            semillaAgua.SetActive(true);
+    }
+
+    // Este método lo llamará la semilla cuando el jugador la recoja
+    public void ActivarPortal()
+    {
+        if (portalAgua != null)
+        {
+            portalAgua.SetActive(true);
+            Debug.Log("🌀 El portal del agua ha sido activado");
         }
     }
 }
