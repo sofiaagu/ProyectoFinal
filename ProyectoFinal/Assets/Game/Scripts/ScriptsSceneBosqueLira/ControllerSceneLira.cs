@@ -34,11 +34,11 @@ public class ControllerSceneLira : MonoBehaviour
         // Si se recolectaron todas las semillas, activar el portal
         if (TieneTodasLasSemillas())
         {
-            ActivarPortal();
+            ActivarPortel();
         }
     }
 
-    private void ActivarPortal()
+    private void ActivarPortel()
     {
         if (portal != null && !portal.activeSelf)
         {

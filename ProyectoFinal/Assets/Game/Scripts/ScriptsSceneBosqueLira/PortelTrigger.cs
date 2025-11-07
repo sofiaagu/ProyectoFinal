@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 [RequireComponent(typeof(Collider))]
-public class PortalTrigger : MonoBehaviour
+public class PortelTrigger : MonoBehaviour
 {
     [Header("Configuración del Portal")]
     [Tooltip("Arrastra aquí el objeto que representa el plano actual (por ejemplo, 'PlanoAgua')")]

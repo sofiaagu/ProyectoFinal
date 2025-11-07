@@ -23,7 +23,7 @@ public class Semilla : MonoBehaviour
 
         // Activar el portal del santuario correspondiente
         SantuarioAgua santuario = FindObjectOfType<SantuarioAgua>();
-        santuario?.ActivarPortal();
+        santuario?.ActivarPortel();
 
         Invoke(nameof(Desactivar), 0.5f);
     }
