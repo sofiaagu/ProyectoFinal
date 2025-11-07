@@ -2,35 +2,33 @@ using UnityEngine;
 
 public class Semilla : MonoBehaviour
 {
-    private ControllerSceneLira controller;
+    public string tipoSemilla; // "Agua", "Tierra" o "Luz"
     private bool recolectada = false;
 
     [Header("Efectos opcionales")]
     public ParticleSystem efectoRecoleccion;
     public AudioSource sonidoRecoleccion;
 
-    void Start()
-    {
-        controller = FindObjectOfType<ControllerSceneLira>();
-    }
-
     void OnMouseDown()
     {
-        if (!recolectada)
-        {
-            recolectada = true;
-            controller.RecogerSemilla();
+        if (recolectada) return;
+        recolectada = true;
 
-            // Efectos visuales y sonoros
-            if (efectoRecoleccion != null) efectoRecoleccion.Play();
-            if (sonidoRecoleccion != null) sonidoRecoleccion.Play();
+        if (GameFlowManager.Instance != null)
+            GameFlowManager.Instance.MarcarSemillaRecogida(tipoSemilla);
 
-            // Desactivar objeto después de un breve tiempo
-            Invoke(nameof(Desactivar), 0.5f);
-        }
+        // Efectos visuales
+        if (efectoRecoleccion != null) efectoRecoleccion.Play();
+        if (sonidoRecoleccion != null) sonidoRecoleccion.Play();
+
+        // Activar el portal del santuario correspondiente
+        SantuarioAgua santuario = FindObjectOfType<SantuarioAgua>();
+        santuario?.ActivarPortal();
+
+        Invoke(nameof(Desactivar), 0.5f);
     }
 
-    private void Desactivar()
+    void Desactivar()
     {
         gameObject.SetActive(false);
     }
