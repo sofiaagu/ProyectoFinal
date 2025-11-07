@@ -1,31 +1,27 @@
-using UnityEngine;
-using System.Collections;
+﻿using UnityEngine;
+using TMPro;
 
 public class ArbolCentral : MonoBehaviour
 {
-    private ControllerSceneLira controlador;
+    public TextMeshProUGUI mensajeUI;
+    public ParticleSystem efectoRestauracion;
 
-    void Start()
-    {
-        controlador = FindObjectOfType<ControllerSceneLira>();
-    }
+    private bool restaurado = false;
 
-    void OnMouseDown()
+    void Update()
     {
-        if (controlador.TieneTodasLasSemillas())
+        if (!restaurado && GameFlowManager.Instance != null && GameFlowManager.Instance.TieneTodasLasSemillas())
         {
-            controlador.RestaurarBosque();
-        }
-        else
-        {
-            controlador.mensajeUI.text = "A�n te faltan semillas...";
-            StartCoroutine(LimpiarMensaje());
+            restaurado = true;
+            RestaurarBosque();
         }
     }
 
-    IEnumerator LimpiarMensaje()
+    void RestaurarBosque()
     {
-        yield return new WaitForSeconds(3f); // Espera 3 segundos
-        controlador.mensajeUI.text = "";     // Limpia el texto
+        mensajeUI.text = "🌳 ¡Has restaurado el Bosque de Lira!";
+        if (efectoRestauracion != null)
+            efectoRestauracion.Play();
+        Debug.Log("✨ Bosque restaurado con las 3 semillas");
     }
 }
