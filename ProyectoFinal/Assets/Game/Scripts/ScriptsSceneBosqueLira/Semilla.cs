@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class Semilla : MonoBehaviour
 {
-    public string tipoSemilla; // "Agua", "Tierra" o "Luz"
+    public string tipoSemilla; // "Agua", "Tierra", "Luz"
     private bool recolectada = false;
 
     [Header("Efectos opcionales")]
@@ -17,11 +17,10 @@ public class Semilla : MonoBehaviour
         if (GameFlowManager.Instance != null)
             GameFlowManager.Instance.MarcarSemillaRecogida(tipoSemilla);
 
-        // Efectos visuales
         if (efectoRecoleccion != null) efectoRecoleccion.Play();
         if (sonidoRecoleccion != null) sonidoRecoleccion.Play();
 
-        // Activar el portal del santuario correspondiente
+        // Activar portel del santuario correspondiente
         SantuarioAgua santuario = FindObjectOfType<SantuarioAgua>();
         santuario?.ActivarPortel();
 

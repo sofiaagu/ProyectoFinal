@@ -27,13 +27,13 @@ public class PiedraPuzzle : MonoBehaviour
     public void Desactivar()
     {
         activa = false;
-        gameObject.SetActive(false); // 🔹 La piedra desaparece
+        gameObject.SetActive(false);
     }
 
     public void Reactivar()
     {
         activa = true;
-        gameObject.SetActive(true); // 🔹 Reaparece al reiniciar
+        gameObject.SetActive(true);
         transform.position = posicionInicial;
         transform.rotation = rotacionInicial;
     }
