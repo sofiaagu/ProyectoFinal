@@ -1,30 +1,44 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class PlayerZonaProhibida : MonoBehaviour
 {
-    private Vector3 puntoInicio;
+    [Header("🏁 Punto al que regresa el jugador")]
+    [Tooltip("Asigna aquí el objeto que marca el punto de reinicio.")]
+    public Transform puntoReinicio;
+
     private CharacterController controller;
 
     void Start()
     {
         controller = GetComponent<CharacterController>();
-        puntoInicio = transform.position; // Guarda la posici�n inicial
+
+        // Verifica que haya un punto de reinicio asignado
+        if (puntoReinicio == null)
+        {
+            Debug.LogWarning("⚠️ No se asignó un punto de reinicio al jugador.");
+        }
     }
 
     void OnControllerColliderHit(ControllerColliderHit hit)
     {
-        // Detecta si toc� un objeto con el tag "Prohibido"
         if (hit.collider.CompareTag("Prohibido"))
         {
-            Debug.Log("Zona prohibida tocada");
+            Debug.Log("🚫 Zona prohibida tocada");
 
-            // Reinicia la posici�n del jugador
-            controller.enabled = false; // Desactiva moment�neamente para evitar bugs
-            transform.position = puntoInicio;
-            controller.enabled = true;
+            if (puntoReinicio != null)
+            {
+                controller.enabled = false;
+                transform.position = puntoReinicio.position; // ✅ Teletransporte al punto marcado
+                controller.enabled = true;
 
-            // (Opcional) agrega un efecto o sonido aqu�
+                Debug.Log($"🔄 Jugador devuelto a: {puntoReinicio.position}");
+            }
+            else
+            {
+                Debug.LogWarning("⚠️ No se pudo regresar porque no hay punto de reinicio asignado.");
+            }
+
+            // (Opcional) aquí puedes reproducir un sonido o animación
         }
     }
 }
-

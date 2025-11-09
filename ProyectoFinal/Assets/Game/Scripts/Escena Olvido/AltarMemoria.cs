@@ -42,7 +42,7 @@ public class AltarMemoria : MonoBehaviour
     {
         if (palabras.Count != ordenCorrecto.Count)
         {
-            Debug.Log("❌ Faltan palabras.");
+            Debug.Log("Faltan palabras.");
             return;
         }
 
