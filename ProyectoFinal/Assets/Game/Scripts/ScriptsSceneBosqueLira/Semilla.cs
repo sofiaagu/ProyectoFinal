@@ -1,12 +1,16 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Semilla : MonoBehaviour
 {
+    [Header("Configuración de la Semilla")]
     public string tipoSemilla; // "Agua", "Tierra", "Luz"
     private bool recolectada = false;
 
-    [Header("Efectos opcionales")]
+    [Header("Efectos al recolectar")]
     public ParticleSystem efectoRecoleccion;
+    public ParticleSystem particulaExtra1;
+    public ParticleSystem particulaExtra2;
+    public ParticleSystem particulaExtra3;
     public AudioSource sonidoRecoleccion;
 
     void OnMouseDown()
@@ -14,20 +18,59 @@ public class Semilla : MonoBehaviour
         if (recolectada) return;
         recolectada = true;
 
+        Debug.Log($"🌱 Semilla de {tipoSemilla} recogida");
+
+        // ✅ 1. Marcar semilla globalmente
         if (GameFlowManager.Instance != null)
             GameFlowManager.Instance.MarcarSemillaRecogida(tipoSemilla);
 
-        if (efectoRecoleccion != null) efectoRecoleccion.Play();
-        if (sonidoRecoleccion != null) sonidoRecoleccion.Play();
+        // ✅ 2. Mostrar mensaje y actualizar contador
+        ControllerSceneLira controller = FindObjectOfType<ControllerSceneLira>();
+        if (controller != null)
+        {
+            controller.RecogerSemilla(); // Actualiza texto y contador
+            controller.MostrarMensaje($"Sigue el camino de luz para usar el Portal");
+        }
 
-        // Activar portel del santuario correspondiente
-        SantuarioAgua santuario = FindObjectOfType<SantuarioAgua>();
-        santuario?.ActivarPortel();
+        // ✅ 3. Reproducir efectos
+        ReproducirEfectos();
 
-        Invoke(nameof(Desactivar), 0.5f);
+        // ✅ 4. Activar portal del santuario correspondiente
+        if (tipoSemilla == "Agua")
+        {
+            SantuarioAgua santuarioAgua = FindObjectOfType<SantuarioAgua>();
+            if (santuarioAgua != null)
+                santuarioAgua.ActivarPortel();
+        }
+
+        // ✅ 5. Desactivar semilla después del efecto
+        Invoke(nameof(Desactivar), 0.2f);
     }
 
-    void Desactivar()
+    private void ReproducirEfectos()
+    {
+        ActivarYReproducir(efectoRecoleccion);
+        ActivarYReproducir(particulaExtra1);
+        ActivarYReproducir(particulaExtra2);
+        ActivarYReproducir(particulaExtra3);
+
+        if (sonidoRecoleccion != null)
+        {
+            sonidoRecoleccion.gameObject.SetActive(true);
+            sonidoRecoleccion.Play();
+        }
+    }
+
+    private void ActivarYReproducir(ParticleSystem ps)
+    {
+        if (ps != null)
+        {
+            ps.gameObject.SetActive(true);
+            ps.Play();
+        }
+    }
+
+    private void Desactivar()
     {
         gameObject.SetActive(false);
     }
