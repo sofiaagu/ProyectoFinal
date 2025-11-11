@@ -1,5 +1,4 @@
 ﻿using TMPro;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 public class ControllerSceneLira : MonoBehaviour
@@ -24,14 +23,20 @@ public class ControllerSceneLira : MonoBehaviour
     {
         textoSemillas.text = "Semillas recolectadas: 0/" + semillasTotales;
         mensajeUI.text = "";
+
+        // 🌿 Mensaje inicial
+        MostrarMensaje("Bienvenido al Santuario de Agua. \n\n Haz clic en las gemas en el orden correcto para activar la semilla del santuario.", 6f);
     }
 
+    // 🔹 Llamado por Semilla al ser recogida
     public void RecogerSemilla()
     {
         semillasRecolectadas++;
-        textoSemillas.text = "Semillas recolectadas: " + semillasRecolectadas + "/" + semillasTotales;
+        textoSemillas.text = $"Semillas recolectadas: {semillasRecolectadas}/{semillasTotales}";
 
-        // Si se recolectaron todas las semillas, activar el portal
+        // Mensaje informativo
+        MostrarMensaje($"🌱 Has recolectado una semilla ({semillasRecolectadas}/{semillasTotales})", 3f);
+
         if (TieneTodasLasSemillas())
         {
             ActivarPortel();
@@ -43,7 +48,7 @@ public class ControllerSceneLira : MonoBehaviour
         if (portal != null && !portal.activeSelf)
         {
             portal.SetActive(true);
-            mensajeUI.text = "🌌 ¡El portal del bosque ha aparecido!";
+            MostrarMensaje("🌌 ¡El portal del bosque ha aparecido!", 3f);
             Debug.Log("Portal activado");
         }
     }
@@ -58,7 +63,7 @@ public class ControllerSceneLira : MonoBehaviour
         if (bosqueRestaurado) return;
 
         bosqueRestaurado = true;
-        mensajeUI.text = "¡Has restaurado el Bosque de Lira!";
+        MostrarMensaje("✨ ¡Has restaurado el Bosque de Lira! 🌿", 3f);
 
         if (efectoRestauracion != null) efectoRestauracion.Play();
 
@@ -76,7 +81,7 @@ public class ControllerSceneLira : MonoBehaviour
         RenderSettings.fog = false;
     }
 
-    public void MostrarMensaje(string texto, float duracion = 3f)
+    public void MostrarMensaje(string texto, float duracion = 2f)
     {
         if (mensajeUI == null) return;
         StopAllCoroutines();
@@ -89,5 +94,4 @@ public class ControllerSceneLira : MonoBehaviour
         yield return new WaitForSeconds(duracion);
         mensajeUI.text = "";
     }
-
 }

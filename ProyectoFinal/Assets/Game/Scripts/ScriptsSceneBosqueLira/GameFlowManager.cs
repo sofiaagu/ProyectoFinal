@@ -31,7 +31,7 @@ public class GameFlowManager : MonoBehaviour
             case "Luz": semillaLuzRecogida = true; break;
         }
 
-        Debug.Log($"🌱 Semilla {tipo} recogida");
+        Debug.Log($" Semilla {tipo} recogida");
     }
 
     public bool TieneTodasLasSemillas()

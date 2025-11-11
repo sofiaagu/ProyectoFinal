@@ -48,7 +48,7 @@ public class SantuarioAgua : MonoBehaviour
         {
             piedra.Desactivar();
             indiceActual++;
-            controller.MostrarMensaje("Piedra correcta");
+            controller.MostrarMensaje("Orden correcto");
 
             if (indiceActual >= ordenCorrecto.Length)
                 Completado();
@@ -74,7 +74,7 @@ public class SantuarioAgua : MonoBehaviour
     private void Completado()
     {
         completado = true;
-        controller.MostrarMensaje("¡Puzzle completado! La semilla de agua ha aparecido.");
+        controller.MostrarMensaje("¡Puzzle completado! \n Recolecta la semilla de agua.", 3f);
 
         if (efectoAparicion != null)
             efectoAparicion.Play();

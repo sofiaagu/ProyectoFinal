@@ -7,47 +7,70 @@ public class Semilla : MonoBehaviour
     private bool recolectada = false;
 
     [Header("Efectos al recolectar")]
-    public ParticleSystem efectoRecoleccion;  // 🌟 Efecto principal
-    public ParticleSystem particulaExtra1;    // ✨ Partícula extra 1
-    public ParticleSystem particulaExtra2;    // 💫 Partícula extra 2
-    public ParticleSystem particulaExtra3;    // 🌈 Partícula extra 3
-    public AudioSource sonidoRecoleccion;     // 🔊 Sonido opcional
+    public ParticleSystem efectoRecoleccion;
+    public ParticleSystem particulaExtra1;
+    public ParticleSystem particulaExtra2;
+    public ParticleSystem particulaExtra3;
+    public AudioSource sonidoRecoleccion;
 
     void OnMouseDown()
     {
         if (recolectada) return;
         recolectada = true;
 
-        // 🌱 Marcar semilla como recogida globalmente
+        Debug.Log($"🌱 Semilla de {tipoSemilla} recogida");
+
+        // ✅ 1. Marcar semilla globalmente
         if (GameFlowManager.Instance != null)
             GameFlowManager.Instance.MarcarSemillaRecogida(tipoSemilla);
 
-        // 🎇 Activar partículas
-        if (efectoRecoleccion != null)
-            efectoRecoleccion.Play();
+        // ✅ 2. Mostrar mensaje y actualizar contador
+        ControllerSceneLira controller = FindObjectOfType<ControllerSceneLira>();
+        if (controller != null)
+        {
+            controller.RecogerSemilla(); // Actualiza texto y contador
+            controller.MostrarMensaje($"Sigue el camino de luz para usar el Portal");
+        }
 
-        if (particulaExtra1 != null)
-            particulaExtra1.Play();
+        // ✅ 3. Reproducir efectos
+        ReproducirEfectos();
 
-        if (particulaExtra2 != null)
-            particulaExtra2.Play();
+        // ✅ 4. Activar portal del santuario correspondiente
+        if (tipoSemilla == "Agua")
+        {
+            SantuarioAgua santuarioAgua = FindObjectOfType<SantuarioAgua>();
+            if (santuarioAgua != null)
+                santuarioAgua.ActivarPortel();
+        }
 
-        if (particulaExtra3 != null)
-            particulaExtra3.Play();
-
-        // 🔊 Sonido (opcional)
-        if (sonidoRecoleccion != null)
-            sonidoRecoleccion.Play();
-
-        // 🌀 Activar portal del santuario correspondiente
-        SantuarioAgua santuario = FindObjectOfType<SantuarioAgua>();
-        santuario?.ActivarPortel();
-
-        // 🕐 Esperar un poco antes de desactivar la semilla
-        Invoke(nameof(Desactivar), 1.2f);
+        // ✅ 5. Desactivar semilla después del efecto
+        Invoke(nameof(Desactivar), 0.2f);
     }
 
-    void Desactivar()
+    private void ReproducirEfectos()
+    {
+        ActivarYReproducir(efectoRecoleccion);
+        ActivarYReproducir(particulaExtra1);
+        ActivarYReproducir(particulaExtra2);
+        ActivarYReproducir(particulaExtra3);
+
+        if (sonidoRecoleccion != null)
+        {
+            sonidoRecoleccion.gameObject.SetActive(true);
+            sonidoRecoleccion.Play();
+        }
+    }
+
+    private void ActivarYReproducir(ParticleSystem ps)
+    {
+        if (ps != null)
+        {
+            ps.gameObject.SetActive(true);
+            ps.Play();
+        }
+    }
+
+    private void Desactivar()
     {
         gameObject.SetActive(false);
     }
