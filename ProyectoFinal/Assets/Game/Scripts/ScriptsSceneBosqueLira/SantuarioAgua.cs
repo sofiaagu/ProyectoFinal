@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class SantuarioAgua : MonoBehaviour
 {
@@ -12,8 +11,10 @@ public class SantuarioAgua : MonoBehaviour
     public GameObject prefabDesaparecer;    // 🔹 Prefab que se desactiva
     public GameObject prefabAparecer;       // 🔹 Prefab que se activa
 
-    [Header("Efectos adicionales")]
-    public ParticleSystem particulasDesaparecer; // 💨 Efecto que debe apagarse al completar el puzzle
+    [Header("Efectos de partículas")]
+    public ParticleSystem particulasDesaparecer; // 💨 Efecto que se apaga al completar el puzzle
+    public ParticleSystem particulaExtra1;       // 💧 Primer efecto adicional
+    public ParticleSystem particulaExtra2;       // 💧 Segundo efecto adicional
 
     [Header("Configuración del puzzle")]
     public int[] ordenCorrecto = { 1, 3, 2 };
@@ -21,9 +22,12 @@ public class SantuarioAgua : MonoBehaviour
     private bool completado = false;
 
     private PiedraPuzzle[] todasLasPiedras;
+    private ControllerSceneLira controller;
 
     void Start()
     {
+        controller = FindObjectOfType<ControllerSceneLira>();
+
         if (semillaAgua != null)
             semillaAgua.SetActive(false);
 
@@ -44,6 +48,7 @@ public class SantuarioAgua : MonoBehaviour
         {
             piedra.Desactivar();
             indiceActual++;
+            controller.MostrarMensaje("Piedra correcta");
 
             if (indiceActual >= ordenCorrecto.Length)
                 Completado();
@@ -57,18 +62,19 @@ public class SantuarioAgua : MonoBehaviour
     private void ReiniciarPuzzle()
     {
         indiceActual = 0;
-
         foreach (var piedra in todasLasPiedras)
         {
             if (piedra != null)
                 piedra.Reactivar();
         }
+
+        controller.MostrarMensaje("Secuencia incorrecta. Intenta de nuevo.");
     }
 
     private void Completado()
     {
         completado = true;
-        Debug.Log("🌊 ¡Puzzle completado! Aparece la semilla...");
+        controller.MostrarMensaje("¡Puzzle completado! La semilla de agua ha aparecido.");
 
         if (efectoAparicion != null)
             efectoAparicion.Play();
@@ -76,18 +82,30 @@ public class SantuarioAgua : MonoBehaviour
         if (semillaAgua != null)
             semillaAgua.SetActive(true);
 
-        // 🔹 Cambiar prefabs
         if (prefabDesaparecer != null)
             prefabDesaparecer.SetActive(false);
 
         if (prefabAparecer != null)
             prefabAparecer.SetActive(true);
 
-        // 💨 Desactivar partículas
+        // 💨 Desactivar partículas principales
         if (particulasDesaparecer != null)
         {
             particulasDesaparecer.Stop();
             particulasDesaparecer.gameObject.SetActive(false);
+        }
+
+        // 💧 Desactivar partículas adicionales
+        if (particulaExtra1 != null)
+        {
+            particulaExtra1.Stop();
+            particulaExtra1.gameObject.SetActive(false);
+        }
+
+        if (particulaExtra2 != null)
+        {
+            particulaExtra2.Stop();
+            particulaExtra2.gameObject.SetActive(false);
         }
     }
 
@@ -97,7 +115,7 @@ public class SantuarioAgua : MonoBehaviour
         if (portelAgua != null)
         {
             portelAgua.SetActive(true);
-            Debug.Log("🌀 Portel del agua activado");
+            Debug.Log("Portel de agua activado");
         }
     }
 }

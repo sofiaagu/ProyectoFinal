@@ -75,4 +75,19 @@ public class ControllerSceneLira : MonoBehaviour
 
         RenderSettings.fog = false;
     }
+
+    public void MostrarMensaje(string texto, float duracion = 3f)
+    {
+        if (mensajeUI == null) return;
+        StopAllCoroutines();
+        StartCoroutine(MostrarMensajeTemporal(texto, duracion));
+    }
+
+    private System.Collections.IEnumerator MostrarMensajeTemporal(string texto, float duracion)
+    {
+        mensajeUI.text = texto;
+        yield return new WaitForSeconds(duracion);
+        mensajeUI.text = "";
+    }
+
 }
