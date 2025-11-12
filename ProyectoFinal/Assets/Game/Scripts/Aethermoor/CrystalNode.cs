@@ -31,7 +31,16 @@ public class CristalNode : MonoBehaviour
 
     void Start()
     {
-        materialCristal = GetComponent<Renderer>().material;
+        // Buscar el renderer en este objeto o en sus hijos
+        Renderer renderer = GetComponent<Renderer>();
+        if (renderer == null)
+            renderer = GetComponentInChildren<Renderer>();
+
+        if (renderer != null)
+        {
+            materialCristal = renderer.material;
+        }
+
         posicionInicial = transform.position;
 
         // Configurar estado inicial
@@ -81,22 +90,30 @@ public class CristalNode : MonoBehaviour
 
         if (Physics.Raycast(ray, out hit))
         {
-            if (hit.transform == transform)
+            if (hit.transform == transform || hit.transform.IsChildOf(transform))
             {
                 // Verificar si el jugador tiene la habilidad
                 GameObject player = GameObject.FindGameObjectWithTag("Player");
                 if (player != null)
                 {
                     PlayerAbilities abilities = player.GetComponent<PlayerAbilities>();
+                    // Comentar temporalmente para testing
                     if (abilities != null && abilities.tieneLuminiscencia)
                     {
-                        // Invocar evento para que el manager lo procese
                         OnCristalClickado?.Invoke();
                     }
                     else
                     {
                         Debug.Log("Necesitas la habilidad de Luminiscencia");
+                        // Para testing, puedes descomentar la siguiente línea:
+                        // OnCristalClickado?.Invoke();
                     }
+                }
+                else
+                {
+                    // Si no hay jugador, activar de todos modos (para testing)
+                    Debug.LogWarning("No se encontró jugador con tag 'Player'. Activando cristal de todos modos.");
+                    OnCristalClickado?.Invoke();
                 }
             }
         }
@@ -154,7 +171,7 @@ public class CristalNode : MonoBehaviour
     /// <summary>
     /// Activa el cristal permanentemente (cuando el jugador lo hace bien)
     /// </summary>
-    public void ActivarPermanente()
+    public void ActivarPermanente(Transform destinoLinea = null)
     {
         if (activado) return;
 
@@ -172,12 +189,14 @@ public class CristalNode : MonoBehaviour
             puenteAsociado.SetActive(true);
         }
 
-        // Activar línea de energía
-        if (lineRenderer != null && puntoDestino != null)
+        // Activar línea de energía hacia el puente
+        Transform destino = destinoLinea != null ? destinoLinea : puntoDestino;
+
+        if (lineRenderer != null && destino != null)
         {
             lineRenderer.enabled = true;
             lineRenderer.SetPosition(0, transform.position);
-            lineRenderer.SetPosition(1, puntoDestino.position);
+            lineRenderer.SetPosition(1, destino.position);
             lineRenderer.startColor = colorActivo;
             lineRenderer.endColor = colorActivo;
 
