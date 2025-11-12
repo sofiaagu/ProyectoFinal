@@ -22,8 +22,9 @@ public class CrystalSequenceManager : MonoBehaviour
     [Tooltip("Distancia mínima para poder ver las pistas")]
     public float rangoProximidad = 5f;
 
-    [Header("Puente Final")]
-    public GameObject puenteFinal;
+    [Header("Puentes")]
+    [Tooltip("Puentes que se activan progresivamente (uno por cada cristal correcto)")]
+    public GameObject[] puentes;
 
     [Header("UI")]
     public GameObject textoPresionaE;
@@ -54,23 +55,27 @@ public class CrystalSequenceManager : MonoBehaviour
         if (audioSource == null)
             audioSource = gameObject.AddComponent<AudioSource>();
 
-        if (puenteFinal != null)
-            puenteFinal.SetActive(false);
+        // Desactivar todos los puentes al inicio
+        if (puentes != null)
+        {
+            foreach (GameObject puente in puentes)
+            {
+                if (puente != null)
+                    puente.SetActive(false);
+            }
+        }
 
         if (textoPresionaE != null)
             textoPresionaE.SetActive(false);
 
-        // Generar secuencia aleatoria
         GenerarSecuenciaAleatoria();
 
-        // Suscribir eventos de cristales interactuables
         for (int i = 0; i < cristalesInteractuables.Length; i++)
         {
-            int index = i; // Capturar índice para el closure
+            int index = i;
             cristalesInteractuables[i].OnCristalClickado += () => OnCristalActivado(index);
         }
 
-        // Encontrar al jugador
         GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
         if (playerObj != null)
             jugador = playerObj.transform;
@@ -78,12 +83,8 @@ public class CrystalSequenceManager : MonoBehaviour
         ActualizarTextoSecuencia();
     }
 
-    /// <summary>
-    /// Genera una secuencia aleatoria única para este juego
-    /// </summary>
     void GenerarSecuenciaAleatoria()
     {
-        // Crear lista con todos los índices disponibles
         List<int> indices = new List<int>();
         int cantidadCristales = Mathf.Min(cristalesPista.Length, cristalesInteractuables.Length);
 
@@ -92,16 +93,14 @@ public class CrystalSequenceManager : MonoBehaviour
             indices.Add(i);
         }
 
-        // Mezclar la lista usando algoritmo Fisher-Yates
         secuenciaCorrecta = MezclarLista(indices);
 
-        // Debug: Mostrar secuencia generada
         if (mostrarSecuenciaEnConsola)
         {
             string secuenciaTexto = "Secuencia generada: ";
             for (int i = 0; i < secuenciaCorrecta.Count; i++)
             {
-                secuenciaTexto += (secuenciaCorrecta[i] + 1); // +1 para mostrar 1-5 en vez de 0-4
+                secuenciaTexto += (secuenciaCorrecta[i] + 1);
                 if (i < secuenciaCorrecta.Count - 1)
                     secuenciaTexto += " → ";
             }
@@ -109,9 +108,6 @@ public class CrystalSequenceManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Mezcla una lista usando el algoritmo Fisher-Yates
-    /// </summary>
     List<int> MezclarLista(List<int> lista)
     {
         List<int> listaMezclada = new List<int>(lista);
@@ -120,7 +116,6 @@ public class CrystalSequenceManager : MonoBehaviour
         for (int i = n - 1; i > 0; i--)
         {
             int j = Random.Range(0, i + 1);
-            // Intercambiar
             int temp = listaMezclada[i];
             listaMezclada[i] = listaMezclada[j];
             listaMezclada[j] = temp;
@@ -133,7 +128,6 @@ public class CrystalSequenceManager : MonoBehaviour
     {
         if (puzzleCompletado || mostrandoPista) return;
 
-        // Verificar proximidad del jugador
         if (jugador != null)
         {
             float distancia = Vector3.Distance(transform.position, jugador.position);
@@ -155,7 +149,6 @@ public class CrystalSequenceManager : MonoBehaviour
             }
         }
 
-        // Input para mostrar pista (solo si está en rango)
         if (jugadorEnRango && Input.GetKeyDown(teclaPista))
         {
             StartCoroutine(MostrarPistaSecuencia());
@@ -171,11 +164,9 @@ public class CrystalSequenceManager : MonoBehaviour
         if (textoPresionaE != null)
             textoPresionaE.SetActive(false);
 
-        // Reproducir sonido de pista
         if (sonidoPista != null)
             audioSource.PlayOneShot(sonidoPista);
 
-        // Mostrar la secuencia hasta el paso actual + 1
         int pistasAMostrar = Mathf.Min(pasoActual + 1, secuenciaCorrecta.Count);
 
         for (int i = 0; i < pistasAMostrar; i++)
@@ -184,7 +175,6 @@ public class CrystalSequenceManager : MonoBehaviour
 
             if (indiceCristal < cristalesPista.Length)
             {
-                // Encender cristal de pista temporalmente
                 cristalesPista[indiceCristal].MostrarPista(tiempoPorCristal);
                 yield return new WaitForSeconds(tiempoPorCristal + 0.3f);
             }
@@ -192,7 +182,6 @@ public class CrystalSequenceManager : MonoBehaviour
 
         mostrandoPista = false;
 
-        // Mostrar texto de nuevo si está en rango
         if (jugadorEnRango && textoPresionaE != null)
         {
             textoPresionaE.SetActive(true);
@@ -203,22 +192,25 @@ public class CrystalSequenceManager : MonoBehaviour
     {
         if (puzzleCompletado) return;
 
-        // Verificar si es el cristal correcto en la secuencia
         if (indiceCristal == secuenciaCorrecta[pasoActual])
         {
-            // ¡Correcto!
             secuenciaJugador.Add(indiceCristal);
             cristalesInteractuables[indiceCristal].ActivarPermanente();
 
             if (sonidoCorrecto != null)
                 audioSource.PlayOneShot(sonidoCorrecto);
 
+            // Activar puente correspondiente
+            if (puentes != null && pasoActual < puentes.Length && puentes[pasoActual] != null)
+            {
+                puentes[pasoActual].SetActive(true);
+            }
+
             pasoActual++;
             ActualizarTextoSecuencia();
 
             Debug.Log($"¡Correcto! Cristal {indiceCristal + 1} activado. Paso {pasoActual}/{secuenciaCorrecta.Count}");
 
-            // Verificar si completó la secuencia
             if (pasoActual >= secuenciaCorrecta.Count)
             {
                 CompletarPuzzle();
@@ -226,7 +218,6 @@ public class CrystalSequenceManager : MonoBehaviour
         }
         else
         {
-            // ¡Error! Reiniciar secuencia
             if (sonidoError != null)
                 audioSource.PlayOneShot(sonidoError);
 
@@ -240,10 +231,19 @@ public class CrystalSequenceManager : MonoBehaviour
     {
         Debug.Log("¡Secuencia incorrecta! Reiniciando...");
 
-        // Desactivar todos los cristales interactuables
         foreach (var cristal in cristalesInteractuables)
         {
             cristal.Desactivar();
+        }
+
+        // Desactivar todos los puentes
+        if (puentes != null)
+        {
+            foreach (GameObject puente in puentes)
+            {
+                if (puente != null)
+                    puente.SetActive(false);
+            }
         }
 
         secuenciaJugador.Clear();
@@ -255,25 +255,27 @@ public class CrystalSequenceManager : MonoBehaviour
     {
         puzzleCompletado = true;
 
-        Debug.Log("¡Puzzle completado! Puente activado.");
+        Debug.Log("¡Puzzle completado! Todos los puentes activados.");
 
         if (sonidoCompletado != null)
             audioSource.PlayOneShot(sonidoCompletado);
 
-        // Activar puente final
-        if (puenteFinal != null)
+        // Asegurar que todos los puentes estén activos
+        if (puentes != null)
         {
-            puenteFinal.SetActive(true);
+            foreach (GameObject puente in puentes)
+            {
+                if (puente != null)
+                    puente.SetActive(true);
+            }
         }
 
-        // Ocultar UI
         if (textoPresionaE != null)
             textoPresionaE.SetActive(false);
 
         if (textoSecuencia != null)
             textoSecuencia.text = "¡COMPLETADO!";
 
-        // Efecto visual en todos los cristales
         StartCoroutine(EfectoCompletado());
     }
 
@@ -298,11 +300,9 @@ public class CrystalSequenceManager : MonoBehaviour
 
     void OnDrawGizmosSelected()
     {
-        // Dibujar rango de proximidad
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, rangoProximidad);
 
-        // Mostrar conexiones con cristales de pista
         if (cristalesPista != null)
         {
             Gizmos.color = Color.cyan;
