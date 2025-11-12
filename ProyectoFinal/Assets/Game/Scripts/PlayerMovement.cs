@@ -1,115 +1,82 @@
-﻿using UnityEngine;
-using UnityEngine.InputSystem;
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 
-[RequireComponent(typeof(CharacterController))]
 public class PlayerMovement : MonoBehaviour
 {
-    [Header("Movimiento")]
-    [SerializeField] private float moveSpeed = 5f;
-    [SerializeField] private float gravity = -20f;
-    [SerializeField] private float jumpHeight = 2f;
-
-    [Header("Cámara")]
-    [SerializeField] private Transform cameraPivot; // Punto donde está la cámara (hijo del player)
-    [SerializeField] private float mouseSensitivity = 2f;
-    [SerializeField] private float verticalClamp = 80f;
+    public float velocidadMovimiento = 5.0f;
+    public float velocidadRotacion = 200.0f;
+    public float fuerzaSalto = 8.0f;
+    public float gravedad = 20.0f;
 
     private CharacterController controller;
-    private Vector2 moveInput;
-    private Vector2 lookInput;
-    private Vector3 velocity;
-    private float xRotation = 0f;
-    private bool jumpPressed;
-    private bool isGrounded;
-    private bool rightClickHeld = false;
+    private Animator anim;
 
-    private void Awake()
+    private Vector3 movimiento;
+    private float x, y;
+    private bool puedoSaltar = false;
+    private bool estaCayendo = false;
+
+    void Start()
     {
         controller = GetComponent<CharacterController>();
-
-        // Cursor libre al inicio (puedes cambiarlo si quieres que empiece bloqueado)
-        Cursor.lockState = CursorLockMode.None;
-        Cursor.visible = true;
+        anim = GetComponent<Animator>();
     }
 
-    // --- INPUT SYSTEM ---
-    public void OnMove(InputAction.CallbackContext ctx)
+    void Update()
     {
-        moveInput = ctx.ReadValue<Vector2>();
-    }
+        x = Input.GetAxis("Horizontal");
+        y = Input.GetAxis("Vertical");
 
-    public void OnLook(InputAction.CallbackContext ctx)
-    {
-        lookInput = ctx.ReadValue<Vector2>();
-    }
+        anim.SetFloat("VelX", x);
+        anim.SetFloat("VelY", y);
 
-    public void OnJump(InputAction.CallbackContext ctx)
-    {
-        if (ctx.performed)
-            jumpPressed = true;
-    }
+        transform.Rotate(0, x * Time.deltaTime * velocidadRotacion, 0);
 
-    // 🔹 Nuevo: se llama desde la acción "RightClick"
-    public void OnRightClick(InputAction.CallbackContext ctx)
-    {
-        if (ctx.performed)
+        Vector3 direccion = transform.forward * y * velocidadMovimiento;
+        movimiento.x = direccion.x;
+        movimiento.z = direccion.z;
+
+        if (puedoSaltar)
         {
-            rightClickHeld = true;
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                movimiento.y = fuerzaSalto;
+                anim.SetBool("salte", true);
+                anim.SetBool("tocoSuelo", false);
+                puedoSaltar = false;
+            }
         }
-        else if (ctx.canceled)
+        else
         {
-            rightClickHeld = false;
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
+            EstoyCayendo();
         }
+
+        // Aplicar gravedad
+        movimiento.y -= gravedad * Time.deltaTime;
+
+        controller.Move(movimiento * Time.deltaTime);
     }
 
-    private void Update()
+    public void EstoyCayendo()
     {
-        HandleMovement();
-
-        // Solo mirar mientras el clic derecho esté presionado
-        if (rightClickHeld)
-            HandleLook();
-    }
-
-    private void HandleMovement()
-    {
-        isGrounded = controller.isGrounded;
-
-        // Movimiento horizontal relativo a la cámara
-        Vector3 move = transform.right * moveInput.x + transform.forward * moveInput.y;
-        controller.Move(move * moveSpeed * Time.deltaTime);
-
-        // Salto
-        if (isGrounded && jumpPressed)
+        // Cambia animaciones al caer
+        if (!estaCayendo)
         {
-            velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+            estaCayendo = true;
+            anim.SetBool("tocoSuelo", false);
+            anim.SetBool("salte", false);
         }
-        jumpPressed = false;
-
-        // Gravedad
-        if (!isGrounded)
-            velocity.y += gravity * Time.deltaTime;
-        else if (velocity.y < 0)
-            velocity.y = -2f;
-
-        controller.Move(velocity * Time.deltaTime);
     }
 
-    private void HandleLook()
+    private void OnControllerColliderHit(ControllerColliderHit hit)
     {
-        float mouseX = lookInput.x * mouseSensitivity;
-        float mouseY = lookInput.y * mouseSensitivity;
-
-        // Rotación vertical de la cámara (eje X)
-        xRotation -= mouseY;
-        xRotation = Mathf.Clamp(xRotation, -verticalClamp, verticalClamp);
-        cameraPivot.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
-
-        // Rotación horizontal del jugador (eje Y)
-        transform.Rotate(Vector3.up * mouseX);
+        if (hit.collider.CompareTag("Ground"))
+        {
+            puedoSaltar = true;
+            estaCayendo = false;
+            anim.SetBool("tocoSuelo", true);
+            anim.SetBool("salte", false);
+        }
     }
 }
