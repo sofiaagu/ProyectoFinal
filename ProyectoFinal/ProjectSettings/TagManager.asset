@@ -8,6 +8,7 @@ TagManager:
   - Fragmento
   - Prohibido
   - Enemy
+  - arma
   layers:
   - Default
   - TransparentFX
