@@ -56,6 +56,11 @@ public class PlayerMovement : MonoBehaviour
         movimiento.y -= gravedad * Time.deltaTime;
 
         controller.Move(movimiento * Time.deltaTime);
+
+        if (Input.GetKeyDown(KeyCode.J))
+        {
+            anim.SetTrigger("attack");
+        }
     }
 
     public void EstoyCayendo()
