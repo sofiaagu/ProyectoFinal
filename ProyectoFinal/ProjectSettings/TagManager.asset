@@ -9,6 +9,7 @@ TagManager:
   - Prohibido
   - Enemy
   - arma
+  - TextoVidas
   layers:
   - Default
   - TransparentFX
