@@ -16809,7 +16809,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 77a87d279c6023042aa3670d66e01644, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerTarget: {fileID: 0}
+  playerTarget: {fileID: 1780683798}
 --- !u!195 &974637043
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -26018,7 +26018,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 3998566506539321637, guid: cc2e49a80815a4e4f917f1759ba4542b, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.8
+      value: 1.6
       objectReference: {fileID: 0}
     - target: {fileID: 3998566506539321637, guid: cc2e49a80815a4e4f917f1759ba4542b, type: 3}
       propertyPath: m_LocalScale.y
@@ -26070,7 +26070,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3998566506539321637, guid: cc2e49a80815a4e4f917f1759ba4542b, type: 3}
       propertyPath: m_ConstrainProportionsScale
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4338676877317985183, guid: cc2e49a80815a4e4f917f1759ba4542b, type: 3}
       propertyPath: m_Name
@@ -31340,9 +31340,9 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 826697504}
   - {fileID: 466336258}
   - {fileID: 802683203}
+  - {fileID: 826697504}
   - {fileID: 768947955}
   - {fileID: 1995151759}
   - {fileID: 1176389320}
