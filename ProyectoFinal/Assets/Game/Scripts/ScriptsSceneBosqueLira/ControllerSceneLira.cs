@@ -35,7 +35,7 @@ public class ControllerSceneLira : MonoBehaviour
         textoSemillas.text = $"Semillas recolectadas: {semillasRecolectadas}/{semillasTotales}";
 
         // Mensaje informativo
-        MostrarMensaje($"🌱 Has recolectado una semilla ({semillasRecolectadas}/{semillasTotales})", 3f);
+        MostrarMensaje($"Has recolectado una semilla ({semillasRecolectadas}/{semillasTotales})", 3f);
 
         if (TieneTodasLasSemillas())
         {
@@ -48,7 +48,7 @@ public class ControllerSceneLira : MonoBehaviour
         if (portal != null && !portal.activeSelf)
         {
             portal.SetActive(true);
-            MostrarMensaje("🌌 ¡El portal del bosque ha aparecido!", 3f);
+            MostrarMensaje("¡El portal del bosque ha aparecido!", 3f);
             Debug.Log("Portal activado");
         }
     }
