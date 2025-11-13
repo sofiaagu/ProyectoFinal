@@ -36,6 +36,10 @@ public class CrystalSequenceManager : MonoBehaviour
     public AudioClip sonidoError;
     public AudioClip sonidoCompletado;
 
+    [Header("Sistema de Feedback")]
+    [Tooltip("Sistema mejorado de feedback visual y auditivo")]
+    public CrystalFeedbackSystem feedbackSystem;
+
     [Header("Debug")]
     [Tooltip("Muestra la secuencia generada en consola al iniciar")]
     public bool mostrarSecuenciaEnConsola = true;
@@ -74,12 +78,14 @@ public class CrystalSequenceManager : MonoBehaviour
 
         GenerarSecuenciaAleatoria();
 
+        // Suscribir eventos de cristales
         for (int i = 0; i < cristalesInteractuables.Length; i++)
         {
             int index = i;
             cristalesInteractuables[i].OnCristalClickado += () => OnCristalActivado(index);
         }
 
+        // Encontrar al jugador
         GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
         if (playerObj != null)
             jugador = playerObj.transform;
@@ -205,18 +211,38 @@ public class CrystalSequenceManager : MonoBehaviour
         {
             secuenciaJugador.Add(indiceCristal);
 
-            // Activar puente correspondiente y conectar línea
+            // === CEREMONIA DE ACTIVACIÓN MEJORADA ===
             Transform puenteDestino = null;
+            GameObject puenteObj = null;
+
             if (puentes != null && pasoActual < puentes.Length && puentes[pasoActual] != null)
             {
-                puentes[pasoActual].SetActive(true);
-                puenteDestino = puentes[pasoActual].transform;
+                puenteObj = puentes[pasoActual];
+                puenteDestino = puenteObj.transform;
             }
 
+            // Activar cristal (prepara el LineRenderer y configuración básica)
             cristalesInteractuables[indiceCristal].ActivarPermanente(puenteDestino);
 
-            if (sonidoCorrecto != null)
-                audioSource.PlayOneShot(sonidoCorrecto);
+            // INICIAR CEREMONIA (esto maneja todos los efectos visuales épicos)
+            if (feedbackSystem != null)
+            {
+                StartCoroutine(feedbackSystem.CeremoniaActivacionCristal(
+                    cristalesInteractuables[indiceCristal],
+                    puenteObj,
+                    pasoActual
+                ));
+            }
+            else
+            {
+                // Fallback: comportamiento original si no hay feedback system
+                if (sonidoCorrecto != null)
+                    audioSource.PlayOneShot(sonidoCorrecto);
+
+                // Activar puente manualmente
+                if (puenteObj != null)
+                    puenteObj.SetActive(true);
+            }
 
             pasoActual++;
             ActualizarTextoSecuencia();
@@ -230,6 +256,7 @@ public class CrystalSequenceManager : MonoBehaviour
         }
         else
         {
+            // Error: cristal incorrecto
             if (sonidoError != null)
                 audioSource.PlayOneShot(sonidoError);
 
@@ -243,6 +270,20 @@ public class CrystalSequenceManager : MonoBehaviour
     {
         Debug.Log("¡Secuencia incorrecta! Reiniciando...");
 
+        // Efecto visual de error mejorado
+        if (feedbackSystem != null)
+        {
+            // Los cristales pierden brillo temporalmente
+            foreach (var cristal in cristalesInteractuables)
+            {
+                if (cristal.luzCristal != null)
+                {
+                    StartCoroutine(ReducirBrilloTemporal(cristal.luzCristal));
+                }
+            }
+        }
+
+        // Desactivar todos los cristales
         foreach (var cristal in cristalesInteractuables)
         {
             cristal.Desactivar();
@@ -263,23 +304,61 @@ public class CrystalSequenceManager : MonoBehaviour
         ActualizarTextoSecuencia();
     }
 
+    IEnumerator ReducirBrilloTemporal(Light luz)
+    {
+        float intensidadOriginal = luz.intensity;
+        float tiempo = 0f;
+        float duracion = 0.5f;
+
+        // Reducir a 30%
+        while (tiempo < duracion)
+        {
+            tiempo += Time.deltaTime;
+            luz.intensity = Mathf.Lerp(intensidadOriginal, intensidadOriginal * 0.3f, tiempo / duracion);
+            yield return null;
+        }
+
+        yield return new WaitForSeconds(1.5f);
+
+        // Restaurar
+        tiempo = 0f;
+        while (tiempo < duracion)
+        {
+            tiempo += Time.deltaTime;
+            luz.intensity = Mathf.Lerp(intensidadOriginal * 0.3f, intensidadOriginal, tiempo / duracion);
+            yield return null;
+        }
+
+        luz.intensity = intensidadOriginal;
+    }
+
     void CompletarPuzzle()
     {
         puzzleCompletado = true;
 
-        Debug.Log("¡Puzzle completado! Todos los puentes activados.");
+        Debug.Log("¡Puzzle completado! Iniciando secuencia final épica...");
 
-        if (sonidoCompletado != null)
-            audioSource.PlayOneShot(sonidoCompletado);
-
-        // Asegurar que todos los puentes estén activos
-        if (puentes != null)
+        // SECUENCIA FINAL ÉPICA
+        if (feedbackSystem != null)
         {
-            foreach (GameObject puente in puentes)
+            StartCoroutine(feedbackSystem.SecuenciaFinalCompletado());
+        }
+        else
+        {
+            // Fallback: comportamiento original
+            if (sonidoCompletado != null)
+                audioSource.PlayOneShot(sonidoCompletado);
+
+            if (puentes != null)
             {
-                if (puente != null)
-                    puente.SetActive(true);
+                foreach (GameObject puente in puentes)
+                {
+                    if (puente != null)
+                        puente.SetActive(true);
+                }
             }
+
+            StartCoroutine(EfectoCompletado());
         }
 
         if (textoPresionaE != null)
@@ -287,8 +366,6 @@ public class CrystalSequenceManager : MonoBehaviour
 
         if (textoSecuencia != null)
             textoSecuencia.text = "¡COMPLETADO!";
-
-        StartCoroutine(EfectoCompletado());
     }
 
     IEnumerator EfectoCompletado()
@@ -308,6 +385,34 @@ public class CrystalSequenceManager : MonoBehaviour
         if (textoSecuencia == null) return;
 
         textoSecuencia.text = $"Secuencia: {pasoActual}/{secuenciaCorrecta.Count}";
+    }
+
+    /// <summary>
+    /// Método público para que el FeedbackSystem pueda obtener el siguiente cristal correcto
+    /// </summary>
+    public int ObtenerSiguienteCristalCorrecto()
+    {
+        if (pasoActual < secuenciaCorrecta.Count)
+        {
+            return secuenciaCorrecta[pasoActual];
+        }
+        return -1;
+    }
+
+    /// <summary>
+    /// Método público para obtener el progreso actual
+    /// </summary>
+    public int ObtenerProgresoActual()
+    {
+        return pasoActual;
+    }
+
+    /// <summary>
+    /// Método público para obtener el total de pasos
+    /// </summary>
+    public int ObtenerTotalPasos()
+    {
+        return secuenciaCorrecta.Count;
     }
 
     void OnDrawGizmosSelected()
