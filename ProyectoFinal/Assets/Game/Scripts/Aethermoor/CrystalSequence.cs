@@ -68,6 +68,10 @@ public class CrystalSequenceManager : MonoBehaviour
         if (textoPresionaE != null)
             textoPresionaE.SetActive(false);
 
+        // Ocultar texto de secuencia al inicio
+        if (textoSecuencia != null)
+            textoSecuencia.gameObject.SetActive(false);
+
         GenerarSecuenciaAleatoria();
 
         for (int i = 0; i < cristalesInteractuables.Length; i++)
@@ -79,8 +83,6 @@ public class CrystalSequenceManager : MonoBehaviour
         GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
         if (playerObj != null)
             jugador = playerObj.transform;
-
-        ActualizarTextoSecuencia();
     }
 
     void GenerarSecuenciaAleatoria()
@@ -161,6 +163,13 @@ public class CrystalSequenceManager : MonoBehaviour
 
         mostrandoPista = true;
 
+        // Activar texto de secuencia la primera vez
+        if (textoSecuencia != null && !textoSecuencia.gameObject.activeSelf)
+        {
+            textoSecuencia.gameObject.SetActive(true);
+            ActualizarTextoSecuencia();
+        }
+
         if (textoPresionaE != null)
             textoPresionaE.SetActive(false);
 
@@ -195,16 +204,19 @@ public class CrystalSequenceManager : MonoBehaviour
         if (indiceCristal == secuenciaCorrecta[pasoActual])
         {
             secuenciaJugador.Add(indiceCristal);
-            cristalesInteractuables[indiceCristal].ActivarPermanente();
 
-            if (sonidoCorrecto != null)
-                audioSource.PlayOneShot(sonidoCorrecto);
-
-            // Activar puente correspondiente
+            // Activar puente correspondiente y conectar línea
+            Transform puenteDestino = null;
             if (puentes != null && pasoActual < puentes.Length && puentes[pasoActual] != null)
             {
                 puentes[pasoActual].SetActive(true);
+                puenteDestino = puentes[pasoActual].transform;
             }
+
+            cristalesInteractuables[indiceCristal].ActivarPermanente(puenteDestino);
+
+            if (sonidoCorrecto != null)
+                audioSource.PlayOneShot(sonidoCorrecto);
 
             pasoActual++;
             ActualizarTextoSecuencia();

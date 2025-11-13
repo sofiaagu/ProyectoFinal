@@ -1,4 +1,4 @@
-using UnityEngine;
+Ôªøusing UnityEngine;
 using System;
 using System.Collections;
 
@@ -7,6 +7,7 @@ public class CristalNode : MonoBehaviour
     [Header("Referencias")]
     public GameObject puenteAsociado;
     public LineRenderer lineRenderer;
+    public Transform puntoInicioLinea; // Desde d√≥nde sale la l√≠nea (opcional)
     public Transform puntoDestino;
 
     [Header("Efectos")]
@@ -18,9 +19,20 @@ public class CristalNode : MonoBehaviour
     public Color colorActivo = Color.cyan;
     public Color colorPista = Color.yellow;
 
-    [Header("ConfiguraciÛn")]
-    [Tooltip("øEs un cristal de pista o interactuable?")]
+    [Header("Configuraci√≥n")]
+    [Tooltip("¬øEs un cristal de pista o interactuable?")]
     public bool esCristalPista = false;
+
+    [Tooltip("Distancia m√≠nima para activar el cristal")]
+    public float rangoActivacion = 3f;
+
+    [Header("Mensaje sin Habilidad")]
+    [TextArea(2, 4)]
+    public string mensajeSinHabilidad = "Necesitas la habilidad de Luminiscencia para activar este cristal.";
+    public TMPro.TextMeshProUGUI textoMensaje; // Referencia al texto del Canvas
+    public float tiempoMensaje = 3f;
+
+    private bool mostrandoMensaje = false;
 
     public Action OnCristalClickado;
 
@@ -65,10 +77,10 @@ public class CristalNode : MonoBehaviour
 
     void Update()
     {
-        // RotaciÛn del cristal
+        // Rotaci√≥n del cristal
         transform.Rotate(Vector3.up, 30f * Time.deltaTime);
 
-        // FlotaciÛn suave
+        // Flotaci√≥n suave
         float offset = Mathf.Sin(Time.time * 2f) * 0.2f;
         transform.position = new Vector3(
             posicionInicial.x,
@@ -92,31 +104,63 @@ public class CristalNode : MonoBehaviour
         {
             if (hit.transform == transform || hit.transform.IsChildOf(transform))
             {
-                // Verificar si el jugador tiene la habilidad
+                // Verificar distancia del jugador
                 GameObject player = GameObject.FindGameObjectWithTag("Player");
-                if (player != null)
+
+                if (player == null)
                 {
-                    PlayerAbilities abilities = player.GetComponent<PlayerAbilities>();
-                    // Comentar temporalmente para testing
-                    if (abilities != null && abilities.tieneLuminiscencia)
-                    {
-                        OnCristalClickado?.Invoke();
-                    }
-                    else
-                    {
-                        Debug.Log("Necesitas la habilidad de Luminiscencia");
-                        // Para testing, puedes descomentar la siguiente lÌnea:
-                        // OnCristalClickado?.Invoke();
-                    }
+                    Debug.LogWarning("No se encontr√≥ jugador con tag 'Player'. Activando cristal de todos modos (para testing).");
+                    OnCristalClickado?.Invoke();
+                    return;
+                }
+
+                float distancia = Vector3.Distance(transform.position, player.transform.position);
+
+                Debug.Log($"Distancia al cristal: {distancia:F2}m (Rango requerido: {rangoActivacion}m)");
+
+                if (distancia > rangoActivacion)
+                {
+                    Debug.LogWarning($"‚ùå Est√°s muy lejos del cristal. Ac√©rcate m√°s (necesitas estar a {rangoActivacion}m o menos)");
+                    return;
+                }
+
+                Debug.Log("‚úÖ Est√°s dentro del rango de activaci√≥n");
+
+                // Verificar si el jugador tiene la habilidad
+                PlayerAbilities abilities = player.GetComponent<PlayerAbilities>();
+                if (abilities != null && abilities.tieneLuminiscencia)
+                {
+                    OnCristalClickado?.Invoke();
                 }
                 else
                 {
-                    // Si no hay jugador, activar de todos modos (para testing)
-                    Debug.LogWarning("No se encontrÛ jugador con tag 'Player'. Activando cristal de todos modos.");
-                    OnCristalClickado?.Invoke();
+                    MostrarMensajeSinHabilidad();
                 }
             }
         }
+    }
+
+    void MostrarMensajeSinHabilidad()
+    {
+        if (textoMensaje != null)
+        {
+            StopAllCoroutines();
+            StartCoroutine(MostrarMensajeCoroutine());
+        }
+        else
+        {
+            Debug.Log(mensajeSinHabilidad);
+        }
+    }
+
+    IEnumerator MostrarMensajeCoroutine()
+    {
+        textoMensaje.text = mensajeSinHabilidad;
+        textoMensaje.gameObject.SetActive(true);
+
+        yield return new WaitForSeconds(tiempoMensaje);
+
+        textoMensaje.gameObject.SetActive(false);
     }
 
     /// <summary>
@@ -144,7 +188,7 @@ public class CristalNode : MonoBehaviour
             luzCristal.intensity = 8f;
         }
 
-        // Efecto de partÌculas
+        // Efecto de part√≠culas
         if (efectoActivacion != null)
         {
             Instantiate(efectoActivacion, transform.position, Quaternion.identity);
@@ -189,22 +233,44 @@ public class CristalNode : MonoBehaviour
             puenteAsociado.SetActive(true);
         }
 
-        // Activar lÌnea de energÌa hacia el puente
+        // Activar l√≠nea de energ√≠a hacia el puente
         Transform destino = destinoLinea != null ? destinoLinea : puntoDestino;
 
         if (lineRenderer != null && destino != null)
         {
             lineRenderer.enabled = true;
-            lineRenderer.SetPosition(0, transform.position);
-            lineRenderer.SetPosition(1, destino.position);
-            lineRenderer.startColor = colorActivo;
-            lineRenderer.endColor = colorActivo;
 
-            // Animar la lÌnea
+            // Determinar punto de inicio (desde donde sale la l√≠nea)
+            Vector3 puntoInicio = puntoInicioLinea != null ? puntoInicioLinea.position : transform.position;
+
+            lineRenderer.SetPosition(0, puntoInicio);
+            lineRenderer.SetPosition(1, destino.position);
+
+            // Usar el color del LineRenderer ya configurado, pero aplicar el color activo
+            Color colorLinea = lineRenderer.startColor;
+            if (colorLinea == Color.white || colorLinea == Color.clear)
+            {
+                // Si no tiene color asignado, usar el color activo del cristal
+                colorLinea = colorActivo;
+            }
+
+            lineRenderer.startColor = colorLinea;
+            lineRenderer.endColor = colorLinea;
+
+            Debug.Log($"LineRenderer activado desde {puntoInicio} hacia {destino.position} con color {colorLinea}");
+
+            // Animar la l√≠nea
             StartCoroutine(AnimarLineaEnergia());
         }
+        else
+        {
+            if (lineRenderer == null)
+                Debug.LogWarning($"Cristal {gameObject.name}: No tiene LineRenderer asignado");
+            if (destino == null)
+                Debug.LogWarning($"Cristal {gameObject.name}: No hay destino para la l√≠nea");
+        }
 
-        // Efecto de partÌculas
+        // Efecto de part√≠culas
         if (efectoActivacion != null)
         {
             Instantiate(efectoActivacion, transform.position, Quaternion.identity);
@@ -239,7 +305,7 @@ public class CristalNode : MonoBehaviour
             puenteAsociado.SetActive(false);
         }
 
-        // Desactivar lÌnea
+        // Desactivar l√≠nea
         if (lineRenderer != null)
         {
             lineRenderer.enabled = false;
@@ -284,7 +350,7 @@ public class CristalNode : MonoBehaviour
             tiempo += Time.deltaTime;
             float progreso = tiempo / duracion;
 
-            // Animar el ancho de la lÌnea
+            // Animar el ancho de la l√≠nea
             lineRenderer.startWidth = Mathf.Lerp(0f, 0.1f, progreso);
             lineRenderer.endWidth = Mathf.Lerp(0f, 0.1f, progreso);
 
@@ -292,9 +358,19 @@ public class CristalNode : MonoBehaviour
         }
     }
 
-    // MÈtodo legacy para compatibilidad con cÛdigo anterior
+    // M√©todo legacy para compatibilidad con c√≥digo anterior
     public void Activar()
     {
         ActivarPermanente();
+    }
+
+    void OnDrawGizmosSelected()
+    {
+        if (!esCristalPista)
+        {
+            // Dibujar rango de activaci√≥n
+            Gizmos.color = Color.green;
+            Gizmos.DrawWireSphere(transform.position, rangoActivacion);
+        }
     }
 }
