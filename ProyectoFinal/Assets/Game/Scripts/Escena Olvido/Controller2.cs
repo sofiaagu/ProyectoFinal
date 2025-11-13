@@ -10,6 +10,7 @@ public class Controller2 : MonoBehaviour
 
     [Header("Referencias de escena")]
     public AltarMemoria altarMemoria;
+    public Timer timer; // ← referencia al temporizador de la escena
 
     private List<string> palabrasRecolectadas = new List<string>();
     [SerializeField] private int totalPalabras = 4;
@@ -50,29 +51,45 @@ public class Controller2 : MonoBehaviour
         }
     }
 
+    // 👉 NUEVO MÉTODO
     public void CompletarEscena()
     {
-        Debug.Log("Escena completada. Portal abierto.");
-        // Aquí puedes llamar al siguiente nivel con SceneManager.LoadScene()
+        Debug.Log("Escena completada. Registrando tiempo y abriendo portal.");
+
+        if (timer != null)
+        {
+            timer.TimerStop(); // Detiene el cronómetro
+            if (GameManager.instance != null)
+            {
+                GameManager.instance.RegistrarTiempo(timer.StopTime);
+            }
+        }
+        else
+        {
+            Debug.LogWarning("⚠️ No se encontró el Timer en esta escena.");
+        }
+
+        // Aquí puedes cargar la siguiente escena
+        // SceneManager.LoadScene("NombreDeLaSiguienteEscena");
     }
 
     public List<string> ObtenerPalabrasRecolectadas()
     {
         return new List<string>(palabrasRecolectadas);
     }
+
     public void ReiniciarJuego()
     {
-        Time.timeScale = 1f; // Reanuda el tiempo
+        Time.timeScale = 1f;
 
-        // Accede al GameManager y reinicia vidas si existe
         if (GameManager.instance != null)
         {
-            GameManager.instance.ReiniciarJuego(); // Usa el método centralizado
+            GameManager.instance.ReiniciarJuego();
         }
         else
         {
             Debug.LogWarning("No se encontró el GameManager persistente.");
-            SceneManager.LoadScene(SceneManager.GetActiveScene().name); // Plan B
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
     }
 }
