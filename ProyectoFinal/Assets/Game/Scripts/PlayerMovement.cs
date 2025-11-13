@@ -79,4 +79,55 @@ public class PlayerMovement : MonoBehaviour
             anim.SetBool("salte", false);
         }
     }
+
+    // --- SISTEMA DE VIDAS ---
+    [Header("Vida del jugador")]
+    public float tiempoInvulnerable = 2f;
+    private bool invulnerable = false;
+
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("arma") && !invulnerable)
+        {
+            TomarDaño();
+        }
+    }
+
+    void TomarDaño()
+    {
+        GameManager.instance.PerderVida();
+
+        // Si aún tiene vidas, activar invulnerabilidad temporal
+        if (GameManager.instance.vidasActuales > 0)
+        {
+            StartCoroutine(InvulnerabilidadTemporal());
+        }
+        else
+        {
+            // Si llega a 0 vidas, puedes desactivar al jugador o dejar que el GameManager cambie de escena
+            gameObject.SetActive(false);
+        }
+    }
+
+    IEnumerator InvulnerabilidadTemporal()
+    {
+        invulnerable = true;
+
+        // Efecto visual (parpadeo o brillo)
+        Renderer rend = GetComponentInChildren<Renderer>();
+        float tiempo = 0;
+        while (tiempo < tiempoInvulnerable)
+        {
+            if (rend != null)
+                rend.enabled = !rend.enabled; // parpadea
+            yield return new WaitForSeconds(0.2f);
+            tiempo += 0.2f;
+        }
+
+        if (rend != null)
+            rend.enabled = true;
+
+        invulnerable = false;
+    }
+
 }

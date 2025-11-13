@@ -1,6 +1,7 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
 using TMPro;
-using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Controller2 : MonoBehaviour
 {
@@ -58,5 +59,20 @@ public class Controller2 : MonoBehaviour
     public List<string> ObtenerPalabrasRecolectadas()
     {
         return new List<string>(palabrasRecolectadas);
+    }
+    public void ReiniciarJuego()
+    {
+        Time.timeScale = 1f; // Reanuda el tiempo
+
+        // Accede al GameManager y reinicia vidas si existe
+        if (GameManager.instance != null)
+        {
+            GameManager.instance.ReiniciarJuego(); // Usa el método centralizado
+        }
+        else
+        {
+            Debug.LogWarning("No se encontró el GameManager persistente.");
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name); // Plan B
+        }
     }
 }
