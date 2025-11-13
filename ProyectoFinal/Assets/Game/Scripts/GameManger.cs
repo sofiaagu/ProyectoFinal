@@ -1,34 +1,38 @@
-﻿using System.Collections.Generic;
-using TMPro;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
+using TMPro;
+using System.Collections.Generic;
 
 public class GameManager : MonoBehaviour
 {
-    public static GameManager instance; // Singleton
+    public static GameManager instance;
+
+    // ============================================================
+    // =========================== VIDAS ===========================
+    // ============================================================
 
     [Header("❤️ Vidas del jugador")]
     public int maxVidas = 3;
     public int vidasActuales;
-    public GameObject panelGameOver;
+    public GameObject[] corazones;   // Iconos de vida
 
-    [Header("💰 Monedas")]
-    public int monedasTotales = 0;                 // Monedas acumuladas en todas las escenas
-    public TextMeshProUGUI textoMonedas;           // Texto UI opcional para mostrar monedas
+    // ============================================================
+    // =========================== SCORE ===========================
+    // ============================================================
 
-    [Header("⏱️ Tiempo")]
+    [Header("💰 Score Total (monedas globales)")]
+    public int score = 0;
+    public TextMeshProUGUI textoScore;
+
+    // ============================================================
+    // =========================== TIEMPO ==========================
+    // ============================================================
+
     private Dictionary<string, float> tiemposPorEscena = new Dictionary<string, float>();
     private float tiempoTotal = 0f;
-    public TextMeshProUGUI textoTiempoTotal;       // (Opcional) Mostrar tiempo total
-
-    [Header("🖥️ UI de vidas")]
-    public TextMeshProUGUI textoVidas;
-    public GameObject[] corazones;
 
     private void Awake()
     {
-        // Configurar Singleton persistente
         if (instance == null)
         {
             instance = this;
@@ -44,41 +48,31 @@ public class GameManager : MonoBehaviour
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        // Reasignar referencias de UI cuando cambia de escena
-        if (textoVidas == null)
+        // Buscar el texto del score en cada escena que tenga uno
+        if (textoScore == null)
         {
-            GameObject t = GameObject.FindWithTag("TextoVidas");
-            if (t != null) textoVidas = t.GetComponent<TextMeshProUGUI>();
-        }
-
-        if (textoMonedas == null)
-        {
-            GameObject m = GameObject.FindWithTag("TextoMonedas");
-            if (m != null) textoMonedas = m.GetComponent<TextMeshProUGUI>();
+            GameObject s = GameObject.FindWithTag("TextoScore");
+            if (s != null)
+                textoScore = s.GetComponent<TextMeshProUGUI>();
         }
 
         ActualizarUI();
     }
 
     // ============================================================
-    // ===================== SISTEMA DE MONEDAS ===================
+    // ======================= SCORE / MONEDAS =====================
     // ============================================================
+
     public void AgregarMoneda(int cantidad = 1)
     {
-        monedasTotales += cantidad;
-        ActualizarUI();
-        Debug.Log($"💰 Monedas totales: {monedasTotales}");
-    }
-
-    public void QuitarMoneda(int cantidad = 1)
-    {
-        monedasTotales = Mathf.Max(0, monedasTotales - cantidad);
+        score += cantidad;
         ActualizarUI();
     }
 
     // ============================================================
-    // ===================== SISTEMA DE VIDAS =====================
+    // =========================== VIDAS ===========================
     // ============================================================
+
     public void PerderVida()
     {
         vidasActuales--;
@@ -100,29 +94,36 @@ public class GameManager : MonoBehaviour
         ActualizarUI();
     }
 
-    // ============================================================
-    // ===================== CONTROL DE TIEMPO ====================
-    // ============================================================
-    public void RegistrarTiempo(float tiempoEscena)
+    private void ActualizarUI()
     {
-        string escenaActual = SceneManager.GetActiveScene().name;
-
-        if (!tiemposPorEscena.ContainsKey(escenaActual))
+        // Actualizar corazones
+        if (corazones != null && corazones.Length > 0)
         {
-            tiemposPorEscena.Add(escenaActual, tiempoEscena);
-        }
-        else
-        {
-            tiemposPorEscena[escenaActual] = tiempoEscena;
+            for (int i = 0; i < corazones.Length; i++)
+                corazones[i].SetActive(i < vidasActuales);
         }
 
-        CalcularTiempoTotal();
-        Debug.Log($"⏱️ Tiempo registrado en {escenaActual}: {tiempoEscena:F2}s | Total: {tiempoTotal:F2}s");
+        // Actualizar score si existe texto
+        if (textoScore != null)
+            textoScore.text = "x " + score;
     }
 
-    private void CalcularTiempoTotal()
+    // ============================================================
+    // =========================== TIEMPO ==========================
+    // ============================================================
+
+    public void RegistrarTiempo(float tiempoEscena)
+    {
+        string escena = SceneManager.GetActiveScene().name;
+
+        tiemposPorEscena[escena] = tiempoEscena;
+        RecalcularTiempoTotal();
+    }
+
+    private void RecalcularTiempoTotal()
     {
         tiempoTotal = 0f;
+
         foreach (float t in tiemposPorEscena.Values)
             tiempoTotal += t;
     }
@@ -130,54 +131,29 @@ public class GameManager : MonoBehaviour
     public float ObtenerTiempoTotal() => tiempoTotal;
 
     // ============================================================
-    // ===================== ACTUALIZAR UI ========================
+    // =========================== GAME OVER =======================
     // ============================================================
-    private void ActualizarUI()
-    {
-        if (textoVidas != null)
-            textoVidas.text = $"Vidas: {vidasActuales}";
 
-        if (corazones != null && corazones.Length > 0)
-        {
-            for (int i = 0; i < corazones.Length; i++)
-                corazones[i].SetActive(i < vidasActuales);
-        }
-
-        if (textoMonedas != null)
-            textoMonedas.text = $"Monedas: {monedasTotales}";
-
-        if (textoTiempoTotal != null)
-            textoTiempoTotal.text = $"Tiempo total: {tiempoTotal:F2}s";
-    }
-
-    // ============================================================
-    // ===================== GAME OVER ============================
-    // ============================================================
     private void GameOver()
     {
-        if (panelGameOver != null)
-            panelGameOver.SetActive(true);
-
-        if (textoTiempoTotal != null)
-            textoTiempoTotal.text = $"Tiempo total: {tiempoTotal:F2}s";
-
-        Time.timeScale = 0f;
         Debug.Log("💀 GAME OVER");
+        // Aquí puedes poner un panel de Game Over si tienes uno
+        Time.timeScale = 0f;
     }
 
     // ============================================================
-    // ===================== REINICIAR JUEGO ======================
+    // =========================== RESET ===========================
     // ============================================================
+
     public void ReiniciarJuego()
     {
-        Time.timeScale = 1f;
         vidasActuales = maxVidas;
-        tiemposPorEscena.Clear();
+        score = 0;
         tiempoTotal = 0f;
-        monedasTotales = 0;
-        ActualizarUI();
+        tiemposPorEscena.Clear();
 
+        Time.timeScale = 1f;
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-        Debug.Log("🔄 Juego reiniciado.");
+        ActualizarUI();
     }
 }

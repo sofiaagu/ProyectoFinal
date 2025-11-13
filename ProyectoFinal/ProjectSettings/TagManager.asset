@@ -11,6 +11,7 @@ TagManager:
   - arma
   - TextoVidas
   - arma2
+  - TextoScore
   layers:
   - Default
   - TransparentFX

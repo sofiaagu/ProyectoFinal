@@ -1,95 +1,125 @@
-﻿using System.Collections.Generic;
+﻿using UnityEngine;
 using TMPro;
-using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.Collections.Generic;
 
 public class Controller2 : MonoBehaviour
 {
-    [Header("Referencias UI")]
-    public TextMeshProUGUI palabrasRecolectadasText;
+    // ============================================================
+    // ======================= REFERENCIAS =========================
+    // ============================================================
 
-    [Header("Referencias de escena")]
+    [Header("📜 UI")]
+    public TextMeshProUGUI palabrasRecolectadasText;
+    public TextMeshProUGUI textoMonedas;
+
+    [Header("📌 Referencias de escena")]
     public AltarMemoria altarMemoria;
-    public Timer timer; // ← referencia al temporizador de la escena
+    public Timer timer;
+
+    // ============================================================
+    // ==================== VARIABLES INTERNAS =====================
+    // ============================================================
 
     private List<string> palabrasRecolectadas = new List<string>();
+    private int monedasEscena = 0;
+
     [SerializeField] private int totalPalabras = 4;
 
-    void Start()
+    // ============================================================
+    // ========================= START =============================
+    // ============================================================
+
+    private void Start()
     {
+        if (timer == null)
+            timer = FindObjectOfType<Timer>();
+
         ActualizarUI();
+
         if (altarMemoria != null)
             altarMemoria.gameObject.SetActive(false);
     }
 
+    // ============================================================
+    // =================== SISTEMA DE PALABRAS =====================
+    // ============================================================
+
     public void AgregarPalabra(string palabra)
     {
-        if (!palabrasRecolectadas.Contains(palabra))
-        {
-            palabrasRecolectadas.Add(palabra);
-            ActualizarUI();
+        if (palabrasRecolectadas.Contains(palabra))
+            return;
 
-            if (palabrasRecolectadas.Count >= totalPalabras)
-            {
-                ActivarAltar();
-            }
-        }
+        palabrasRecolectadas.Add(palabra);
+        ActualizarUI();
+
+        if (palabrasRecolectadas.Count >= totalPalabras)
+            ActivarAltar();
     }
 
-    void ActualizarUI()
+    private void ActivarAltar()
     {
-        if (palabrasRecolectadasText != null)
-            palabrasRecolectadasText.text = "Palabras: " + string.Join(" - ", palabrasRecolectadas);
+        if (altarMemoria == null)
+            return;
+
+        altarMemoria.gameObject.SetActive(true);
+        Debug.Log("✨ Todas las palabras recolectadas. Altar activado.");
     }
 
-    void ActivarAltar()
+    // ============================================================
+    // ======================= MONEDAS =============================
+    // ============================================================
+
+    public void RegistrarMoneda(int cantidad)
     {
-        if (altarMemoria != null)
-        {
-            altarMemoria.gameObject.SetActive(true);
-            Debug.Log("Todas las palabras recolectadas. Altar activado.");
-        }
+        monedasEscena += cantidad;
+        ActualizarUI();
+
+        if (GameManager.instance != null)
+            GameManager.instance.AgregarMoneda(cantidad);
+
+        Debug.Log($"💰 Moneda recogida | Escena: {monedasEscena}");
     }
 
-    // 👉 NUEVO MÉTODO
+    // ============================================================
+    // ===================== FINAL DE ESCENA ========================
+    // ============================================================
+
     public void CompletarEscena()
     {
-        Debug.Log("Escena completada. Registrando tiempo y abriendo portal.");
+        Debug.Log("🏁 Escena completada. Registrando tiempo…");
 
         if (timer != null)
         {
-            timer.TimerStop(); // Detiene el cronómetro
+            timer.TimerStop();
+
             if (GameManager.instance != null)
-            {
                 GameManager.instance.RegistrarTiempo(timer.StopTime);
-            }
-        }
-        else
-        {
-            Debug.LogWarning("⚠️ No se encontró el Timer en esta escena.");
         }
 
-        // Aquí puedes cargar la siguiente escena
-        // SceneManager.LoadScene("NombreDeLaSiguienteEscena");
+        // Aquí puedes cargar otro nivel si deseas:
+        // SceneManager.LoadScene("SiguienteNivel");
     }
+
+    // ============================================================
+    // ========================= UI UPDATE =========================
+    // ============================================================
+
+    private void ActualizarUI()
+    {
+        if (palabrasRecolectadasText != null)
+            palabrasRecolectadasText.text = "Palabras: " + string.Join(" - ", palabrasRecolectadas);
+
+        if (textoMonedas != null)
+            textoMonedas.text = "Monedas: " + monedasEscena;
+    }
+
+    // ============================================================
+    // ===================== MÉTODOS AUXILIARES ====================
+    // ============================================================
 
     public List<string> ObtenerPalabrasRecolectadas()
     {
         return new List<string>(palabrasRecolectadas);
-    }
-
-    public void ReiniciarJuego()
-    {
-        Time.timeScale = 1f;
-
-        if (GameManager.instance != null)
-        {
-            GameManager.instance.ReiniciarJuego();
-        }
-        else
-        {
-            Debug.LogWarning("No se encontró el GameManager persistente.");
-            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-        }
     }
 }

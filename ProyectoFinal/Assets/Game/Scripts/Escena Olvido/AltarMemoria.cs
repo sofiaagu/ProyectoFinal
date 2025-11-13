@@ -6,6 +6,8 @@ public class AltarMemoria : MonoBehaviour
     [Header("Referencias")]
     public GameObject uiOrdenarPanel;
     public UIOrdenarPalabras uiOrdenarScript;
+    [Header("Portal final")]
+    public GameObject portalFinal;
 
     private Controller2 controller;
     private bool jugadorCerca = false;
@@ -55,7 +57,17 @@ public class AltarMemoria : MonoBehaviour
             }
         }
 
-        Debug.Log("Orden correcto. Portal activado.");
+        if (portalFinal != null)
+        {
+            portalFinal.SetActive(true);
+            Debug.Log("🌌 Portal final ahora está activo.");
+        }
+        else
+        {
+            Debug.LogWarning("⚠️ No se ha asignado un portal final.");
+        }
+
+        // Notificar al controller que se completó la escena
         controller.CompletarEscena();
     }
 }
