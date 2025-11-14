@@ -62,10 +62,6 @@ public class PlayerMovement : MonoBehaviour
             anim.SetTrigger("attack");
         }
 
-        if (Input.GetKeyDown(KeyCode.J))
-        {
-            anim.SetTrigger("attack");
-        }
     }
 
 
