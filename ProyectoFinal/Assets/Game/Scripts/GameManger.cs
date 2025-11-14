@@ -21,6 +21,11 @@ public class GameManager : MonoBehaviour
     public int score = 0;
     public TextMeshProUGUI textoScore;
 
+    [Header("⚔️ Enemigos")]
+    public int enemigosEliminados = 0;        // Contador
+    public int puntosPorEnemigo = 5;          // Puntos por enemigo
+    public TextMeshProUGUI textoEnemigos;     // Opcional si quieres mostrarlo en UI
+
     // ============================================================
     // GAME OVER
     // ============================================================
@@ -85,6 +90,21 @@ public class GameManager : MonoBehaviour
     {
         if (textoScore != null)
             textoScore.text = "x " + score;
+    }
+    public void EnemigoEliminado()
+    {
+        enemigosEliminados++;              // Suma 1 al contador
+        score += puntosPorEnemigo;         // Suma puntos
+        ActualizarUI();                    // Refresca el texto del score
+
+        ActualizarUIEnemigos();            // Refresca el contador (si lo usas)
+
+        Debug.Log("✔ Enemigo eliminado. Total: " + enemigosEliminados);
+    }
+    private void ActualizarUIEnemigos()
+    {
+        if (textoEnemigos != null)
+            textoEnemigos.text = "Enemigos: " + enemigosEliminados;
     }
 
     // ============================================================
