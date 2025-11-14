@@ -10,10 +10,9 @@ public class Coin : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             // Busca el controller de la escena actual
-            Controller2 controller = FindFirstObjectByType<Controller2>();
-            if (controller != null)
+            if (GameManager.instance != null && GameManager.instance.controllerActual != null)
             {
-                controller.RegistrarMoneda(valorMoneda);
+                GameManager.instance.controllerActual.RegistrarMoneda(valorMoneda);
             }
 
             // Reproduce sonido (opcional)

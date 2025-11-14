@@ -8,36 +8,38 @@ public class GameManager : MonoBehaviour
     public static GameManager instance;
 
     // ============================================================
-    // =========================== VIDAS ===========================
+    // CONTROLLER DE LA ESCENA
     // ============================================================
-
-    [Header("❤️ Vidas del jugador")]
-    public int maxVidas = 3;
-    public int vidasActuales;
-    public GameObject[] corazones;   // Iconos de vida
+    public Controller2 controllerActual;
 
     // ============================================================
-    // =========================== SCORE ===========================
+    // SCORE (MONEDAS)
     // ============================================================
-
     [Header("💰 Score Total (monedas globales)")]
     public int score = 0;
     public TextMeshProUGUI textoScore;
 
     // ============================================================
-    // =========================== TIEMPO ==========================
+    // GAME OVER
     // ============================================================
+    [Header("💀 Game Over")]
+    public GameObject panelGameOver;
 
+    // ============================================================
+    // TIEMPO
+    // ============================================================
     private Dictionary<string, float> tiemposPorEscena = new Dictionary<string, float>();
     private float tiempoTotal = 0f;
 
-    private void Awake()
+    // ============================================================
+    // INICIO
+    // ============================================================
+    void Awake()
     {
         if (instance == null)
         {
             instance = this;
             DontDestroyOnLoad(gameObject);
-            vidasActuales = maxVidas;
             SceneManager.sceneLoaded += OnSceneLoaded;
         }
         else
@@ -46,114 +48,78 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        // Buscar el texto del score en cada escena que tenga uno
-        if (textoScore == null)
+        // Score
+        GameObject s = GameObject.FindWithTag("TextoScore");
+        if (s != null)
+            textoScore = s.GetComponent<TextMeshProUGUI>();
+
+        // GameOver Panel
+        GameObject panel = GameObject.FindWithTag("PanelGameOver");
+        if (panel != null)
         {
-            GameObject s = GameObject.FindWithTag("TextoScore");
-            if (s != null)
-                textoScore = s.GetComponent<TextMeshProUGUI>();
+            panelGameOver = panel;
+            panelGameOver.SetActive(false);
         }
+
+        // Controller
+        controllerActual = FindAnyObjectByType<Controller2>();
 
         ActualizarUI();
     }
 
     // ============================================================
-    // ======================= SCORE / MONEDAS =====================
+    // SCORE
     // ============================================================
-
     public void AgregarMoneda(int cantidad = 1)
     {
         score += cantidad;
         ActualizarUI();
     }
 
-    // ============================================================
-    // =========================== VIDAS ===========================
-    // ============================================================
-
-    public void PerderVida()
-    {
-        vidasActuales--;
-
-        if (vidasActuales <= 0)
-        {
-            vidasActuales = 0;
-            GameOver();
-        }
-
-        ActualizarUI();
-    }
-
-    public void GanarVida()
-    {
-        if (vidasActuales < maxVidas)
-            vidasActuales++;
-
-        ActualizarUI();
-    }
-
     private void ActualizarUI()
     {
-        // Actualizar corazones
-        if (corazones != null && corazones.Length > 0)
-        {
-            for (int i = 0; i < corazones.Length; i++)
-                corazones[i].SetActive(i < vidasActuales);
-        }
-
-        // Actualizar score si existe texto
         if (textoScore != null)
             textoScore.text = "x " + score;
     }
 
     // ============================================================
-    // =========================== TIEMPO ==========================
+    // TIEMPO
     // ============================================================
-
     public void RegistrarTiempo(float tiempoEscena)
     {
         string escena = SceneManager.GetActiveScene().name;
-
         tiemposPorEscena[escena] = tiempoEscena;
         RecalcularTiempoTotal();
     }
 
     private void RecalcularTiempoTotal()
     {
-        tiempoTotal = 0f;
-
-        foreach (float t in tiemposPorEscena.Values)
-            tiempoTotal += t;
+        tiempoTotal = 0;
+        foreach (float t in tiemposPorEscena.Values) tiempoTotal += t;
     }
 
     public float ObtenerTiempoTotal() => tiempoTotal;
 
     // ============================================================
-    // =========================== GAME OVER =======================
+    // GAME OVER
     // ============================================================
-
-    private void GameOver()
+    public void MostrarGameOver()
     {
-        Debug.Log("💀 GAME OVER");
-        // Aquí puedes poner un panel de Game Over si tienes uno
+        if (panelGameOver != null)
+            panelGameOver.SetActive(true);
+
         Time.timeScale = 0f;
     }
 
     // ============================================================
-    // =========================== RESET ===========================
+    // REINICIAR JUEGO
     // ============================================================
-
     public void ReiniciarJuego()
     {
-        vidasActuales = maxVidas;
-        score = 0;
-        tiempoTotal = 0f;
-        tiemposPorEscena.Clear();
-
         Time.timeScale = 1f;
+
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-        ActualizarUI();
     }
 }

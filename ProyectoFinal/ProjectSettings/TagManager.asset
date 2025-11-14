@@ -12,6 +12,7 @@ TagManager:
   - TextoVidas
   - arma2
   - TextoScore
+  - PanelGameOver
   layers:
   - Default
   - TransparentFX

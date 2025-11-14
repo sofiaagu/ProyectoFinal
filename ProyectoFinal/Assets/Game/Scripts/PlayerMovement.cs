@@ -94,25 +94,42 @@ public class PlayerMovement : MonoBehaviour
     {
         if (other.CompareTag("arma") && !invulnerable)
         {
-            TomarDaño();
+            PlayerHealth health = GetComponent<PlayerHealth>();
+            if (health != null)
+            {
+                health.TakeDamage(1);
+                if (health.CurrentLives > 0)
+                    StartCoroutine(InvulnerabilidadTemporal());
+            }
         }
     }
 
-    void TomarDaño()
-    {
-        GameManager.instance.PerderVida();
 
-        // Si aún tiene vidas, activar invulnerabilidad temporal
-        if (GameManager.instance.vidasActuales > 0)
+    public void TomarDaño()
+    {
+        PlayerHealth health = GetComponent<PlayerHealth>();
+
+        if (health == null)
+        {
+            Debug.LogError("❌ No se encontró PlayerHealth en el jugador");
+            return;
+        }
+
+        // Aplicar daño
+        health.TakeDamage(1);
+
+        // Si aún está vivo, activar invulnerabilidad
+        if (health.CurrentLives > 0)
         {
             StartCoroutine(InvulnerabilidadTemporal());
         }
         else
         {
-            // Si llega a 0 vidas, puedes desactivar al jugador o dejar que el GameManager cambie de escena
+            // Si muere, PlayerHealth se encarga de GameOver
             gameObject.SetActive(false);
         }
     }
+
 
     IEnumerator InvulnerabilidadTemporal()
     {
