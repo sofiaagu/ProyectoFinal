@@ -7,10 +7,12 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
 
+
     // ============================================================
     // CONTROLLER DE LA ESCENA
     // ============================================================
     public Controller2 controllerActual;
+
 
     // ============================================================
     // SCORE (MONEDAS)
@@ -46,6 +48,7 @@ public class GameManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+
     }
 
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
