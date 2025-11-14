@@ -33,13 +33,14 @@ public class Controller2 : MonoBehaviour
     private void Start()
     {
         if (timer == null)
-            timer = FindObjectOfType<Timer>();
+            timer = FindFirstObjectByType<Timer>();
 
         ActualizarUI();
 
         if (altarMemoria != null)
             altarMemoria.gameObject.SetActive(false);
     }
+
 
     // ============================================================
     // =================== SISTEMA DE PALABRAS =====================
@@ -122,4 +123,16 @@ public class Controller2 : MonoBehaviour
     {
         return new List<string>(palabrasRecolectadas);
     }
+    public void ReiniciarJuego()
+    {
+        Time.timeScale = 1f;
+
+        if (GameManager.instance != null)
+            GameManager.instance.ReiniciarJuego();
+        else
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
+
+
 }
