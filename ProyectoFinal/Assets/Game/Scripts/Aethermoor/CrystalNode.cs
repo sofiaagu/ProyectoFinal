@@ -7,7 +7,7 @@ public class CristalNode : MonoBehaviour
     [Header("Referencias")]
     public GameObject puenteAsociado;
     public LineRenderer lineRenderer;
-    public Transform puntoInicioLinea; // Desde dónde sale la línea (opcional)
+    public Transform puntoInicioLinea;
     public Transform puntoDestino;
 
     [Header("Efectos")]
@@ -15,35 +15,31 @@ public class CristalNode : MonoBehaviour
     public Light luzCristal;
 
     [Header("Colores")]
-    public Color colorInactivo = Color.gray;
+    public Color colorInactivo = new Color(0.3f, 0.3f, 0.3f);
     public Color colorActivo = Color.cyan;
     public Color colorPista = Color.yellow;
 
     [Header("Configuración")]
     [Tooltip("¿Es un cristal de pista o interactuable?")]
     public bool esCristalPista = false;
-
-    [Tooltip("Distancia mínima para activar el cristal")]
     public float rangoActivacion = 3f;
 
     [Header("Mensaje sin Habilidad")]
     [TextArea(2, 4)]
     public string mensajeSinHabilidad = "Necesitas la habilidad de Luminiscencia para activar este cristal.";
-    public TMPro.TextMeshProUGUI textoMensaje; // Referencia al texto del Canvas
+    public TMPro.TextMeshProUGUI textoMensaje;
     public float tiempoMensaje = 3f;
-
-    private bool mostrandoMensaje = false;
-
-    public Action OnCristalClickado;
 
     private bool activado = false;
     private Material materialCristal;
     private Vector3 posicionInicial;
     private Coroutine coroutinePista;
 
+    public Action OnCristalClickado;
+
     void Start()
     {
-        // Buscar el renderer en este objeto o en sus hijos
+        // Obtener material
         Renderer renderer = GetComponent<Renderer>();
         if (renderer == null)
             renderer = GetComponentInChildren<Renderer>();
@@ -51,16 +47,11 @@ public class CristalNode : MonoBehaviour
         if (renderer != null)
         {
             materialCristal = renderer.material;
+            materialCristal.EnableKeyword("_EMISSION");
+            materialCristal.SetColor("_EmissionColor", colorInactivo * 0.5f);
         }
 
         posicionInicial = transform.position;
-
-        // Configurar estado inicial
-        if (materialCristal != null)
-        {
-            materialCristal.EnableKeyword("_EMISSION");
-            materialCristal.SetColor("_EmissionColor", colorInactivo);
-        }
 
         if (puenteAsociado != null && !esCristalPista)
             puenteAsociado.SetActive(false);
@@ -77,10 +68,10 @@ public class CristalNode : MonoBehaviour
 
     void Update()
     {
-        // Rotación del cristal
+        // Rotación suave
         transform.Rotate(Vector3.up, 30f * Time.deltaTime);
 
-        // Flotación suave
+        // Flotación
         float offset = Mathf.Sin(Time.time * 2f) * 0.2f;
         transform.position = new Vector3(
             posicionInicial.x,
@@ -88,11 +79,9 @@ public class CristalNode : MonoBehaviour
             posicionInicial.z
         );
 
-        // Detectar click del mouse (solo para cristales interactuables)
+        // Click solo en cristales interactuables
         if (!esCristalPista && Input.GetMouseButtonDown(0))
-        {
             DetectarClick();
-        }
     }
 
     void DetectarClick()
@@ -100,57 +89,47 @@ public class CristalNode : MonoBehaviour
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
 
-        if (Physics.Raycast(ray, out hit))
+        if (!Physics.Raycast(ray, out hit)) return;
+
+        if (hit.transform != transform && !hit.transform.IsChildOf(transform)) return;
+
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+
+        if (player == null)
         {
-            if (hit.transform == transform || hit.transform.IsChildOf(transform))
-            {
-                // Verificar distancia del jugador
-                GameObject player = GameObject.FindGameObjectWithTag("Player");
+            Debug.LogWarning("No hay jugador. Activando para testing.");
+            OnCristalClickado?.Invoke();
+            return;
+        }
 
-                if (player == null)
-                {
-                    Debug.LogWarning("No se encontró jugador con tag 'Player'. Activando cristal de todos modos (para testing).");
-                    OnCristalClickado?.Invoke();
-                    return;
-                }
+        float distancia = Vector3.Distance(transform.position, player.transform.position);
+        if (distancia > rangoActivacion)
+        {
+            Debug.Log("Muy lejos para activar este cristal.");
+            return;
+        }
 
-                float distancia = Vector3.Distance(transform.position, player.transform.position);
-
-                Debug.Log($"Distancia al cristal: {distancia:F2}m (Rango requerido: {rangoActivacion}m)");
-
-                if (distancia > rangoActivacion)
-                {
-                    Debug.LogWarning($"❌ Estás muy lejos del cristal. Acércate más (necesitas estar a {rangoActivacion}m o menos)");
-                    return;
-                }
-
-                Debug.Log("✅ Estás dentro del rango de activación");
-
-                // Verificar si el jugador tiene la habilidad
-                PlayerAbilities abilities = player.GetComponent<PlayerAbilities>();
-                if (abilities != null && abilities.tieneLuminiscencia)
-                {
-                    OnCristalClickado?.Invoke();
-                }
-                else
-                {
-                    MostrarMensajeSinHabilidad();
-                }
-            }
+        PlayerAbilities abilities = player.GetComponent<PlayerAbilities>();
+        if (abilities != null && abilities.tieneLuminiscencia)
+        {
+            OnCristalClickado?.Invoke();
+        }
+        else
+        {
+            MostrarMensajeSinHabilidad();
         }
     }
 
     void MostrarMensajeSinHabilidad()
     {
-        if (textoMensaje != null)
-        {
-            StopAllCoroutines();
-            StartCoroutine(MostrarMensajeCoroutine());
-        }
-        else
+        if (textoMensaje == null)
         {
             Debug.Log(mensajeSinHabilidad);
+            return;
         }
+
+        StopAllCoroutines();
+        StartCoroutine(MostrarMensajeCoroutine());
     }
 
     IEnumerator MostrarMensajeCoroutine()
@@ -163,9 +142,9 @@ public class CristalNode : MonoBehaviour
         textoMensaje.gameObject.SetActive(false);
     }
 
-    /// <summary>
-    /// Muestra este cristal como pista temporal
-    /// </summary>
+    // ======================================================================
+    //  PISTA (CRISTAL BRILLA Y LUEGO VUELVE A NORMAL / ACTIVO)
+    // ======================================================================
     public void MostrarPista(float duracion)
     {
         if (coroutinePista != null)
@@ -176,11 +155,10 @@ public class CristalNode : MonoBehaviour
 
     IEnumerator MostrarPistaCoroutine(float duracion)
     {
-        // Encender con color de pista
+        Color colorOriginalLuz = luzCristal != null ? luzCristal.color : Color.white;
+
         if (materialCristal != null)
-        {
             materialCristal.SetColor("_EmissionColor", colorPista * 3f);
-        }
 
         if (luzCristal != null)
         {
@@ -188,130 +166,102 @@ public class CristalNode : MonoBehaviour
             luzCristal.intensity = 8f;
         }
 
-        // Efecto de partículas
         if (efectoActivacion != null)
-        {
             Instantiate(efectoActivacion, transform.position, Quaternion.identity);
-        }
 
         yield return new WaitForSeconds(duracion);
 
-        // Volver al estado inactivo
         if (!activado)
         {
             if (materialCristal != null)
-            {
-                materialCristal.SetColor("_EmissionColor", colorInactivo);
-            }
+                materialCristal.SetColor("_EmissionColor", colorInactivo * 0.5f);
 
             if (luzCristal != null)
             {
-                luzCristal.color = colorInactivo;
+                luzCristal.color = colorOriginalLuz;
                 luzCristal.intensity = 1f;
+            }
+        }
+        else
+        {
+            if (materialCristal != null)
+                materialCristal.SetColor("_EmissionColor", colorActivo * 2f);
+
+            if (luzCristal != null)
+            {
+                luzCristal.color = colorActivo;
+                luzCristal.intensity = 5f;
             }
         }
     }
 
-    /// <summary>
-    /// Activa el cristal permanentemente (cuando el jugador lo hace bien)
-    /// </summary>
+    // ======================================================================
+    //  ACTIVACIÓN PERMANENTE (USO REAL IN-GAME)
+    // ======================================================================
     public void ActivarPermanente(Transform destinoLinea = null)
     {
         if (activado) return;
-
         activado = true;
 
-        // Cambiar color del cristal
+        // Cristal cambia de color
         if (materialCristal != null)
-        {
             materialCristal.SetColor("_EmissionColor", colorActivo * 2f);
-        }
 
-        // Activar puente individual si existe
+        // Activar puente
         if (puenteAsociado != null)
-        {
             puenteAsociado.SetActive(true);
-        }
 
-        // Activar línea de energía hacia el puente
+        // Línea de energía
         Transform destino = destinoLinea != null ? destinoLinea : puntoDestino;
 
         if (lineRenderer != null && destino != null)
         {
             lineRenderer.enabled = true;
 
-            // Determinar punto de inicio (desde donde sale la línea)
-            Vector3 puntoInicio = puntoInicioLinea != null ? puntoInicioLinea.position : transform.position;
+            Vector3 puntoInicio = puntoInicioLinea != null ?
+                puntoInicioLinea.position :
+                transform.position;
 
             lineRenderer.SetPosition(0, puntoInicio);
             lineRenderer.SetPosition(1, destino.position);
 
-            // Usar el color del LineRenderer ya configurado, pero aplicar el color activo
-            Color colorLinea = lineRenderer.startColor;
-            if (colorLinea == Color.white || colorLinea == Color.clear)
-            {
-                // Si no tiene color asignado, usar el color activo del cristal
-                colorLinea = colorActivo;
-            }
+            lineRenderer.startColor = colorActivo;
+            lineRenderer.endColor = colorActivo;
 
-            lineRenderer.startColor = colorLinea;
-            lineRenderer.endColor = colorLinea;
-
-            Debug.Log($"LineRenderer activado desde {puntoInicio} hacia {destino.position} con color {colorLinea}");
-
-            // Animar la línea
             StartCoroutine(AnimarLineaEnergia());
         }
-        else
-        {
-            if (lineRenderer == null)
-                Debug.LogWarning($"Cristal {gameObject.name}: No tiene LineRenderer asignado");
-            if (destino == null)
-                Debug.LogWarning($"Cristal {gameObject.name}: No hay destino para la línea");
-        }
 
-        // Efecto de partículas
         if (efectoActivacion != null)
-        {
             Instantiate(efectoActivacion, transform.position, Quaternion.identity);
-        }
 
-        // Cambiar luz
+        // Luz activa
         if (luzCristal != null)
         {
             luzCristal.color = colorActivo;
             luzCristal.intensity = 5f;
         }
-
-        Debug.Log($"Cristal {gameObject.name} activado!");
     }
 
-    /// <summary>
-    /// Desactiva el cristal (para reiniciar la secuencia)
-    /// </summary>
+    // ======================================================================
+    //  DESACTIVAR
+    // ======================================================================
     public void Desactivar()
     {
         activado = false;
 
-        // Restaurar color inactivo
+        // Color inactivo
         if (materialCristal != null)
-        {
-            materialCristal.SetColor("_EmissionColor", colorInactivo);
-        }
+            materialCristal.SetColor("_EmissionColor", colorInactivo * 0.5f);
 
-        // Desactivar puente
+        // Puente off
         if (puenteAsociado != null)
-        {
             puenteAsociado.SetActive(false);
-        }
 
-        // Desactivar línea
+        // Línea off
         if (lineRenderer != null)
-        {
             lineRenderer.enabled = false;
-        }
 
-        // Restaurar luz
+        // Luz a modo inactivo
         if (luzCristal != null)
         {
             luzCristal.color = colorInactivo;
@@ -319,9 +269,9 @@ public class CristalNode : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Hace pulsar la luz del cristal (efecto de completado)
-    /// </summary>
+    // ======================================================================
+    //  PULSO DE LUZ (EFECTO COMPLETADO / FEEDBACK)
+    // ======================================================================
     public void PulsarLuz()
     {
         StartCoroutine(PulsarLuzCoroutine());
@@ -329,46 +279,73 @@ public class CristalNode : MonoBehaviour
 
     IEnumerator PulsarLuzCoroutine()
     {
-        if (luzCristal != null)
+        if (luzCristal == null) yield break;
+
+        float intensidadOriginal = luzCristal.intensity;
+        float intensidadMax = intensidadOriginal * 2.5f;
+
+        float t = 0f;
+        while (t < 0.15f)
         {
-            float intensidadOriginal = luzCristal.intensity;
-            luzCristal.intensity = 10f;
-            yield return new WaitForSeconds(0.2f);
-            luzCristal.intensity = intensidadOriginal;
+            t += Time.deltaTime;
+            luzCristal.intensity = Mathf.Lerp(intensidadOriginal, intensidadMax, t / 0.15f);
+            yield return null;
         }
+
+        t = 0f;
+        while (t < 0.15f)
+        {
+            t += Time.deltaTime;
+            luzCristal.intensity = Mathf.Lerp(intensidadMax, intensidadOriginal, t / 0.15f);
+            yield return null;
+        }
+
+        luzCristal.intensity = intensidadOriginal;
     }
 
+    // ======================================================================
+    //  ANIMACIÓN DE RAYO (LINE RENDERER)
+    // ======================================================================
     IEnumerator AnimarLineaEnergia()
     {
         if (lineRenderer == null) yield break;
 
         float tiempo = 0f;
-        float duracion = 0.5f;
+        float duracion = 1f;
+
+        lineRenderer.startColor = colorActivo;
+        lineRenderer.endColor = colorActivo;
+
+        Vector3 inicio = puntoInicioLinea != null ? puntoInicioLinea.position : transform.position;
+        Vector3 fin = puntoDestino != null ? puntoDestino.position : transform.position;
+
+        lineRenderer.SetPosition(0, inicio);
 
         while (tiempo < duracion)
         {
             tiempo += Time.deltaTime;
-            float progreso = tiempo / duracion;
+            float t = tiempo / duracion;
 
-            // Animar el ancho de la línea
-            lineRenderer.startWidth = Mathf.Lerp(0f, 0.1f, progreso);
-            lineRenderer.endWidth = Mathf.Lerp(0f, 0.1f, progreso);
+            Vector3 posActual = Vector3.Lerp(inicio, fin, t);
+            lineRenderer.SetPosition(1, posActual);
+
+            float w = Mathf.Lerp(0f, 0.12f, t);
+            lineRenderer.startWidth = w;
+            lineRenderer.endWidth = w;
 
             yield return null;
         }
+
+        lineRenderer.SetPosition(1, fin);
     }
 
-    // Método legacy para compatibilidad con código anterior
-    public void Activar()
-    {
-        ActivarPermanente();
-    }
+    // Legacy
+    public void Activar() => ActivarPermanente();
 
     void OnDrawGizmosSelected()
     {
         if (!esCristalPista)
         {
-            // Dibujar rango de activación
             Gizmos.color = Color.green;
             Gizmos.DrawWireSphere(transform.position, rangoActivacion);
         }

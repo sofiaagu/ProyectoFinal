@@ -1,15 +1,26 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
 /// <summary>
 /// Sistema de feedback mejorado para los cristales y el templo.
-/// Maneja resonancia, ceremonias de activaci�n, pilares del templo y secuencia final.
+/// VERSIÓN MULTI-COLOR: Cada cristal tiene su propio color único.
 /// </summary>
 public class CrystalFeedbackSystem : MonoBehaviour
 {
+    [Header("Colores de los Cristales")]
+    [Tooltip("Define el color único de cada cristal (5 colores)")]
+    public Color[] coloresCristales = new Color[5]
+    {
+        new Color(0.5f, 0f, 1f),    // 0: Morado
+        new Color(0f, 0.8f, 1f),    // 1: Celeste
+        new Color(1f, 0.6f, 0f),    // 2: Naranja
+        new Color(1f, 0f, 0f),      // 3: Rojo
+        new Color(0f, 0.2f, 0.8f)   // 4: Azul Oscuro
+    };
+
     [Header("Referencias del Templo")]
-    [Tooltip("GameObject ra�z del templo")]
+    [Tooltip("GameObject raíz del templo")]
     public GameObject templo;
 
     [Tooltip("Pilares que se iluminan progresivamente (5 pilares)")]
@@ -35,24 +46,24 @@ public class CrystalFeedbackSystem : MonoBehaviour
     [Tooltip("Luz/Beacon de la torre")]
     public Light luzTorre;
 
-    [Tooltip("Part�culas de la torre")]
+    [Tooltip("Partículas de la torre")]
     public ParticleSystem particulasTorre;
 
-    [Header("Configuraci�n de Resonancia")]
-    [Tooltip("Cada cu�ntos segundos pulsan los cristales activos")]
+    [Header("Configuración de Resonancia")]
+    [Tooltip("Cada cuántos segundos pulsan los cristales activos")]
     public float intervaloPulso = 3f;
 
-    [Tooltip("Intensidad del pulso de b�squeda")]
+    [Tooltip("Intensidad del pulso de búsqueda")]
     public float intensidadPulsoBusqueda = 2f;
 
-    [Tooltip("Radio del pulso de b�squeda")]
+    [Tooltip("Radio del pulso de búsqueda")]
     public float radioPulsoBusqueda = 50f;
 
-    [Header("Configuraci�n de Ceremonia")]
-    [Tooltip("Duraci�n de la ceremonia de activaci�n")]
+    [Header("Configuración de Ceremonia")]
+    [Tooltip("Duración de la ceremonia de activación")]
     public float duracionCeremonia = 4f;
 
-    [Tooltip("Intensidad del shake de c�mara")]
+    [Tooltip("Intensidad del shake de cámara")]
     public float intensidadShake = 0.3f;
 
     [Header("Audio Mejorado")]
@@ -63,14 +74,15 @@ public class CrystalFeedbackSystem : MonoBehaviour
     public AudioClip sonidoConvergenciaFinal;
     public AudioClip sonidoTorreActivada;
 
-    [Header("Part�culas")]
-    public GameObject particulasHelix;
-    public GameObject particulasOndaExpansiva;
-    public GameObject particulasActivacionPilar;
-    public GameObject particulasConvergencia;
+    [Header("Partículas (Prefabs)")]
+    public GameObject particulasHelixPrefab;
+    public GameObject particulasOndaExpansivaPrefab;
+    public GameObject particulasActivacionPilarPrefab;
+    public GameObject particulasConvergenciaPrefab;
 
     private AudioSource audioSource;
     private List<CristalNode> cristalesActivos = new List<CristalNode>();
+    private List<int> indicesCristalesActivos = new List<int>();
     private Coroutine coroutineResonancia;
     private int cristalesActivadosCount = 0;
     private bool puzzleCompletado = false;
@@ -87,18 +99,38 @@ public class CrystalFeedbackSystem : MonoBehaviour
         if (mainCamera != null)
             posicionCamaraOriginal = mainCamera.transform.position;
 
-        // Desactivar todos los pilares al inicio
         DesactivarPilares();
+        AplicarColoresIniciales();
+    }
 
-        // Suscribirse a eventos del CrystalSequenceManager
-        // (Modificaremos el manager para invocar eventos)
+    void AplicarColoresIniciales()
+    {
+        // Aplicar colores a cada cristal según su índice
+        for (int i = 0; i < cristales.Length && i < coloresCristales.Length; i++)
+        {
+            if (cristales[i] != null)
+            {
+                // Establecer el color del cristal
+                cristales[i].colorActivo = coloresCristales[i];
+
+                // Aplicar color a la luz si existe
+                if (cristales[i].luzCristal != null)
+                {
+                    cristales[i].luzCristal.color = coloresCristales[i];
+                }
+            }
+        }
+    }
+
+    Color ObtenerColorCristal(int indice)
+    {
+        if (indice >= 0 && indice < coloresCristales.Length)
+            return coloresCristales[indice];
+        return Color.white;
     }
 
     #region 1. SISTEMA DE RESONANCIA CRISTALINA
 
-    /// <summary>
-    /// Inicia el sistema de resonancia cuando se activa el primer cristal
-    /// </summary>
     public void IniciarResonancia()
     {
         if (coroutineResonancia == null)
@@ -116,23 +148,58 @@ public class CrystalFeedbackSystem : MonoBehaviour
             if (cristalesActivos.Count > 0)
             {
                 // Todos los cristales activos pulsan sincronizados
-                foreach (CristalNode cristal in cristalesActivos)
+                for (int i = 0; i < cristalesActivos.Count; i++)
                 {
+                    CristalNode cristal = cristalesActivos[i];
+                    int indiceCristal = indicesCristalesActivos[i];
+
                     if (cristal != null)
                     {
                         StartCoroutine(PulsarCristalResonante(cristal));
+
+                        // NUEVO: Emitir helix periódico desde cristal hacia puente
+                        StartCoroutine(EmitirHelixPeriodico(cristal, indiceCristal));
                     }
                 }
 
-                // Reproducir sonido de resonancia
                 if (sonidoPulsoResonancia != null)
                     audioSource.PlayOneShot(sonidoPulsoResonancia, 0.3f);
 
-                // Emitir pulso de b�squeda que ilumina el siguiente cristal
                 yield return new WaitForSeconds(0.5f);
                 EmitirPulsoBusqueda();
             }
         }
+    }
+
+    IEnumerator EmitirHelixPeriodico(CristalNode cristal, int indice)
+    {
+        if (particulasHelixPrefab == null) yield break;
+
+        Color colorCristal = ObtenerColorCristal(indice);
+
+        // Crear helix que viaja desde el cristal hacia el puente
+        GameObject helix = Instantiate(particulasHelixPrefab, cristal.transform.position, Quaternion.identity);
+        AplicarColorAParticulas(helix, colorCristal);
+
+        // Si hay LineRenderer, hacer que las partículas viajen por el rayo
+        if (cristal.lineRenderer != null && cristal.lineRenderer.enabled)
+        {
+            Vector3 destino = cristal.lineRenderer.GetPosition(1);
+            float duracion = 1.5f;
+            float tiempo = 0f;
+
+            while (tiempo < duracion && helix != null)
+            {
+                tiempo += Time.deltaTime;
+                float progreso = tiempo / duracion;
+
+                helix.transform.position = Vector3.Lerp(cristal.transform.position, destino, progreso);
+
+                yield return null;
+            }
+        }
+
+        Destroy(helix, 1f);
     }
 
     IEnumerator PulsarCristalResonante(CristalNode cristal)
@@ -144,7 +211,6 @@ public class CrystalFeedbackSystem : MonoBehaviour
             float tiempo = 0f;
             float duracion = 0.4f;
 
-            // Aumentar intensidad
             while (tiempo < duracion / 2)
             {
                 tiempo += Time.deltaTime;
@@ -152,7 +218,6 @@ public class CrystalFeedbackSystem : MonoBehaviour
                 yield return null;
             }
 
-            // Disminuir intensidad
             tiempo = 0f;
             while (tiempo < duracion / 2)
             {
@@ -167,8 +232,7 @@ public class CrystalFeedbackSystem : MonoBehaviour
 
     void EmitirPulsoBusqueda()
     {
-        // Encuentra el �ndice del siguiente cristal correcto
-        int siguienteIndice = sequenceManager != null ? ObtenerSiguienteCristalCorrecto() : -1;
+        int siguienteIndice = sequenceManager != null ? sequenceManager.ObtenerSiguienteCristalCorrecto() : -1;
 
         if (siguienteIndice >= 0 && siguienteIndice < cristales.Length)
         {
@@ -176,46 +240,38 @@ public class CrystalFeedbackSystem : MonoBehaviour
 
             if (siguienteCristal != null && siguienteCristal.luzCristal != null)
             {
-                StartCoroutine(IluminarBrevementeSiguienteCristal(siguienteCristal));
+                StartCoroutine(IluminarBrevementeSiguienteCristal(siguienteCristal, siguienteIndice));
             }
         }
     }
 
-    IEnumerator IluminarBrevementeSiguienteCristal(CristalNode cristal)
+    IEnumerator IluminarBrevementeSiguienteCristal(CristalNode cristal, int indice)
     {
         Light luz = cristal.luzCristal;
         Color colorOriginal = luz.color;
         float intensidadOriginal = luz.intensity;
 
-        // Pulsar con color amarillo (gu�a)
-        luz.color = Color.yellow;
+        // Pulsar con su propio color pero más brillante
+        Color colorBrillante = ObtenerColorCristal(indice) * 1.5f;
+        luz.color = colorBrillante;
         luz.intensity = intensidadPulsoBusqueda * 3f;
 
-        // Crear efecto de part�culas de "ping"
-        if (particulasHelix != null)
+        if (particulasHelixPrefab != null)
         {
-            Instantiate(particulasHelix, cristal.transform.position, Quaternion.identity);
+            GameObject particulas = Instantiate(particulasHelixPrefab, cristal.transform.position, Quaternion.identity);
+            AplicarColorAParticulas(particulas, ObtenerColorCristal(indice));
+            Destroy(particulas, 2f);
         }
 
         yield return new WaitForSeconds(0.8f);
 
-        // Restaurar
         luz.color = colorOriginal;
         luz.intensity = intensidadOriginal;
     }
 
-    int ObtenerSiguienteCristalCorrecto()
-    {
-        if (sequenceManager != null)
-        {
-            return sequenceManager.ObtenerSiguienteCristalCorrecto();
-        }
-        return -1;
-    }
-
     #endregion
 
-    #region 2. PILARES DEL TEMPLO
+    #region 2. PILARES DEL TEMPLO (VERSIÓN MEJORADA CON FEEDBACK)
 
     void DesactivarPilares()
     {
@@ -225,15 +281,12 @@ public class CrystalFeedbackSystem : MonoBehaviour
         {
             if (pilar != null)
             {
-                // Desactivar renderer o luz
                 Renderer[] renderers = pilar.GetComponentsInChildren<Renderer>();
                 foreach (Renderer r in renderers)
                 {
                     Material mat = r.material;
                     if (mat.HasProperty("_EmissionColor"))
-                    {
                         mat.SetColor("_EmissionColor", Color.black);
-                    }
                 }
             }
         }
@@ -241,17 +294,13 @@ public class CrystalFeedbackSystem : MonoBehaviour
         if (lucesPilares != null)
         {
             foreach (Light luz in lucesPilares)
-            {
-                if (luz != null)
-                    luz.enabled = false;
-            }
+                if (luz != null) luz.enabled = false;
         }
     }
 
     public void ActivarPilar(int index)
     {
         if (pilaresTemplo == null || index >= pilaresTemplo.Length) return;
-
         StartCoroutine(AnimarActivacionPilar(index));
     }
 
@@ -259,97 +308,135 @@ public class CrystalFeedbackSystem : MonoBehaviour
     {
         GameObject pilar = pilaresTemplo[index];
         Light luz = lucesPilares != null && index < lucesPilares.Length ? lucesPilares[index] : null;
+        Color colorPilar = ObtenerColorCristal(index);
 
-        // Sonido
+        // 🔊 Sonido al activarse
         if (sonidoPilarActivado != null)
             audioSource.PlayOneShot(sonidoPilarActivado);
 
-        // Part�culas
-        if (particulasActivacionPilar != null && pilar != null)
+        // ✨ Partículas base + color
+        if (particulasActivacionPilarPrefab != null && pilar != null)
         {
-            Instantiate(particulasActivacionPilar, pilar.transform.position, Quaternion.identity);
+            GameObject particulas = Instantiate(particulasActivacionPilarPrefab, pilar.transform.position, Quaternion.identity);
+            AplicarColorAParticulas(particulas, colorPilar);
+            Destroy(particulas, 2f);
         }
 
-        // Animar emisi�n del material
+        // 🌪️ NUEVO: Helix subiendo por el pilar
+        if (particulasHelixPrefab != null)
+        {
+            GameObject helix = Instantiate(particulasHelixPrefab, pilar.transform.position, Quaternion.identity);
+            AplicarColorAParticulas(helix, colorPilar);
+
+            StartCoroutine(MoverHelixPorPilar(helix, pilar.transform));
+        }
+
+        // 💡 Luz del pilar sube de intensidad
+        if (luz != null)
+        {
+            luz.enabled = true;
+            luz.color = colorPilar;
+            luz.intensity = 0;
+
+            float t = 0;
+            float d = 1f;
+            while (t < d)
+            {
+                t += Time.deltaTime;
+                luz.intensity = Mathf.Lerp(0, 7f, t / d);
+                yield return null;
+            }
+        }
+
+        // 🔥 Emisión del pilar sube progresivamente
         if (pilar != null)
         {
             Renderer[] renderers = pilar.GetComponentsInChildren<Renderer>();
-            float tiempo = 0f;
-            float duracion = 1f;
 
-            while (tiempo < duracion)
+            float t = 0;
+            float d = 1.5f;
+            while (t < d)
             {
-                tiempo += Time.deltaTime;
-                float intensidad = Mathf.Lerp(0f, 3f, tiempo / duracion);
+                t += Time.deltaTime;
+                float intensidad = Mathf.Lerp(0f, 4f, t / d);
 
                 foreach (Renderer r in renderers)
                 {
                     Material mat = r.material;
                     if (mat.HasProperty("_EmissionColor"))
-                    {
-                        mat.SetColor("_EmissionColor", Color.cyan * intensidad);
-                    }
+                        mat.SetColor("_EmissionColor", colorPilar * intensidad);
                 }
 
                 yield return null;
             }
         }
+    }
 
-        // Activar luz
-        if (luz != null)
+    IEnumerator MoverHelixPorPilar(GameObject helix, Transform pilar)
+    {
+        if (helix == null || pilar == null)
+            yield break;
+
+        Vector3 basePos = pilar.position;
+        Vector3 topPos = pilar.position + Vector3.up * 6f; // Ajusta la altura del pilar
+
+        float tiempo = 0;
+        float duracion = 1.2f;
+
+        while (tiempo < duracion && helix != null)
         {
-            luz.enabled = true;
-            luz.color = Color.cyan;
-            luz.intensity = 0f;
+            tiempo += Time.deltaTime;
+            float p = tiempo / duracion;
 
-            float tiempo = 0f;
-            float duracion = 0.5f;
+            // Movimiento helicoidal hacia arriba
+            Vector3 pos = Vector3.Lerp(basePos, topPos, p);
+            pos.x += Mathf.Sin(p * 12f) * 0.2f;
+            pos.z += Mathf.Cos(p * 12f) * 0.2f;
 
-            while (tiempo < duracion)
-            {
-                tiempo += Time.deltaTime;
-                luz.intensity = Mathf.Lerp(0f, 5f, tiempo / duracion);
-                yield return null;
-            }
+            helix.transform.position = pos;
+
+            yield return null;
         }
 
-        Debug.Log($"Pilar {index + 1}/5 activado en el templo");
+        if (helix != null) Destroy(helix);
     }
 
     #endregion
 
-    #region 3. CEREMONIA DE ACTIVACI�N
+    #region 3. CEREMONIA DE ACTIVACIÓN
 
     public IEnumerator CeremoniaActivacionCristal(CristalNode cristal, GameObject puente, int indiceCristal)
     {
-        Debug.Log($"Iniciando ceremonia de activaci�n para cristal {indiceCristal}");
+        Debug.Log($"Iniciando ceremonia de activación para cristal {indiceCristal}");
+
+        Color colorCristal = ObtenerColorCristal(indiceCristal);
 
         // 1. CRISTAL PULSA (0.5s)
         yield return StartCoroutine(PulsoCristalInicial(cristal));
 
-        // 2. HELIX DE PART�CULAS (1s)
-        yield return StartCoroutine(EmitirHelixParticulas(cristal));
+        // 2. HELIX DE PARTÍCULAS (1s)
+        yield return StartCoroutine(EmitirHelixParticulas(cristal, colorCristal));
 
         // 3. RAYO CRECE HACIA PUENTE (1s)
-        yield return StartCoroutine(CrecerRayoEnergia(cristal, puente));
+        yield return StartCoroutine(CrecerRayoEnergia(cristal, puente, colorCristal));
 
         // 4. PUENTE SE MATERIALIZA (1.5s)
-        yield return StartCoroutine(MaterializarPuente(puente));
+        yield return StartCoroutine(MaterializarPuente(puente, colorCristal));
 
         // 5. ONDA EXPANSIVA (0.5s)
-        yield return StartCoroutine(OndaExpansiva(puente));
+        yield return StartCoroutine(OndaExpansiva(puente, colorCristal));
 
         // 6. ACTIVAR PILAR DEL TEMPLO
         ActivarPilar(indiceCristal);
 
-        // A�adir cristal a la lista de activos
+        // Añadir cristal a la lista de activos
         if (!cristalesActivos.Contains(cristal))
         {
             cristalesActivos.Add(cristal);
+            indicesCristalesActivos.Add(indiceCristal);
             cristalesActivadosCount++;
         }
 
-        // Iniciar resonancia si es el primer cristal
         if (cristalesActivadosCount == 1)
         {
             IniciarResonancia();
@@ -366,7 +453,6 @@ public class CrystalFeedbackSystem : MonoBehaviour
         float tiempo = 0f;
         float duracion = 0.25f;
 
-        // Expandir
         while (tiempo < duracion)
         {
             tiempo += Time.deltaTime;
@@ -379,7 +465,6 @@ public class CrystalFeedbackSystem : MonoBehaviour
             yield return null;
         }
 
-        // Contraer
         tiempo = 0f;
         while (tiempo < duracion)
         {
@@ -396,18 +481,19 @@ public class CrystalFeedbackSystem : MonoBehaviour
         t.localScale = escalaOriginal;
     }
 
-    IEnumerator EmitirHelixParticulas(CristalNode cristal)
+    IEnumerator EmitirHelixParticulas(CristalNode cristal, Color color)
     {
-        if (particulasHelix != null)
+        if (particulasHelixPrefab != null)
         {
-            GameObject helix = Instantiate(particulasHelix, cristal.transform.position, Quaternion.identity);
+            GameObject helix = Instantiate(particulasHelixPrefab, cristal.transform.position, Quaternion.identity);
+            AplicarColorAParticulas(helix, color);
             Destroy(helix, 2f);
         }
 
         yield return new WaitForSeconds(1f);
     }
 
-    IEnumerator CrecerRayoEnergia(CristalNode cristal, GameObject puente)
+    IEnumerator CrecerRayoEnergia(CristalNode cristal, GameObject puente, Color color)
     {
         if (sonidoRayoCreciendo != null)
             audioSource.PlayOneShot(sonidoRayoCreciendo);
@@ -416,6 +502,9 @@ public class CrystalFeedbackSystem : MonoBehaviour
         if (line != null && puente != null)
         {
             line.enabled = true;
+            line.startColor = color;
+            line.endColor = color;
+
             Vector3 inicio = cristal.transform.position;
             Vector3 fin = puente.transform.position;
 
@@ -431,7 +520,6 @@ public class CrystalFeedbackSystem : MonoBehaviour
                 line.SetPosition(0, inicio);
                 line.SetPosition(1, puntoActual);
 
-                // Animar grosor
                 line.startWidth = Mathf.Lerp(0f, 0.15f, progreso);
                 line.endWidth = Mathf.Lerp(0f, 0.15f, progreso);
 
@@ -446,7 +534,7 @@ public class CrystalFeedbackSystem : MonoBehaviour
         }
     }
 
-    IEnumerator MaterializarPuente(GameObject puente)
+    IEnumerator MaterializarPuente(GameObject puente, Color color)
     {
         if (puente == null) yield break;
 
@@ -455,16 +543,36 @@ public class CrystalFeedbackSystem : MonoBehaviour
 
         puente.SetActive(true);
 
-        // Animar materiales del puente (de transparente a opaco)
         Renderer[] renderers = puente.GetComponentsInChildren<Renderer>();
 
+        // FASE 1: Cristalización progresiva (partículas recorren el puente)
+        float longitudPuente = 10f; // Ajusta según tu puente
+        int numParticulas = 20;
+
+        for (int i = 0; i < numParticulas; i++)
+        {
+            if (particulasOndaExpansivaPrefab != null)
+            {
+                float progreso = (float)i / numParticulas;
+                Vector3 posicion = puente.transform.position + puente.transform.forward * (longitudPuente * progreso);
+
+                GameObject particula = Instantiate(particulasOndaExpansivaPrefab, posicion, Quaternion.identity);
+                AplicarColorAParticulas(particula, color);
+                Destroy(particula, 1f);
+            }
+
+            yield return new WaitForSeconds(0.05f); // Rápido pero visible
+        }
+
+        // FASE 2: Materialización del material con ondas
         float tiempo = 0f;
-        float duracion = 1.5f;
+        float duracion = 1.2f;
 
         while (tiempo < duracion)
         {
             tiempo += Time.deltaTime;
             float alpha = Mathf.Lerp(0f, 1f, tiempo / duracion);
+            float emissionIntensity = Mathf.Sin(tiempo * 10f) * 2f + 2f; // Pulsos
 
             foreach (Renderer r in renderers)
             {
@@ -479,23 +587,36 @@ public class CrystalFeedbackSystem : MonoBehaviour
 
                     if (mat.HasProperty("_EmissionColor"))
                     {
-                        mat.SetColor("_EmissionColor", Color.cyan * (alpha * 2f));
+                        mat.SetColor("_EmissionColor", color * emissionIntensity);
                     }
                 }
             }
 
             yield return null;
         }
+
+        // FASE 3: Estabilización final
+        foreach (Renderer r in renderers)
+        {
+            foreach (Material mat in r.materials)
+            {
+                if (mat.HasProperty("_EmissionColor"))
+                {
+                    mat.SetColor("_EmissionColor", color * 2f);
+                }
+            }
+        }
     }
 
-    IEnumerator OndaExpansiva(GameObject puente)
+    IEnumerator OndaExpansiva(GameObject puente, Color color)
     {
-        if (particulasOndaExpansiva != null && puente != null)
+        if (particulasOndaExpansivaPrefab != null && puente != null)
         {
-            Instantiate(particulasOndaExpansiva, puente.transform.position, Quaternion.identity);
+            GameObject onda = Instantiate(particulasOndaExpansivaPrefab, puente.transform.position, Quaternion.identity);
+            AplicarColorAParticulas(onda, color);
+            Destroy(onda, 2f);
         }
 
-        // Camera shake
         if (mainCamera != null)
         {
             StartCoroutine(CameraShake(intensidadShake, 0.3f));
@@ -506,33 +627,22 @@ public class CrystalFeedbackSystem : MonoBehaviour
 
     #endregion
 
-    #region 4. SECUENCIA FINAL �PICA
+    #region 4. SECUENCIA FINAL ÉPICA
 
     public IEnumerator SecuenciaFinalCompletado()
     {
         puzzleCompletado = true;
 
-        Debug.Log("�Iniciando secuencia final �pica!");
+        Debug.Log("¡Iniciando secuencia final épica!");
 
-        // 1. TODOS LOS CRISTALES PULSAN AL UN�SONO (2s)
         yield return StartCoroutine(PulsoSincronizadoFinal());
-
-        // 2. CONVERGENCIA DE RAYOS HACIA EL TEMPLO (2s)
         yield return StartCoroutine(ConvergenciaRayosAlTemplo());
-
-        // 3. TEMPLO ABSORBE ENERG�A (1s)
         yield return StartCoroutine(TemploAbsorbeEnergia());
-
-        // 4. EXPLOSI�N DE LUZ (0.5s)
         yield return StartCoroutine(ExplosionLuzTemplo());
-
-        // 5. PUENTE FINAL HACIA LA TORRE (3s)
         yield return StartCoroutine(MaterializarPuenteFinal());
-
-        // 6. ACTIVAR TORRE (2s)
         yield return StartCoroutine(ActivarTorreFinal());
 
-        Debug.Log("�Secuencia final completada!");
+        Debug.Log("¡Secuencia final completada!");
     }
 
     IEnumerator PulsoSincronizadoFinal()
@@ -540,8 +650,6 @@ public class CrystalFeedbackSystem : MonoBehaviour
         if (sonidoConvergenciaFinal != null)
             audioSource.PlayOneShot(sonidoConvergenciaFinal);
 
-        float tiempo = 0f;
-        float duracion = 2f;
         int pulsos = 4;
 
         for (int i = 0; i < pulsos; i++)
@@ -554,7 +662,7 @@ public class CrystalFeedbackSystem : MonoBehaviour
                 }
             }
 
-            yield return new WaitForSeconds(duracion / pulsos);
+            yield return new WaitForSeconds(0.5f);
         }
     }
 
@@ -562,13 +670,11 @@ public class CrystalFeedbackSystem : MonoBehaviour
     {
         if (centroTemplo == null) yield break;
 
-        // Redirigir todos los rayos hacia el centro del templo
         float tiempo = 0f;
         float duracion = 2f;
 
         Dictionary<LineRenderer, Vector3> puntosFinalesOriginales = new Dictionary<LineRenderer, Vector3>();
 
-        // Guardar posiciones finales originales
         foreach (CristalNode cristal in cristalesActivos)
         {
             if (cristal != null && cristal.lineRenderer != null)
@@ -578,7 +684,6 @@ public class CrystalFeedbackSystem : MonoBehaviour
             }
         }
 
-        // Animar hacia el centro del templo
         while (tiempo < duracion)
         {
             tiempo += Time.deltaTime;
@@ -593,7 +698,6 @@ public class CrystalFeedbackSystem : MonoBehaviour
                     Vector3 puntoNuevo = Vector3.Lerp(puntoFinalOriginal, centroTemplo.position, progreso);
                     line.SetPosition(1, puntoNuevo);
 
-                    // Aumentar grosor
                     float grosor = Mathf.Lerp(0.15f, 0.3f, progreso);
                     line.startWidth = grosor;
                     line.endWidth = grosor;
@@ -606,18 +710,120 @@ public class CrystalFeedbackSystem : MonoBehaviour
 
     IEnumerator TemploAbsorbeEnergia()
     {
-        if (particulasConvergencia != null && centroTemplo != null)
+        if (centroTemplo == null) yield break;
+
+        // FASE 1: Crear esfera de absorción que crece
+        GameObject esferaObj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        esferaObj.name = "EsferaConvergencia";
+        esferaObj.transform.position = centroTemplo.position;
+        esferaObj.transform.localScale = Vector3.zero;
+
+        // Material brillante para la esfera
+        Renderer esferaRenderer = esferaObj.GetComponent<Renderer>();
+        Material matEsfera = new Material(Shader.Find("Standard"));
+        matEsfera.EnableKeyword("_EMISSION");
+        matEsfera.SetColor("_EmissionColor", Color.white * 5f);
+        matEsfera.SetFloat("_Metallic", 1f);
+        matEsfera.SetFloat("_Glossiness", 1f);
+        esferaRenderer.material = matEsfera;
+
+        // Luz de la esfera
+        Light luzEsfera = esferaObj.AddComponent<Light>();
+        luzEsfera.type = LightType.Point;
+        luzEsfera.color = Color.white;
+        luzEsfera.intensity = 0f;
+        luzEsfera.range = 30f;
+
+        // FASE 2: Emitir partículas desde cada cristal hacia el centro
+        List<GameObject> particulasConvergentes = new List<GameObject>();
+
+        for (int i = 0; i < cristalesActivos.Count; i++)
         {
-            GameObject convergencia = Instantiate(particulasConvergencia, centroTemplo.position, Quaternion.identity);
-            Destroy(convergencia, 2f);
+            CristalNode cristal = cristalesActivos[i];
+            int indiceCristal = indicesCristalesActivos[i];
+            Color colorCristal = ObtenerColorCristal(indiceCristal);
+
+            if (cristal != null && particulasConvergenciaPrefab != null)
+            {
+                // Crear múltiples ráfagas de partículas desde cada cristal
+                for (int j = 0; j < 5; j++)
+                {
+                    GameObject particulas = Instantiate(particulasConvergenciaPrefab, cristal.transform.position, Quaternion.identity);
+                    AplicarColorAParticulas(particulas, colorCristal);
+
+                    // Mover partículas hacia el centro
+                    StartCoroutine(MoverParticulasHaciaCentro(particulas, cristal.transform.position, centroTemplo.position, 1.5f));
+
+                    particulasConvergentes.Add(particulas);
+
+                    yield return new WaitForSeconds(0.1f);
+                }
+            }
         }
 
-        // Camera shake fuerte
+        // FASE 3: Esfera crece mientras absorbe
+        float tiempo = 0f;
+        float duracionAbsorcion = 1.5f;
+
+        while (tiempo < duracionAbsorcion)
+        {
+            tiempo += Time.deltaTime;
+            float progreso = tiempo / duracionAbsorcion;
+
+            // Esfera crece
+            esferaObj.transform.localScale = Vector3.one * Mathf.Lerp(0f, 3f, progreso);
+
+            // Luz aumenta
+            luzEsfera.intensity = Mathf.Lerp(0f, 15f, progreso);
+
+            // Colores de la esfera ciclan entre los 5 colores
+            Color colorCiclico = Color.Lerp(
+                coloresCristales[(int)(Time.time * 5f) % 5],
+                coloresCristales[((int)(Time.time * 5f) + 1) % 5],
+                (Time.time * 5f) % 1f
+            );
+            matEsfera.SetColor("_EmissionColor", colorCiclico * 5f);
+            luzEsfera.color = colorCiclico;
+
+            yield return null;
+        }
+
+        // FASE 4: Shake intenso mientras absorbe
         StartCoroutine(CameraShake(0.5f, 1f));
 
-        yield return new WaitForSeconds(1f);
+        // FASE 5: Todas las partículas llegan, esfera pulsa violentamente
+        tiempo = 0f;
+        float duracionPulso = 0.5f;
 
-        // Ocultar todos los rayos
+        while (tiempo < duracionPulso)
+        {
+            tiempo += Time.deltaTime;
+
+            // Pulso de escala
+            float pulso = Mathf.Sin(tiempo * 30f) * 0.5f + 3f;
+            esferaObj.transform.localScale = Vector3.one * pulso;
+
+            // Pulso de luz
+            luzEsfera.intensity = 15f + Mathf.Sin(tiempo * 30f) * 10f;
+
+            yield return null;
+        }
+
+        // FASE 6: La esfera se estabiliza antes de explotar
+        esferaObj.transform.localScale = Vector3.one * 2.5f;
+        luzEsfera.intensity = 20f;
+        matEsfera.SetColor("_EmissionColor", Color.white * 10f);
+        luzEsfera.color = Color.white;
+
+        yield return new WaitForSeconds(0.3f);
+
+        // Limpiar partículas convergentes
+        foreach (GameObject p in particulasConvergentes)
+        {
+            if (p != null) Destroy(p);
+        }
+
+        // Ocultar los rayos DESPUÉS de la absorción
         foreach (CristalNode cristal in cristalesActivos)
         {
             if (cristal != null && cristal.lineRenderer != null)
@@ -625,37 +831,112 @@ public class CrystalFeedbackSystem : MonoBehaviour
                 cristal.lineRenderer.enabled = false;
             }
         }
+
+        // Guardar referencia para la explosión
+        StartCoroutine(ExplotarEsfera(esferaObj, luzEsfera));
+    }
+
+    IEnumerator MoverParticulasHaciaCentro(GameObject particulas, Vector3 inicio, Vector3 destino, float duracion)
+    {
+        float tiempo = 0f;
+
+        while (tiempo < duracion && particulas != null)
+        {
+            tiempo += Time.deltaTime;
+            float progreso = tiempo / duracion;
+
+            // Movimiento con aceleración (empieza lento, termina rápido)
+            float progressionCurve = progreso * progreso;
+            particulas.transform.position = Vector3.Lerp(inicio, destino, progressionCurve);
+
+            yield return null;
+        }
+    }
+
+    IEnumerator ExplotarEsfera(GameObject esfera, Light luz)
+    {
+        // La esfera "implosiona" rápidamente
+        float tiempo = 0f;
+        float duracion = 0.2f;
+        Vector3 escalaInicial = esfera.transform.localScale;
+
+        while (tiempo < duracion)
+        {
+            tiempo += Time.deltaTime;
+            float progreso = tiempo / duracion;
+
+            // Implosión
+            esfera.transform.localScale = Vector3.Lerp(escalaInicial, Vector3.zero, progreso);
+            luz.intensity = Mathf.Lerp(20f, 0f, progreso);
+
+            yield return null;
+        }
+
+        Destroy(esfera);
+        // La explosión de luz viene después en ExplosionLuzTemplo()
     }
 
     IEnumerator ExplosionLuzTemplo()
     {
         if (centroTemplo == null) yield break;
 
-        // Crear luz intensa en el centro
+        // MEGA EXPLOSIÓN con múltiples ondas
         GameObject lightObj = new GameObject("ExplosionLuz");
         lightObj.transform.position = centroTemplo.position;
         Light luz = lightObj.AddComponent<Light>();
         luz.type = LightType.Point;
         luz.color = Color.white;
         luz.intensity = 0f;
-        luz.range = 50f;
+        luz.range = 100f; // MUCHO más grande
 
+        // Crear múltiples ondas expansivas de partículas
+        for (int i = 0; i < 3; i++)
+        {
+            if (particulasOndaExpansivaPrefab != null)
+            {
+                GameObject onda = Instantiate(particulasOndaExpansivaPrefab, centroTemplo.position, Quaternion.identity);
+
+                // Escalar el sistema de partículas para que sea gigante
+                ParticleSystem ps = onda.GetComponent<ParticleSystem>();
+                if (ps != null)
+                {
+                    var main = ps.main;
+                    main.startSpeed = 25f * (i + 1); // Cada onda más rápida
+                    main.startSize = 1f * (i + 1);
+                }
+
+                Destroy(onda, 2f);
+            }
+
+            yield return new WaitForSeconds(0.1f);
+        }
+
+        // Explosión de luz súper intensa
         float tiempo = 0f;
-        float duracion = 0.5f;
+        float duracion = 0.3f;
 
         while (tiempo < duracion)
         {
             tiempo += Time.deltaTime;
-            luz.intensity = Mathf.Lerp(0f, 20f, tiempo / duracion);
+            luz.intensity = Mathf.Lerp(0f, 30f, tiempo / duracion);
+            luz.range = Mathf.Lerp(50f, 100f, tiempo / duracion);
             yield return null;
         }
 
-        // Desvanecer
+        // Camera shake FUERTE
+        StartCoroutine(CameraShake(0.8f, 0.5f));
+
+        // Mantener luz máxima brevemente
+        yield return new WaitForSeconds(0.2f);
+
+        // Desvanecer lentamente (más dramático)
         tiempo = 0f;
+        duracion = 1f;
+
         while (tiempo < duracion)
         {
             tiempo += Time.deltaTime;
-            luz.intensity = Mathf.Lerp(20f, 0f, tiempo / duracion);
+            luz.intensity = Mathf.Lerp(30f, 0f, tiempo / duracion);
             yield return null;
         }
 
@@ -664,8 +945,6 @@ public class CrystalFeedbackSystem : MonoBehaviour
 
     IEnumerator MaterializarPuenteFinal()
     {
-        // Este m�todo necesitar�a referencia al puente final
-        // Por ahora solo esperamos
         yield return new WaitForSeconds(3f);
     }
 
@@ -682,6 +961,7 @@ public class CrystalFeedbackSystem : MonoBehaviour
         if (luzTorre != null)
         {
             luzTorre.enabled = true;
+            luzTorre.color = new Color(1f, 0.84f, 0f); // Dorado
             luzTorre.intensity = 0f;
 
             float tiempo = 0f;
@@ -706,6 +986,35 @@ public class CrystalFeedbackSystem : MonoBehaviour
     #endregion
 
     #region UTILIDADES
+
+    void AplicarColorAParticulas(GameObject particulasObj, Color color)
+    {
+        ParticleSystem ps = particulasObj.GetComponent<ParticleSystem>();
+        if (ps != null)
+        {
+            var main = ps.main;
+            main.startColor = color;
+
+            var colorOverLifetime = ps.colorOverLifetime;
+            if (colorOverLifetime.enabled)
+            {
+                Gradient grad = new Gradient();
+                grad.SetKeys(
+                    new GradientColorKey[] {
+                        new GradientColorKey(color, 0f),
+                        new GradientColorKey(Color.white, 0.5f),
+                        new GradientColorKey(color, 1f)
+                    },
+                    new GradientAlphaKey[] {
+                        new GradientAlphaKey(1f, 0f),
+                        new GradientAlphaKey(1f, 0.7f),
+                        new GradientAlphaKey(0f, 1f)
+                    }
+                );
+                colorOverLifetime.color = grad;
+            }
+        }
+    }
 
     IEnumerator CameraShake(float intensidad, float duracion)
     {
