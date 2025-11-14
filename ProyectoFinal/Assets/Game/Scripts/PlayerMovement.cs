@@ -61,7 +61,14 @@ public class PlayerMovement : MonoBehaviour
         {
             anim.SetTrigger("attack");
         }
+
+        if (Input.GetKeyDown(KeyCode.J))
+        {
+            anim.SetTrigger("attack");
+        }
     }
+
+
 
     public void EstoyCayendo()
     {
@@ -102,6 +109,7 @@ public class PlayerMovement : MonoBehaviour
                     StartCoroutine(InvulnerabilidadTemporal());
             }
         }
+
     }
 
 
@@ -151,5 +159,7 @@ public class PlayerMovement : MonoBehaviour
 
         invulnerable = false;
     }
+
+
 
 }
