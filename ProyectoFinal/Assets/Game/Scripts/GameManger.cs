@@ -122,4 +122,36 @@ public class GameManager : MonoBehaviour
 
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
+
+    public void VolverAlMenuYResetear()
+    {
+        Time.timeScale = 1f;
+
+        ResetDatos(); // Reinicia score, tiempo y UI
+
+        // Mostrar cursor
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+
+        // Apagar panel game over si está presente
+        if (panelGameOver != null)
+            panelGameOver.SetActive(false);
+
+        // Cargar escena del menú
+        SceneManager.LoadScene("Menu");
+
+        Debug.Log("🏠 Volviendo al menú principal con reset global.");
+    }
+    public void ResetDatos()
+    {
+        score = 0;
+
+        // Reset de tiempo
+        tiemposPorEscena.Clear();
+        tiempoTotal = 0f;
+
+        ActualizarUI();
+    }
+
+
 }
