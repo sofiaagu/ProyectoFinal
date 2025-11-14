@@ -620,12 +620,12 @@ MonoBehaviour:
   sliderVolumen: {fileID: 0}
   sliderMusica: {fileID: 0}
   sliderSFX: {fileID: 0}
-  nombreSiguienteEscena: EscenaOlvido
+  nombreSiguienteEscena: Sactum
   nombresNiveles:
+  - Sactum
   - EscenaOlvido
-  - Escena1
-  - Escena3
-  - Escena4
+  - BosquedeLira
+  - Aethermoor
 --- !u!4 &997671761
 Transform:
   m_ObjectHideFlags: 0
@@ -811,6 +811,9 @@ MonoBehaviour:
   controllerActual: {fileID: 0}
   score: 0
   textoScore: {fileID: 0}
+  enemigosEliminados: 0
+  puntosPorEnemigo: 5
+  textoEnemigos: {fileID: 0}
   panelGameOver: {fileID: 0}
 --- !u!1 &2084073139
 GameObject:
@@ -919,13 +922,29 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 997671760}
+    - target: {fileID: 1229771325158093366, guid: fc0f84dc146af1f49addd379f2ef7950, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1450176785033649484, guid: fc0f84dc146af1f49addd379f2ef7950, type: 3}
       propertyPath: m_AnchoredPosition.x
       value: 49
       objectReference: {fileID: 0}
     - target: {fileID: 1851929263561194272, guid: fc0f84dc146af1f49addd379f2ef7950, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 627.849
+      objectReference: {fileID: 0}
+    - target: {fileID: 1851929263561194272, guid: fc0f84dc146af1f49addd379f2ef7950, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 117.722
+      objectReference: {fileID: 0}
+    - target: {fileID: 1851929263561194272, guid: fc0f84dc146af1f49addd379f2ef7950, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 64
+      value: 38.99999
+      objectReference: {fileID: 0}
+    - target: {fileID: 1851929263561194272, guid: fc0f84dc146af1f49addd379f2ef7950, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 54.05606
       objectReference: {fileID: 0}
     - target: {fileID: 1980208302472898135, guid: fc0f84dc146af1f49addd379f2ef7950, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
@@ -988,8 +1007,28 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3647051549592091287, guid: fc0f84dc146af1f49addd379f2ef7950, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 627.849
+      objectReference: {fileID: 0}
+    - target: {fileID: 3647051549592091287, guid: fc0f84dc146af1f49addd379f2ef7950, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 117.722
+      objectReference: {fileID: 0}
+    - target: {fileID: 3647051549592091287, guid: fc0f84dc146af1f49addd379f2ef7950, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 64
+      value: 38.99999
+      objectReference: {fileID: 0}
+    - target: {fileID: 3647051549592091287, guid: fc0f84dc146af1f49addd379f2ef7950, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -409.99994
+      objectReference: {fileID: 0}
+    - target: {fileID: 3813174079974813427, guid: fc0f84dc146af1f49addd379f2ef7950, type: 3}
+      propertyPath: m_text
+      value: Ecos del Umbral
+      objectReference: {fileID: 0}
+    - target: {fileID: 3813174079974813427, guid: fc0f84dc146af1f49addd379f2ef7950, type: 3}
+      propertyPath: m_margin.y
+      value: 98.00465
       objectReference: {fileID: 0}
     - target: {fileID: 3813174079974813427, guid: fc0f84dc146af1f49addd379f2ef7950, type: 3}
       propertyPath: m_fontAsset
@@ -1116,8 +1155,20 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 997671760}
     - target: {fileID: 7051828203032623456, guid: fc0f84dc146af1f49addd379f2ef7950, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 627.849
+      objectReference: {fileID: 0}
+    - target: {fileID: 7051828203032623456, guid: fc0f84dc146af1f49addd379f2ef7950, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 117.722
+      objectReference: {fileID: 0}
+    - target: {fileID: 7051828203032623456, guid: fc0f84dc146af1f49addd379f2ef7950, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 64
+      value: 38.99999
+      objectReference: {fileID: 0}
+    - target: {fileID: 7051828203032623456, guid: fc0f84dc146af1f49addd379f2ef7950, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -250.34093
       objectReference: {fileID: 0}
     - target: {fileID: 7440414123432272424, guid: fc0f84dc146af1f49addd379f2ef7950, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
@@ -1252,12 +1303,36 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8527395665084667217, guid: fc0f84dc146af1f49addd379f2ef7950, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 627.849
+      objectReference: {fileID: 0}
+    - target: {fileID: 8527395665084667217, guid: fc0f84dc146af1f49addd379f2ef7950, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 117.722
+      objectReference: {fileID: 0}
+    - target: {fileID: 8527395665084667217, guid: fc0f84dc146af1f49addd379f2ef7950, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 64
+      value: 38.99999
+      objectReference: {fileID: 0}
+    - target: {fileID: 8527395665084667217, guid: fc0f84dc146af1f49addd379f2ef7950, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -98.142944
+      objectReference: {fileID: 0}
+    - target: {fileID: 8647286302283148118, guid: fc0f84dc146af1f49addd379f2ef7950, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 627.849
+      objectReference: {fileID: 0}
+    - target: {fileID: 8647286302283148118, guid: fc0f84dc146af1f49addd379f2ef7950, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 117.722
       objectReference: {fileID: 0}
     - target: {fileID: 8647286302283148118, guid: fc0f84dc146af1f49addd379f2ef7950, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 64
+      value: 39
+      objectReference: {fileID: 0}
+    - target: {fileID: 8647286302283148118, guid: fc0f84dc146af1f49addd379f2ef7950, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 207
       objectReference: {fileID: 0}
     - target: {fileID: 9077317719512267806, guid: fc0f84dc146af1f49addd379f2ef7950, type: 3}
       propertyPath: m_Type
