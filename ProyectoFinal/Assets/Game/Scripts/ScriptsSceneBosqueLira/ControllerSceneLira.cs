@@ -19,13 +19,13 @@ public class ControllerSceneLira : MonoBehaviour
 
     private bool bosqueRestaurado = false;
 
+    // 🔹 NUEVO: guardamos la corutina activa del mensaje
+    private Coroutine mensajeCoroutine;
+
     void Start()
     {
         textoSemillas.text = "Semillas recolectadas: 0/" + semillasTotales;
         mensajeUI.text = "";
-
-        // 🌿 Mensaje inicial
-        MostrarMensaje("Bienvenido al Santuario de Agua. \n\n Haz clic en las gemas en el orden correcto para activar la semilla del santuario.", 6f);
     }
 
     // 🔹 Llamado por Semilla al ser recogida
@@ -34,7 +34,6 @@ public class ControllerSceneLira : MonoBehaviour
         semillasRecolectadas++;
         textoSemillas.text = $"Semillas recolectadas: {semillasRecolectadas}/{semillasTotales}";
 
-        // Mensaje informativo
         MostrarMensaje($"Has recolectado una semilla ({semillasRecolectadas}/{semillasTotales})", 3f);
 
         if (TieneTodasLasSemillas())
@@ -81,11 +80,19 @@ public class ControllerSceneLira : MonoBehaviour
         RenderSettings.fog = false;
     }
 
+    // ============================================================
+    // 🟢 MÉTODO ARREGLADO: NO BLOQUEA A LOS SANTUARIOS
+    // ============================================================
+
     public void MostrarMensaje(string texto, float duracion = 2f)
     {
         if (mensajeUI == null) return;
-        StopAllCoroutines();
-        StartCoroutine(MostrarMensajeTemporal(texto, duracion));
+
+        // Detiene SOLO su propia corutina, NO las demás del juego
+        if (mensajeCoroutine != null)
+            StopCoroutine(mensajeCoroutine);
+
+        mensajeCoroutine = StartCoroutine(MostrarMensajeTemporal(texto, duracion));
     }
 
     private System.Collections.IEnumerator MostrarMensajeTemporal(string texto, float duracion)
