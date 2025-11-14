@@ -18,7 +18,7 @@ EditorBuildSettings:
     path: Assets/Game/Scenes/BosquedeLira.unity
     guid: c55d7a8f6fc7e8a4597275cc63f56cee
   - enabled: 1
-    path: Assets/Game/Scenes/Escena4.unity
+    path: Assets/Game/Scenes/Aethermoor.unity
     guid: 593533ceb139e81448d943bd8360c1b6
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
