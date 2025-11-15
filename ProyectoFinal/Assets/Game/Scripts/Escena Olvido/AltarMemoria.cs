@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class AltarMemoria : MonoBehaviour
 {
+    public UIestado uiEstado;
+
     [Header("Referencias")]
     public GameObject uiOrdenarPanel;
     public UIOrdenarPalabras uiOrdenarScript;
@@ -53,6 +55,7 @@ public class AltarMemoria : MonoBehaviour
             if (palabras[i] != ordenCorrecto[i])
             {
                 Debug.Log("Orden incorrecto. Intenta de nuevo.");
+                uiEstado.ActualizarEstado("Orden incorrecto. Intenta de nuevo.");
                 return;
             }
         }
@@ -61,6 +64,7 @@ public class AltarMemoria : MonoBehaviour
         {
             portalFinal.SetActive(true);
             Debug.Log("🌌 Portal final ahora está activo.");
+            uiEstado.ActualizarEstado("Portal final ahora está activo.");
         }
         else
         {

@@ -13,6 +13,7 @@ public class PortalController : MonoBehaviour
     [Tooltip("Si está marcado, el portal no se desactiva tras usarse.")]
     public bool persistente = false;
 
+    public UIestado uiEstado;
     private void Start()
     {
         // Solo el primer portal estará activo desde el inicio
@@ -61,5 +62,6 @@ public class PortalController : MonoBehaviour
     {
         gameObject.SetActive(true);
         Debug.Log($"🟢 Portal activado manualmente: {gameObject.name}");
+        uiEstado.ActualizarEstado("Portal Activado");
     }
 }

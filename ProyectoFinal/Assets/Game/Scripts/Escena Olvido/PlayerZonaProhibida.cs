@@ -25,7 +25,7 @@ public class PlayerZonaProhibida : MonoBehaviour
         if (hit.collider.CompareTag("Prohibido"))
         {
             Debug.Log("🚫 Zona prohibida tocada");
-            uiEstado.ActualizarEstado("🚫 Zona prohibida tocada");
+            uiEstado.ActualizarEstado("Zona prohibida tocada");
 
             if (puntoReinicio != null)
             {
