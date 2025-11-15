@@ -7,6 +7,7 @@ public class PlayerZonaProhibida : MonoBehaviour
     public Transform puntoReinicio;
 
     private CharacterController controller;
+    public UIestado uiEstado;
 
     void Start()
     {
@@ -24,6 +25,7 @@ public class PlayerZonaProhibida : MonoBehaviour
         if (hit.collider.CompareTag("Prohibido"))
         {
             Debug.Log("🚫 Zona prohibida tocada");
+            uiEstado.ActualizarEstado("🚫 Zona prohibida tocada");
 
             if (puntoReinicio != null)
             {
