@@ -72,7 +72,7 @@ public class AbilityPickup : MonoBehaviour
         else if (habilidad == AbilityType.Equilibrio)
         {
             abilities.tieneEquilibrio = true;
-            mensaje = "¡Habilidad Adquirida!\nEquilibrio\n[Presiona E para cambiar plano]";
+            mensaje = "¡Habilidad Adquirida!\nEquilibrio\n[Presiona R para cambiar plano]";
         }
 
         // Mostrar notificación ANTES de destruir

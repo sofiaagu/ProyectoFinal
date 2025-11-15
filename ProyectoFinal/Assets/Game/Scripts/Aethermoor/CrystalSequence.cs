@@ -4,7 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 
 public class CrystalSequenceManager : MonoBehaviour
+
+
 {
+    
+
     [Header("Configuración de Cristales")]
     [Tooltip("Cristales de pista (los que muestran la secuencia)")]
     public CristalNode[] cristalesPista;
@@ -55,6 +59,7 @@ public class CrystalSequenceManager : MonoBehaviour
 
     void Start()
     {
+        //reproduccionesRestantes = maxReproducciones;
         audioSource = GetComponent<AudioSource>();
         if (audioSource == null)
             audioSource = gameObject.AddComponent<AudioSource>();
