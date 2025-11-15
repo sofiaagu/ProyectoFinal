@@ -127877,7 +127877,7 @@ MonoBehaviour:
   panelPerdiste: {fileID: 0}
   healthUI: {fileID: 0}
   sonidoMuerte: {fileID: 8300000, guid: 26f0b711c768ac2449f083834e7156ff, type: 3}
-  sonidoVidaPerdida: {fileID: 0}
+  sonidoVidaPerdida: {fileID: 8300000, guid: 26f0b711c768ac2449f083834e7156ff, type: 3}
 --- !u!82 &611500692
 AudioSource:
   m_ObjectHideFlags: 0
@@ -414696,7 +414696,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8946929817114775780, guid: fc0f84dc146af1f49addd379f2ef7950, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -22.999634
+      value: -22.999878
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
