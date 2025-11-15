@@ -1,61 +1,107 @@
-using UnityEngine;
-using System.Collections;
+﻿using UnityEngine;
 
+[RequireComponent(typeof(CharacterController))]
+[RequireComponent(typeof(AudioSource))]
 public class PlayerRespawn : MonoBehaviour
 {
-    [Header("Configuraci�n")]
-    public float alturaMinima = 970f;
-    public Transform puntoRespawn; // P�BLICO para que los cubos puedan cambiarlo
-    public float tiempoAntesDeRespawn = 2f;
+    [Header("Respawn Settings")]
+    public Transform respawnPoint; // 🔹 PÚBLICO para que los cubos lo puedan cambiar
 
-    [Header("Efectos (Opcional)")]
-    public GameObject efectoMuerte;
+    [Header("Vida")]
+    public int vidasIniciales = 3;
+    private int vidasActuales;
+
+    [Header("Death Zone")]
+    public float alturaMinima = -10f; // 🔹 Altura por debajo de la cual el jugador muere
+
+    [Header("UI")]
+    public GameObject panelPerdiste;
+    public PlayerHealthUI healthUI;
+
+    [Header("Efectos opcionales")]
     public AudioClip sonidoMuerte;
+    public AudioClip sonidoVidaPerdida;
 
-    private bool estaMuriendo = false;
+    private CharacterController controller;
     private AudioSource audioSource;
+    private bool estaMuriendo = false; // 🔹 Evita muerte múltiple
 
-    void Start()
+    public int CurrentLives => vidasActuales;
+
+    private void Awake()
     {
+        controller = GetComponent<CharacterController>();
         audioSource = GetComponent<AudioSource>();
-        if (audioSource == null)
-            audioSource = gameObject.AddComponent<AudioSource>();
 
-        if (puntoRespawn == null)
+        Time.timeScale = 1f;
+        vidasActuales = vidasIniciales;
+
+        if (respawnPoint == null)
         {
-            GameObject respawnPoint = new GameObject("RespawnPoint");
-            respawnPoint.transform.position = transform.position;
-            puntoRespawn = respawnPoint.transform;
+            GameObject spawn = new GameObject("SpawnPoint");
+            spawn.transform.position = transform.position;
+            respawnPoint = spawn.transform;
         }
     }
 
-    void Update()
+    private void Start()
     {
+        if (panelPerdiste != null)
+            panelPerdiste.SetActive(false);
+
+        if (healthUI != null)
+            healthUI.UpdateHearts();
+    }
+
+    private void Update()
+    {
+        // 🔹 DETECTAR CAÍDA (Death Zone por altura)
         if (!estaMuriendo && transform.position.y < alturaMinima)
         {
-            StartCoroutine(Morir());
+            PerderVida();
         }
     }
 
-    IEnumerator Morir()
+    private void OnControllerColliderHit(ControllerColliderHit hit)
     {
-        estaMuriendo = true;
-        yield return new WaitForSeconds(tiempoAntesDeRespawn);
-
-        if (efectoMuerte != null)
-            Instantiate(efectoMuerte, transform.position, Quaternion.identity);
-
-        if (sonidoMuerte != null && audioSource != null)
-            audioSource.PlayOneShot(sonidoMuerte);
-
-        Respawn();
+        // 🔹 DETECTAR COLISIÓN con objetos etiquetados como "DeathZone"
+        if (!estaMuriendo && hit.gameObject.CompareTag("DeathZone"))
+        {
+            PerderVida();
+        }
     }
 
-    void Respawn()
+    private void PerderVida()
     {
-        CharacterController cc = GetComponent<CharacterController>();
-        if (cc != null) cc.enabled = false;
+        if (estaMuriendo) return; // Evitar múltiples llamadas
 
+        estaMuriendo = true;
+        vidasActuales--;
+
+        if (healthUI != null)
+            healthUI.UpdateHearts();
+
+        Debug.Log("Vida perdida. Vidas restantes: " + vidasActuales);
+
+        // 🔊 Reproducir sonido de vida perdida
+        if (sonidoVidaPerdida != null && audioSource != null)
+            audioSource.PlayOneShot(sonidoVidaPerdida);
+
+        if (vidasActuales <= 0)
+        {
+            GameOver();
+        }
+        else
+        {
+            Respawn();
+        }
+    }
+
+    private void Respawn()
+    {
+        controller.enabled = false;
+
+        // 🔹 Resetear velocidad si hay Rigidbody
         Rigidbody rb = GetComponent<Rigidbody>();
         if (rb != null)
         {
@@ -63,16 +109,45 @@ public class PlayerRespawn : MonoBehaviour
             rb.angularVelocity = Vector3.zero;
         }
 
-        if (puntoRespawn != null)
-        {
-            transform.position = puntoRespawn.position;
-        }
-        else
-        {
-            transform.position = new Vector3(0, 1, 0);
-        }
+        transform.position = respawnPoint.position;
+        controller.enabled = true;
 
-        if (cc != null) cc.enabled = true;
+        estaMuriendo = false; // 🔹 Permitir detectar muerte nuevamente
+        Debug.Log("Respawn en: " + respawnPoint.position);
+    }
+
+    private void GameOver()
+    {
+        Debug.Log("¡Game Over!");
+
+        // 🔊 Reproducir sonido de muerte
+        if (sonidoMuerte != null && audioSource != null)
+            audioSource.PlayOneShot(sonidoMuerte);
+
+        if (panelPerdiste != null)
+            panelPerdiste.SetActive(true);
+
+        // 🔹 Pausa del juego
+        Time.timeScale = 0f;
+
+        // 🔹 Desactivar controles del jugador (opcional)
+        controller.enabled = false;
+    }
+
+    // 🔹 MÉTODO PÚBLICO para reiniciar el juego
+    public void ReiniciarJuego()
+    {
+        Time.timeScale = 1f;
+        vidasActuales = vidasIniciales;
+
+        if (panelPerdiste != null)
+            panelPerdiste.SetActive(false);
+
+        if (healthUI != null)
+            healthUI.UpdateHearts();
+
+        controller.enabled = true;
         estaMuriendo = false;
+        Respawn();
     }
 }

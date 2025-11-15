@@ -13,6 +13,8 @@ TagManager:
   - arma2
   - TextoScore
   - PanelGameOver
+  - Lava
+  - DeathZone
   layers:
   - Default
   - TransparentFX

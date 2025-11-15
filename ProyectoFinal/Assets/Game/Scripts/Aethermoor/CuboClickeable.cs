@@ -146,7 +146,7 @@ public class CuboClickeable : MonoBehaviour
             PlayerRespawn playerRespawn = FindFirstObjectByType<PlayerRespawn>();
             if (playerRespawn != null)
             {
-                playerRespawn.puntoRespawn = nuevoPuntoRespawn;
+                playerRespawn.respawnPoint = nuevoPuntoRespawn;
                 Debug.Log("Punto de respawn cambiado a: " + nuevoPuntoRespawn.name);
             }
         }
