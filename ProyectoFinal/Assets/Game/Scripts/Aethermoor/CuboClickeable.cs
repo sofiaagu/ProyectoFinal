@@ -13,21 +13,24 @@ public class CuboClickeable : MonoBehaviour
     };
 
     [Header("Configuración Visual")]
-    public float tiempoEntreMensajes = 2f; // Tiempo que dura cada mensaje
+    public float tiempoEntreMensajes = 2f;
     public int tamañoFuente = 24;
     public Color colorTexto = Color.white;
-    public Color colorFondo = new Color(0, 0, 0, 0.7f); // Negro semi-transparente
+    public Color colorFondo = new Color(0, 0, 0, 0.7f);
 
     [Header("Configuración de Animación del Cubo")]
-    public float alturaMovimiento = 2f; // Qué tan alto sube el cubo
-    public float velocidadMovimiento = 2f; // Velocidad de subida/bajada
-    public float velocidadRotacion = 180f; // Grados por segundo de rotación
+    public float alturaMovimiento = 2f;
+    public float velocidadMovimiento = 2f;
+    public float velocidadRotacion = 180f;
 
     [Header("Configuración de Sonido")]
-    public AudioClip sonidoClick; // Sonido al hacer click en el cubo
-    public AudioClip sonidoMensaje; // Sonido al aparecer cada mensaje
+    public AudioClip sonidoClick;
+    public AudioClip sonidoMensaje;
     [Range(0f, 1f)]
     public float volumen = 0.5f;
+
+    [Header("Configuración de Respawn")]
+    public Transform nuevoPuntoRespawn; // NUEVO: Arrastra aquí el punto de respawn para este cubo
 
     private int indiceMensajeActual = 0;
     private bool mostrandoMensajes = false;
@@ -35,17 +38,14 @@ public class CuboClickeable : MonoBehaviour
     private string mensajeActual = "";
     private AudioSource audioSource;
 
-    // Variables para la animación del cubo
     private Vector3 posicionInicial;
     private bool animandoCubo = false;
     private float progresoAnimacion = 0f;
 
     void Start()
     {
-        // Guardar posición inicial del cubo
         posicionInicial = transform.position;
 
-        // Crear o obtener AudioSource
         audioSource = GetComponent<AudioSource>();
         if (audioSource == null)
         {
@@ -57,7 +57,6 @@ public class CuboClickeable : MonoBehaviour
 
     void Update()
     {
-        // Detectar click en el cubo
         if (Input.GetMouseButtonDown(0) && !mostrandoMensajes)
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -69,11 +68,11 @@ public class CuboClickeable : MonoBehaviour
                 {
                     IniciarMensajes();
                     ReproducirSonido(sonidoClick);
+                    CambiarPuntoRespawn(); // NUEVO: Cambia el respawn al hacer click
                 }
             }
         }
 
-        // Gestionar la muestra de mensajes
         if (mostrandoMensajes)
         {
             tiempoTranscurrido += Time.deltaTime;
@@ -95,7 +94,6 @@ public class CuboClickeable : MonoBehaviour
             }
         }
 
-        // Animar el cubo
         AnimarCubo();
     }
 
@@ -103,17 +101,13 @@ public class CuboClickeable : MonoBehaviour
     {
         if (animandoCubo)
         {
-            // Movimiento de arriba hacia abajo (efecto de rebote)
             progresoAnimacion += Time.deltaTime * velocidadMovimiento;
             float offsetY = Mathf.Sin(progresoAnimacion) * alturaMovimiento;
             transform.position = posicionInicial + Vector3.up * offsetY;
-
-            // Rotación continua
             transform.Rotate(Vector3.up * velocidadRotacion * Time.deltaTime);
         }
         else
         {
-            // Volver suavemente a la posición original
             transform.position = Vector3.Lerp(transform.position, posicionInicial, Time.deltaTime * 5f);
         }
     }
@@ -144,33 +138,42 @@ public class CuboClickeable : MonoBehaviour
         }
     }
 
+    // NUEVO MÉTODO: Cambia el punto de respawn del jugador
+    void CambiarPuntoRespawn()
+    {
+        if (nuevoPuntoRespawn != null)
+        {
+            PlayerRespawn playerRespawn = FindFirstObjectByType<PlayerRespawn>();
+            if (playerRespawn != null)
+            {
+                playerRespawn.puntoRespawn = nuevoPuntoRespawn;
+                Debug.Log("Punto de respawn cambiado a: " + nuevoPuntoRespawn.name);
+            }
+        }
+    }
+
     void OnGUI()
     {
         if (mostrandoMensajes && !string.IsNullOrEmpty(mensajeActual))
         {
-            // Configurar estilo del texto
             GUIStyle estiloTexto = new GUIStyle(GUI.skin.label);
             estiloTexto.fontSize = tamañoFuente;
             estiloTexto.normal.textColor = colorTexto;
             estiloTexto.alignment = TextAnchor.MiddleCenter;
             estiloTexto.wordWrap = true;
 
-            // Calcular dimensiones
             float anchoPanel = Screen.width * 0.8f;
             float altoPanel = 100f;
             float x = (Screen.width - anchoPanel) / 2;
             float y = Screen.height / 2 - altoPanel / 2;
 
-            // Dibujar fondo
             Texture2D fondoTextura = new Texture2D(1, 1);
             fondoTextura.SetPixel(0, 0, colorFondo);
             fondoTextura.Apply();
             GUI.DrawTexture(new Rect(x, y, anchoPanel, altoPanel), fondoTextura);
 
-            // Dibujar texto
             GUI.Label(new Rect(x, y, anchoPanel, altoPanel), mensajeActual, estiloTexto);
 
-            // Limpiar textura
             Destroy(fondoTextura);
         }
     }
