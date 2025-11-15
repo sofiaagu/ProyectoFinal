@@ -1,27 +1,55 @@
-﻿using TMPro;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class ArbolCentral : MonoBehaviour
 {
-    public TextMeshProUGUI mensajeUI;
-    public ParticleSystem efectoRestauracion;
+    [Header("Portal final que aparecerá")]
+    public GameObject portalFinal;
 
-    private bool restaurado = false;
+    [Header("UI del juego")]
+    public ControllerSceneLira controller;
 
-    void Update()
+    void Start()
     {
-        if (!restaurado && GameFlowManager.Instance != null && GameFlowManager.Instance.TieneTodasLasSemillas())
-        {
-            restaurado = true;
-            RestaurarBosque();
-        }
+        // Seguridad
+        if (controller == null)
+            controller = FindObjectOfType<ControllerSceneLira>();
+
+        if (portalFinal != null)
+            portalFinal.SetActive(false);
     }
 
-    void RestaurarBosque()
+    private void OnMouseDown()
     {
-        mensajeUI.text = "🌳 ¡Has restaurado el Bosque de Lira!";
-        if (efectoRestauracion != null)
-            efectoRestauracion.Play();
-        Debug.Log("✨ Bosque restaurado con las 3 semillas");
+        // Si NO existe GameFlowManager
+        if (GameFlowManager.Instance == null)
+        {
+            Debug.LogError("No existe GameFlowManager en escena.");
+            return;
+        }
+
+        // Si NO tiene todas las semillas
+        if (!GameFlowManager.Instance.TieneTodasLasSemillas())
+        {
+            controller?.MostrarMensaje("Aún te faltan semillas...", 3f);
+            Debug.Log("❌ No tienes todas las semillas");
+            return;
+        }
+
+        // Si tiene las 3 → activar portal
+        ActivarPortalFinal();
+    }
+
+    void ActivarPortalFinal()
+    {
+        if (portalFinal != null)
+        {
+            portalFinal.SetActive(true);
+            controller?.MostrarMensaje("¡El portal final ha aparecido!", 3f);
+            Debug.Log("✨ Portal final activado");
+        }
+        else
+        {
+            Debug.LogError("No asignaste el portalFinal en el inspector.");
+        }
     }
 }
