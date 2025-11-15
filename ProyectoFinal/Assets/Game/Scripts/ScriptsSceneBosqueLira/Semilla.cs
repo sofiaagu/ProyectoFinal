@@ -50,6 +50,12 @@ public class Semilla : MonoBehaviour
                 santuarioTierra.ActivarPrefab();
         }
 
+        else if (tipoSemilla == "Luz")
+        {
+            SantuarioLuz santuarioLuz = FindObjectOfType<SantuarioLuz>();
+            if (santuarioLuz != null)
+                santuarioLuz.ActivarPortel();
+        }
 
         // ✅ 5. Desactivar semilla después del efecto
         Invoke(nameof(Desactivar), 0.2f);

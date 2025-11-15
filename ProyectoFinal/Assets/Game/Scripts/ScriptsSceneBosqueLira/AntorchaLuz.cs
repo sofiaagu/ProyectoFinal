@@ -2,33 +2,47 @@ using UnityEngine;
 
 public class AntorchaLuz : MonoBehaviour
 {
-    [Header("Luz cuando se enciende")]
-    public GameObject luzAntorcha; // Point Light
+    [Header("Partículas de la antorcha")]
+    public ParticleSystem fuegoEncendido;   // Sistema de partículas de fuego (apagado al inicio)
 
-    [Header("Manager del Santuario de Luz")]
-    public SantuarioLuz manager;
+    [Header("Opcional")]
+    public AudioSource sonidoEncender;
 
-    bool encendida = false;
+    private bool encendida = false;
+    private SantuarioLuz santuario;
 
     void Start()
     {
-        if (luzAntorcha != null)
-            luzAntorcha.SetActive(false);
+        // Buscar el script del santuario
+        santuario = FindObjectOfType<SantuarioLuz>();
+
+        // Asegurar que la antorcha empieza apagada
+        if (fuegoEncendido != null)
+        {
+            fuegoEncendido.Stop();
+            fuegoEncendido.gameObject.SetActive(false);
+        }
     }
 
-    void OnMouseDown()
+    private void OnMouseDown()
     {
-        if (!encendida)
-            EncenderAntorcha();
-    }
+        // Evitar repetir clics
+        if (encendida) return;
 
-    void EncenderAntorcha()
-    {
         encendida = true;
 
-        if (luzAntorcha != null)
-            luzAntorcha.SetActive(true);
+        // Encender partículas
+        if (fuegoEncendido != null)
+        {
+            fuegoEncendido.gameObject.SetActive(true);
+            fuegoEncendido.Play();
+        }
 
-        manager.RegistrarAntorchaEncendida();
+        // Sonido opcional
+        if (sonidoEncender != null)
+            sonidoEncender.Play();
+
+        // Avisar al santuario que una antorcha fue encendida
+        santuario?.RegistrarAntorchaEncendida();
     }
 }
