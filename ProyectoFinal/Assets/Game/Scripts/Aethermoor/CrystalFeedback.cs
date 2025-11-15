@@ -512,7 +512,6 @@ public class CrystalFeedbackSystem : MonoBehaviour
 
                 yield return null;
             }
-
             line.SetPosition(1, fin);
         }
         else
@@ -520,7 +519,6 @@ public class CrystalFeedbackSystem : MonoBehaviour
             yield return new WaitForSeconds(1f);
         }
     }
-
     IEnumerator MaterializarPuente(GameObject puente, Color color)
     {
         if (puente == null) yield break;
@@ -1002,7 +1000,6 @@ public class CrystalFeedbackSystem : MonoBehaviour
             }
         }
     }
-
     IEnumerator CameraShake(float intensidad, float duracion)
     {
         if (mainCamera == null) yield break;
