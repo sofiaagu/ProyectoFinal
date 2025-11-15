@@ -1,2 +1,14 @@
 fileFormatVersion: 2
 guid: a9c5ec41f751f384995c1d7de9b15784
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - estructurasTemporales: {instanceID: 0}
+  - flechaIndicadora: {fileID: 919132149155446097, guid: 5291f336b65a1e34cb41b853504cccc0, type: 3}
+  - siguienteCristal: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

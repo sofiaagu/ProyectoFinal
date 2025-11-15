@@ -11,6 +11,12 @@ public class PlayerAbilities : MonoBehaviour
     public GameObject planoEtereo;
     public Camera playerCamera;
 
+    [Header("Equilibrio Temporal (Q)")]
+    public GameObject estructurasTemporales;        // Agrupa aquí todas las plataformas que deben aparecer
+    public float duracionEquilibrioTemporal = 12f;  // 10–15 segundos recomendado
+    private bool usandoEquilibrioTemporal = false;
+    private float timerEquilibrio = 0f;
+
     private bool enPlanoEtereo = false;
 
     void Start()
@@ -18,14 +24,35 @@ public class PlayerAbilities : MonoBehaviour
         // Configuración inicial del plano
         if (planoFisico != null) planoFisico.SetActive(true);
         if (planoEtereo != null) planoEtereo.SetActive(false);
+
+        // Asegurar que las estructuras temporales inicien apagadas
+        if (estructurasTemporales != null)
+            estructurasTemporales.SetActive(false);
     }
 
     void Update()
     {
         // Habilidad de Equilibrio - Cambiar de plano con E
-        if (tieneEquilibrio && Input.GetKeyDown(KeyCode.E))
+        if (tieneEquilibrio && Input.GetKeyDown(KeyCode.R))
         {
             CambiarPlano();
+        }
+
+        // Activar estructuras temporales con Q
+        if (tieneEquilibrio && Input.GetKeyDown(KeyCode.Q))
+        {
+            ActivarEquilibrioTemporal();
+        }
+
+        // Manejar duración del Equilibrio Temporal
+        if (usandoEquilibrioTemporal)
+        {
+            timerEquilibrio -= Time.deltaTime;
+
+            if (timerEquilibrio <= 0)
+            {
+                DesactivarEquilibrioTemporal();
+            }
         }
     }
 
@@ -45,5 +72,33 @@ public class PlayerAbilities : MonoBehaviour
         }
 
         Debug.Log("Cambiado a plano: " + (enPlanoEtereo ? "Etéreo" : "Físico"));
+    }
+
+    // ============================================================
+    //   MÉTODOS DEL EQUILIBRIO TEMPORAL (Q)
+    // ============================================================
+
+    void ActivarEquilibrioTemporal()
+    {
+        if (estructurasTemporales == null) return;
+
+        if (!usandoEquilibrioTemporal)
+        {
+            estructurasTemporales.SetActive(true);
+            usandoEquilibrioTemporal = true;
+            timerEquilibrio = duracionEquilibrioTemporal;
+
+            Debug.Log("Equilibrio Temporal ACTIVADO por " + duracionEquilibrioTemporal + " segundos.");
+        }
+    }
+
+    void DesactivarEquilibrioTemporal()
+    {
+        if (estructurasTemporales == null) return;
+
+        estructurasTemporales.SetActive(false);
+        usandoEquilibrioTemporal = false;
+
+        Debug.Log("Equilibrio Temporal DESACTIVADO.");
     }
 }

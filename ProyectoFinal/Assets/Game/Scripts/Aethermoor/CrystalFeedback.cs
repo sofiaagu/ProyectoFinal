@@ -97,7 +97,10 @@ public class CrystalFeedbackSystem : MonoBehaviour
 
         mainCamera = Camera.main;
         if (mainCamera != null)
+        {
+            // Guardar la posición Y ROTACIÓN original
             posicionCamaraOriginal = mainCamera.transform.position;
+        }
 
         DesactivarPilares();
         AplicarColoresIniciales();
@@ -177,15 +180,16 @@ public class CrystalFeedbackSystem : MonoBehaviour
 
         Color colorCristal = ObtenerColorCristal(indice);
 
-        // Crear helix que viaja desde el cristal hacia el puente
+        // Crear helix MÁS GRANDE que viaja desde el cristal hacia el puente
         GameObject helix = Instantiate(particulasHelixPrefab, cristal.transform.position, Quaternion.identity);
+        helix.transform.localScale = Vector3.one * 2f; // MÁS GRANDE
         AplicarColorAParticulas(helix, colorCristal);
 
         // Si hay LineRenderer, hacer que las partículas viajen por el rayo
         if (cristal.lineRenderer != null && cristal.lineRenderer.enabled)
         {
             Vector3 destino = cristal.lineRenderer.GetPosition(1);
-            float duracion = 1.5f;
+            float duracion = 2f; // MÁS LENTO (antes 1.5s)
             float tiempo = 0f;
 
             while (tiempo < duracion && helix != null)
@@ -199,7 +203,7 @@ public class CrystalFeedbackSystem : MonoBehaviour
             }
         }
 
-        Destroy(helix, 1f);
+        Destroy(helix, 1.5f);
     }
 
     IEnumerator PulsarCristalResonante(CristalNode cristal)
@@ -240,27 +244,30 @@ public class CrystalFeedbackSystem : MonoBehaviour
 
             if (siguienteCristal != null && siguienteCristal.luzCristal != null)
             {
-                StartCoroutine(IluminarBrevementeSiguienteCristal(siguienteCristal, siguienteIndice));
+                // CRÍTICO: Usar el índice REAL del cristal para el color
+                int indiceRealCristal = System.Array.IndexOf(cristales, siguienteCristal);
+                StartCoroutine(IluminarBrevementeSiguienteCristal(siguienteCristal, indiceRealCristal));
             }
         }
     }
 
-    IEnumerator IluminarBrevementeSiguienteCristal(CristalNode cristal, int indice)
+    IEnumerator IluminarBrevementeSiguienteCristal(CristalNode cristal, int indiceReal)
     {
         Light luz = cristal.luzCristal;
         Color colorOriginal = luz.color;
         float intensidadOriginal = luz.intensity;
 
-        // Pulsar con su propio color pero más brillante
-        Color colorBrillante = ObtenerColorCristal(indice) * 1.5f;
+        // Pulsar con su propio color (índice REAL) pero más brillante
+        Color colorBrillante = ObtenerColorCristal(indiceReal) * 1.5f;
         luz.color = colorBrillante;
         luz.intensity = intensidadPulsoBusqueda * 3f;
 
         if (particulasHelixPrefab != null)
         {
             GameObject particulas = Instantiate(particulasHelixPrefab, cristal.transform.position, Quaternion.identity);
-            AplicarColorAParticulas(particulas, ObtenerColorCristal(indice));
-            Destroy(particulas, 2f);
+            particulas.transform.localScale = Vector3.one * 2f; // MÁS GRANDE
+            AplicarColorAParticulas(particulas, ObtenerColorCristal(indiceReal));
+            Destroy(particulas, 2.5f);
         }
 
         yield return new WaitForSeconds(0.8f);
@@ -271,7 +278,7 @@ public class CrystalFeedbackSystem : MonoBehaviour
 
     #endregion
 
-    #region 2. PILARES DEL TEMPLO (VERSIÓN MEJORADA CON FEEDBACK)
+    #region 2. PILARES DEL TEMPLO
 
     void DesactivarPilares()
     {
@@ -286,7 +293,9 @@ public class CrystalFeedbackSystem : MonoBehaviour
                 {
                     Material mat = r.material;
                     if (mat.HasProperty("_EmissionColor"))
+                    {
                         mat.SetColor("_EmissionColor", Color.black);
+                    }
                 }
             }
         }
@@ -294,7 +303,10 @@ public class CrystalFeedbackSystem : MonoBehaviour
         if (lucesPilares != null)
         {
             foreach (Light luz in lucesPilares)
-                if (luz != null) luz.enabled = false;
+            {
+                if (luz != null)
+                    luz.enabled = false;
+            }
         }
     }
 
@@ -308,97 +320,62 @@ public class CrystalFeedbackSystem : MonoBehaviour
     {
         GameObject pilar = pilaresTemplo[index];
         Light luz = lucesPilares != null && index < lucesPilares.Length ? lucesPilares[index] : null;
+
+        // Obtener el color del cristal correspondiente
         Color colorPilar = ObtenerColorCristal(index);
 
-        // 🔊 Sonido al activarse
         if (sonidoPilarActivado != null)
             audioSource.PlayOneShot(sonidoPilarActivado);
 
-        // ✨ Partículas base + color
         if (particulasActivacionPilarPrefab != null && pilar != null)
         {
             GameObject particulas = Instantiate(particulasActivacionPilarPrefab, pilar.transform.position, Quaternion.identity);
             AplicarColorAParticulas(particulas, colorPilar);
-            Destroy(particulas, 2f);
+            Destroy(particulas, 3f);
         }
 
-        // 🌪️ NUEVO: Helix subiendo por el pilar
-        if (particulasHelixPrefab != null)
-        {
-            GameObject helix = Instantiate(particulasHelixPrefab, pilar.transform.position, Quaternion.identity);
-            AplicarColorAParticulas(helix, colorPilar);
-
-            StartCoroutine(MoverHelixPorPilar(helix, pilar.transform));
-        }
-
-        // 💡 Luz del pilar sube de intensidad
-        if (luz != null)
-        {
-            luz.enabled = true;
-            luz.color = colorPilar;
-            luz.intensity = 0;
-
-            float t = 0;
-            float d = 1f;
-            while (t < d)
-            {
-                t += Time.deltaTime;
-                luz.intensity = Mathf.Lerp(0, 7f, t / d);
-                yield return null;
-            }
-        }
-
-        // 🔥 Emisión del pilar sube progresivamente
         if (pilar != null)
         {
             Renderer[] renderers = pilar.GetComponentsInChildren<Renderer>();
+            float tiempo = 0f;
+            float duracion = 1f;
 
-            float t = 0;
-            float d = 1.5f;
-            while (t < d)
+            while (tiempo < duracion)
             {
-                t += Time.deltaTime;
-                float intensidad = Mathf.Lerp(0f, 4f, t / d);
+                tiempo += Time.deltaTime;
+                float intensidad = Mathf.Lerp(0f, 3f, tiempo / duracion);
 
                 foreach (Renderer r in renderers)
                 {
                     Material mat = r.material;
                     if (mat.HasProperty("_EmissionColor"))
+                    {
                         mat.SetColor("_EmissionColor", colorPilar * intensidad);
+                    }
                 }
 
                 yield return null;
             }
         }
-    }
 
-    IEnumerator MoverHelixPorPilar(GameObject helix, Transform pilar)
-    {
-        if (helix == null || pilar == null)
-            yield break;
-
-        Vector3 basePos = pilar.position;
-        Vector3 topPos = pilar.position + Vector3.up * 6f; // Ajusta la altura del pilar
-
-        float tiempo = 0;
-        float duracion = 1.2f;
-
-        while (tiempo < duracion && helix != null)
+        if (luz != null)
         {
-            tiempo += Time.deltaTime;
-            float p = tiempo / duracion;
+            luz.enabled = true;
+            luz.color = colorPilar;
+            luz.intensity = 0f;
 
-            // Movimiento helicoidal hacia arriba
-            Vector3 pos = Vector3.Lerp(basePos, topPos, p);
-            pos.x += Mathf.Sin(p * 12f) * 0.2f;
-            pos.z += Mathf.Cos(p * 12f) * 0.2f;
+            float tiempo = 0f;
+            float duracion = 0.5f;
 
-            helix.transform.position = pos;
-
-            yield return null;
+            while (tiempo < duracion)
+            {
+                tiempo += Time.deltaTime;
+                luz.intensity = Mathf.Lerp(0f, 5f, tiempo / duracion);
+                yield return null;
+            }
         }
 
-        if (helix != null) Destroy(helix);
+        Debug.Log($"Pilar {index + 1}/5 activado con color {colorPilar}");
     }
 
     #endregion
@@ -407,9 +384,12 @@ public class CrystalFeedbackSystem : MonoBehaviour
 
     public IEnumerator CeremoniaActivacionCristal(CristalNode cristal, GameObject puente, int indiceCristal)
     {
-        Debug.Log($"Iniciando ceremonia de activación para cristal {indiceCristal}");
+        // CRÍTICO: Obtener el índice REAL del cristal en el array, no el índice de la secuencia
+        int indiceRealCristal = System.Array.IndexOf(cristales, cristal);
 
-        Color colorCristal = ObtenerColorCristal(indiceCristal);
+        Debug.Log($"Iniciando ceremonia - Índice secuencia: {indiceCristal}, Índice real cristal: {indiceRealCristal}");
+
+        Color colorCristal = ObtenerColorCristal(indiceRealCristal);
 
         // 1. CRISTAL PULSA (0.5s)
         yield return StartCoroutine(PulsoCristalInicial(cristal));
@@ -426,14 +406,14 @@ public class CrystalFeedbackSystem : MonoBehaviour
         // 5. ONDA EXPANSIVA (0.5s)
         yield return StartCoroutine(OndaExpansiva(puente, colorCristal));
 
-        // 6. ACTIVAR PILAR DEL TEMPLO
-        ActivarPilar(indiceCristal);
+        // 6. ACTIVAR PILAR DEL TEMPLO (usar índice REAL del cristal)
+        ActivarPilar(indiceRealCristal);
 
-        // Añadir cristal a la lista de activos
+        // Añadir cristal a la lista de activos con su índice REAL
         if (!cristalesActivos.Contains(cristal))
         {
             cristalesActivos.Add(cristal);
-            indicesCristalesActivos.Add(indiceCristal);
+            indicesCristalesActivos.Add(indiceRealCristal); // Guardar índice REAL
             cristalesActivadosCount++;
         }
 
@@ -486,11 +466,18 @@ public class CrystalFeedbackSystem : MonoBehaviour
         if (particulasHelixPrefab != null)
         {
             GameObject helix = Instantiate(particulasHelixPrefab, cristal.transform.position, Quaternion.identity);
+
+            // Hacer el helix MÁS GRANDE
+            helix.transform.localScale = Vector3.one * 2f;
+
             AplicarColorAParticulas(helix, color);
-            Destroy(helix, 2f);
+
+            // Destruir después de MÁS TIEMPO
+            Destroy(helix, 3f);
         }
 
-        yield return new WaitForSeconds(1f);
+        // Esperar MÁS tiempo antes de continuar
+        yield return new WaitForSeconds(1.5f);
     }
 
     IEnumerator CrecerRayoEnergia(CristalNode cristal, GameObject puente, Color color)
@@ -1020,7 +1007,8 @@ public class CrystalFeedbackSystem : MonoBehaviour
     {
         if (mainCamera == null) yield break;
 
-        Vector3 posicionOriginal = mainCamera.transform.position;
+        // CRÍTICO: Guardar posición ACTUAL antes de cada shake
+        Vector3 posicionInicial = mainCamera.transform.position;
         float tiempoTranscurrido = 0f;
 
         while (tiempoTranscurrido < duracion)
@@ -1028,13 +1016,14 @@ public class CrystalFeedbackSystem : MonoBehaviour
             float x = Random.Range(-1f, 1f) * intensidad;
             float y = Random.Range(-1f, 1f) * intensidad;
 
-            mainCamera.transform.position = posicionOriginal + new Vector3(x, y, 0f);
+            mainCamera.transform.position = posicionInicial + new Vector3(x, y, 0f);
 
             tiempoTranscurrido += Time.deltaTime;
             yield return null;
         }
 
-        mainCamera.transform.position = posicionOriginal;
+        // SIEMPRE volver a la posición inicial
+        mainCamera.transform.position = posicionInicial;
     }
 
     #endregion
