@@ -1,10 +1,14 @@
 ﻿using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class ControllerSceneLira : MonoBehaviour
 {
     public int semillasTotales = 3;
     private int semillasRecolectadas = 0;
+    private int monedasEscena = 0;
+
+    public Timer timer;
 
     [Header("Portal")]
     public GameObject portal;
@@ -12,6 +16,7 @@ public class ControllerSceneLira : MonoBehaviour
     [Header("Referencias UI")]
     public TextMeshProUGUI textoSemillas;
     public TextMeshProUGUI mensajeUI;
+    public TextMeshProUGUI textoMonedas;
 
     [Header("Referencias de Escena")]
     public GameObject arbolCentral;
@@ -26,6 +31,11 @@ public class ControllerSceneLira : MonoBehaviour
     {
         textoSemillas.text = "Semillas recolectadas: 0/" + semillasTotales;
         mensajeUI.text = "";
+
+        if (timer == null)
+            timer = FindFirstObjectByType<Timer>();
+
+        ActualizarUI();
     }
 
     // 🔹 Llamado por Semilla al ser recogida
@@ -100,5 +110,45 @@ public class ControllerSceneLira : MonoBehaviour
         mensajeUI.text = texto;
         yield return new WaitForSeconds(duracion);
         mensajeUI.text = "";
+    }
+    private void ActualizarUI()
+    {
+
+        if (textoMonedas != null)
+            textoMonedas.text = "Monedas: " + monedasEscena;
+    }
+    public void ReiniciarJuego()
+    {
+        Time.timeScale = 1f;
+
+        if (GameManager.instance != null)
+            GameManager.instance.ReiniciarJuego();
+        else
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+    public void CompletarEscena()
+    {
+        Debug.Log("🏁 Escena completada. Registrando tiempo…");
+
+        if (timer != null)
+        {
+            timer.TimerStop();
+
+            if (GameManager.instance != null)
+                GameManager.instance.RegistrarTiempo(timer.StopTime);
+        }
+
+        // Aquí puedes cargar otro nivel si deseas:
+        // SceneManager.LoadScene("SiguienteNivel");
+    }
+    public void RegistrarMoneda(int cantidad)
+    {
+        monedasEscena += cantidad;
+        ActualizarUI();
+
+        if (GameManager.instance != null)
+            GameManager.instance.AgregarMoneda(cantidad);
+
+        Debug.Log($"💰 Moneda recogida | Escena: {monedasEscena}");
     }
 }

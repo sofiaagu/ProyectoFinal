@@ -2,24 +2,27 @@
 
 public class Coin : MonoBehaviour
 {
-    public int valorMoneda = 1;
+    public int valorMoneda = 2;
     public AudioClip sonidoMoneda;
 
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
         {
-            // Busca el controller de la escena actual
-            if (GameManager.instance != null && GameManager.instance.controllerActual != null)
+            if (GameManager.instance != null)
             {
-                GameManager.instance.controllerActual.RegistrarMoneda(valorMoneda);
+                // Si existe Controller2
+                if (GameManager.instance.controllerActual != null)
+                    GameManager.instance.controllerActual.RegistrarMoneda(valorMoneda);
+
+                // Si existe ControllerSceneLira
+                if (GameManager.instance.controllerActual2 != null)
+                    GameManager.instance.controllerActual2.RegistrarMoneda(valorMoneda);
             }
 
-            // Reproduce sonido (opcional)
             if (sonidoMoneda != null)
                 AudioSource.PlayClipAtPoint(sonidoMoneda, transform.position);
 
-            // Destruye la moneda
             Destroy(gameObject);
         }
     }

@@ -11,9 +11,13 @@ public class PlayerHealth : MonoBehaviour
 
     void Start()
     {
-        currentLives = maxLives;
+        // Si GameManager tiene vidas guardadas, úsalas
+        if (GameManager.instance != null && GameManager.instance.vidasPersistentes >= 0)
+            currentLives = GameManager.instance.vidasPersistentes;
+        else
+            currentLives = maxLives; // Primera vez en el juego
 
-        // 🔥 AUTOASIGNACIÓN DEL UI (si no está asignado a mano)
+        // Autoasignar UI
         if (playerHealthUI == null)
             playerHealthUI = FindFirstObjectByType<PlayerHealthUI>();
 
@@ -27,6 +31,10 @@ public class PlayerHealth : MonoBehaviour
         if (currentLives < 0)
             currentLives = 0;
 
+        // 🔥 Guardar en GameManager
+        if (GameManager.instance != null)
+            GameManager.instance.vidasPersistentes = currentLives;
+
         if (playerHealthUI == null)
             playerHealthUI = FindFirstObjectByType<PlayerHealthUI>();
 
@@ -36,6 +44,7 @@ public class PlayerHealth : MonoBehaviour
         if (currentLives <= 0)
             Die();
     }
+
 
     void Die()
     {
