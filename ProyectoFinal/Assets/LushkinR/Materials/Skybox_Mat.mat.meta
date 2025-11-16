@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 7f0fb1ace69929e49b0c7df8078ad9c8
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 176085
+  packageName: LWRP Vertical Fog
+  packageVersion: 1.0
+  assetPath: Assets/LushkinR/Materials/Skybox_Mat.mat
+  uploadId: 385281
