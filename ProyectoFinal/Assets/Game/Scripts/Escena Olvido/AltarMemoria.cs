@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class AltarMemoria : MonoBehaviour
 {
@@ -73,5 +74,7 @@ public class AltarMemoria : MonoBehaviour
 
         // Notificar al controller que se completó la escena
         controller.CompletarEscena();
+        
     }
+
 }

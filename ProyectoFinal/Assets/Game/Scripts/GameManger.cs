@@ -12,8 +12,7 @@ public class GameManager : MonoBehaviour
     // CONTROLLER DE LA ESCENA
     // ============================================================
     public Controller2 controllerActual;
-
-
+    public ControllerSceneLira controllerActual2;
     // ============================================================
     // SCORE (MONEDAS)
     // ============================================================
@@ -25,6 +24,9 @@ public class GameManager : MonoBehaviour
     public int enemigosEliminados = 0;        // Contador
     public int puntosPorEnemigo = 5;          // Puntos por enemigo
     public TextMeshProUGUI textoEnemigos;     // Opcional si quieres mostrarlo en UI
+
+    public int vidasPersistentes = -1; // -1 significa "no inicializado"
+
 
     // ============================================================
     // GAME OVER
@@ -73,7 +75,8 @@ public class GameManager : MonoBehaviour
 
         // Controller
         controllerActual = FindAnyObjectByType<Controller2>();
-
+        controllerActual2 = FindAnyObjectByType<ControllerSceneLira>();
+        
         ActualizarUI();
     }
 
@@ -168,6 +171,7 @@ public class GameManager : MonoBehaviour
     public void ResetDatos()
     {
         score = 0;
+        vidasPersistentes = -1;
 
         // Reset de tiempo
         tiemposPorEscena.Clear();
