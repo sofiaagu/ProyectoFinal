@@ -5,7 +5,7 @@ using UnityEngine;
 public class Fragmento : MonoBehaviour
 {
     public GameObject panelUI;
-    public Texture2D iconoFragmento; // Arrastra aquí la TEXTURA del fragmento
+    public Texture2D iconoFragmento;
 
     void Start()
     {
@@ -17,7 +17,6 @@ public class Fragmento : MonoBehaviour
 
     void Update()
     {
-        // Permitir cerrar el panel con ESC
         if (panelUI != null && panelUI.activeSelf && Input.GetKeyDown(KeyCode.Escape))
         {
             CerrarPanel();
@@ -48,16 +47,13 @@ public class Fragmento : MonoBehaviour
     {
         Debug.Log("RecolectarFragmento llamado");
 
-        // PRIMERO reanudar el juego
         Time.timeScale = 1f;
 
-        // LUEGO cerrar el panel
         if (panelUI != null)
         {
             panelUI.SetActive(false);
         }
 
-        // Agregar al inventario
         if (Inventory.instance != null)
         {
             if (iconoFragmento != null)
@@ -67,6 +63,10 @@ public class Fragmento : MonoBehaviour
                 if (agregado)
                 {
                     Debug.Log("¡Fragmento recolectado y agregado al inventario!");
+
+                    // ⭐ SOLO NOTIFICAR AL SCENECONTROLLER
+                    SceneController.instance?.RegistrarFragmento();
+
                     Destroy(gameObject);
                 }
                 else

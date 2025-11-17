@@ -39,6 +39,18 @@ public class PuertaController : MonoBehaviour
     {
         puertaAbierta = true;
         Debug.Log("🎉 ¡Puerta abierta! Enemigos eliminados: " + GameManager.instance.enemigosEliminados);
-        gameObject.SetActive(false); // Desaparecer la puerta
+
+        // ⭐ AÑADE ESTOS DEBUGS ⭐
+        if (SceneController.instance != null)
+        {
+            Debug.Log("✅ SceneController encontrado, llamando a PuertaSeAbrio()");
+            SceneController.instance.PuertaSeAbrio();
+        }
+        else
+        {
+            Debug.LogError("❌ SceneController.instance es NULL!");
+        }
+
+        gameObject.SetActive(false);
     }
 }
