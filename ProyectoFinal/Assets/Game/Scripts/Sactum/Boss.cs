@@ -1,147 +1,123 @@
 ﻿using UnityEngine;
-using UnityEngine.AI;
+using System.Collections;
+using System.Collections.Generic;
 
 public class Boss : MonoBehaviour
 {
-    [Header("Configuración")]
-    public float distanciaDeteccion = 15f;
-    public float distanciaAtaque = 2.5f;
-    public float velocidadCaminar = 1.5f;
-    public float velocidadCorrer = 3.5f;
-
-    [Header("Nombres de Parámetros del Animator")]
-    public string paramWalk = "walk";
-    public string paramRun = "run";
-    public string paramAttack = "attack";
-
-    private NavMeshAgent agent;
-    private GameObject target;
-    private Animator ani;
-    private bool atacando;
-    private float tiempoEntreAtaques = 1.5f;
+    public int rutina;
+    public float cronometro;
+    public Animator ani;
+    public Quaternion angulo;
+    public float grado;
+    public GameObject target;
+    public bool atacando;
+    private float tiempoEntreAtaques = 0.5f;
     private float siguienteAtaque = 0f;
 
     void Start()
     {
-        Debug.Log("🟢 Boss Start() ejecutado");
-
         ani = GetComponent<Animator>();
-        if (ani == null)
-            Debug.LogError("❌ No hay Animator!");
-        else
-        {
-            Debug.Log("✅ Animator encontrado");
-            // Mostrar parámetros disponibles
-            foreach (AnimatorControllerParameter param in ani.parameters)
-            {
-                Debug.Log($"   Parámetro: {param.name} (tipo: {param.type})");
-            }
-        }
-
-        agent = GetComponent<NavMeshAgent>();
-        if (agent == null)
-            Debug.LogError("❌ No hay NavMeshAgent!");
-        else
-        {
-            Debug.Log("✅ NavMeshAgent encontrado");
-            agent.speed = velocidadCorrer;
-            agent.stoppingDistance = distanciaAtaque;
-            agent.updateRotation = true;
-        }
-
         target = GameObject.Find("Player");
-        if (target == null)
-            Debug.LogError("❌ No se encontró Player!");
-        else
-            Debug.Log("✅ Player encontrado");
     }
 
     void Update()
     {
-        if (agent == null || target == null || ani == null) return;
+        Comportamiento_Enemigo();
+    }
+
+    public void Comportamiento_Enemigo()
+    {
+        // SI ESTÁ ATACANDO, NO HACER NADA MÁS - dejar que termine
+        if (atacando)
+        {
+            // Opcional: seguir mirando al jugador mientras ataca
+            var lookPos = target.transform.position - transform.position;
+            lookPos.y = 0;
+            if (lookPos != Vector3.zero)
+            {
+                var rotation = Quaternion.LookRotation(lookPos);
+                transform.rotation = Quaternion.RotateTowards(transform.rotation, rotation, 3);
+            }
+            return; // Sale del método, ignora todo lo demás
+        }
 
         float distancia = Vector3.Distance(transform.position, target.transform.position);
 
-        // Si está atacando
-        if (atacando)
+        if (distancia > 10)
         {
-            agent.isStopped = true;
-            ani.SetBool(paramWalk, false);
-            ani.SetBool(paramRun, false);
-            ani.SetBool(paramAttack, true);
-            return;
-        }
+            // Lejos del jugador - comportamiento aleatorio
+            ani.SetBool("run", false);
+            ani.SetBool("attack", false);
 
-        // Jugador detectado
-        if (distancia <= distanciaDeteccion)
-        {
-            agent.isStopped = false;
-
-            // Muy cerca - Atacar
-            if (distancia <= distanciaAtaque)
+            cronometro += 1 * Time.deltaTime;
+            if (cronometro >= 4)
             {
-                agent.isStopped = true;
-
-                ani.SetBool(paramWalk, false);
-                ani.SetBool(paramRun, false);
-                ani.SetBool(paramAttack, false);
-
-                if (Time.time >= siguienteAtaque)
-                {
-                    ani.SetBool(paramAttack, true);
-                    atacando = true;
-                    Invoke("FinalizarAtaque", 1.5f);
-                }
+                rutina = Random.Range(0, 2);
+                cronometro = 0;
             }
-            // Perseguir
-            else
+
+            switch (rutina)
             {
-                agent.SetDestination(target.transform.position);
-                agent.speed = velocidadCorrer;
+                case 0:
+                    ani.SetBool("walk", false);
+                    break;
 
-                // FORZAR animación de correr
-                ani.SetBool(paramAttack, false);
-                ani.SetBool(paramWalk, false);
-                ani.SetBool(paramRun, true);
+                case 1:
+                    grado = Random.Range(0, 360);
+                    angulo = Quaternion.Euler(0, grado, 0);
+                    rutina++;
+                    break;
 
-                Debug.Log("🏃 Corriendo hacia el jugador - run=true");
+                case 2:
+                    transform.rotation = Quaternion.RotateTowards(transform.rotation, angulo, 0.5f);
+                    transform.Translate(Vector3.forward * 1 * Time.deltaTime);
+                    ani.SetBool("walk", true);
+                    break;
             }
         }
-        // Jugador lejos - idle
+        else if (distancia > 5)
+        {
+            // Cerca del jugador - perseguir
+            var lookPos = target.transform.position - transform.position;
+            lookPos.y = 0;
+            var rotation = Quaternion.LookRotation(lookPos);
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, rotation, 2);
+
+            ani.SetBool("walk", false);
+            ani.SetBool("run", true);
+            ani.SetBool("attack", false);
+
+            transform.Translate(Vector3.forward * 2 * Time.deltaTime);
+        }
         else
         {
-            agent.isStopped = true;
-            ani.SetBool(paramWalk, false);
-            ani.SetBool(paramRun, false);
-            ani.SetBool(paramAttack, false);
-        }
+            // Muy cerca del jugador - zona de ataque
+            ani.SetBool("walk", false);
+            ani.SetBool("run", false);
 
-        // Debug
-        if (Time.frameCount % 30 == 0)
-        {
-            Debug.Log($"walk={ani.GetBool(paramWalk)} | run={ani.GetBool(paramRun)} | attack={ani.GetBool(paramAttack)}");
-        }
-    }
+            // Mirar hacia el jugador
+            var lookPos = target.transform.position - transform.position;
+            lookPos.y = 0;
+            if (lookPos != Vector3.zero)
+            {
+                var rotation = Quaternion.LookRotation(lookPos);
+                transform.rotation = Quaternion.RotateTowards(transform.rotation, rotation, 3);
+            }
 
-    void SetAnimBool(string param, bool value)
-    {
-        if (ani == null) return;
-
-        // Intentar setear el parámetro si existe
-        try
-        {
-            ani.SetBool(param, value);
-        }
-        catch
-        {
-            // El parámetro no existe, no hacer nada
+            // Iniciar ataque si es posible
+            if (Time.time >= siguienteAtaque)
+            {
+                ani.SetBool("attack", true);
+                atacando = true;
+            }
         }
     }
 
-    void FinalizarAtaque()
+    // Este método es llamado por el Animation Event al final de la animación
+    public void Final_Ani()
     {
+        ani.SetBool("attack", false);
         atacando = false;
         siguienteAtaque = Time.time + tiempoEntreAtaques;
-        SetAnimBool(paramAttack, false);
     }
 }
