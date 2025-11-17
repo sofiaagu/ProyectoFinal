@@ -72,6 +72,7 @@ public class AbilityPickup : MonoBehaviour
         else if (habilidad == AbilityType.Equilibrio)
         {
             abilities.tieneEquilibrio = true;
+            FindFirstObjectByType<GameController4>()?.ObtenerHabilidadEquilibrio();
             mensaje = "¡Habilidad Adquirida!\nEquilibrio\n[Presiona R para cambiar plano]";
         }
 

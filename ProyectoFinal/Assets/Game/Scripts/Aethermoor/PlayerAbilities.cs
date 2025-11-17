@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 public class PlayerAbilities : MonoBehaviour
 {
@@ -6,14 +6,14 @@ public class PlayerAbilities : MonoBehaviour
     public bool tieneLuminiscencia = false;
     public bool tieneEquilibrio = false;
 
-    [Header("Equilibrio - Configuración")]
+    [Header("Equilibrio - ConfiguraciÃ³n")]
     public GameObject planoFisico;
     public GameObject planoEtereo;
     public Camera playerCamera;
 
     [Header("Equilibrio Temporal (Q)")]
-    public GameObject estructurasTemporales;        // Agrupa aquí todas las plataformas que deben aparecer
-    public float duracionEquilibrioTemporal = 12f;  // 10–15 segundos recomendado
+    public GameObject estructurasTemporales;        // Agrupa aquÃ­ todas las plataformas que deben aparecer
+    public float duracionEquilibrioTemporal = 12f;  // 10â€“15 segundos recomendado
     private bool usandoEquilibrioTemporal = false;
     private float timerEquilibrio = 0f;
 
@@ -21,7 +21,7 @@ public class PlayerAbilities : MonoBehaviour
 
     void Start()
     {
-        // Configuración inicial del plano
+        // ConfiguraciÃ³n inicial del plano
         if (planoFisico != null) planoFisico.SetActive(true);
         if (planoEtereo != null) planoEtereo.SetActive(false);
 
@@ -44,7 +44,7 @@ public class PlayerAbilities : MonoBehaviour
             ActivarEquilibrioTemporal();
         }
 
-        // Manejar duración del Equilibrio Temporal
+        // Manejar duraciÃ³n del Equilibrio Temporal
         if (usandoEquilibrioTemporal)
         {
             timerEquilibrio -= Time.deltaTime;
@@ -63,19 +63,21 @@ public class PlayerAbilities : MonoBehaviour
         if (planoFisico != null) planoFisico.SetActive(!enPlanoEtereo);
         if (planoEtereo != null) planoEtereo.SetActive(enPlanoEtereo);
 
-        // Cambiar color de la cámara
         if (playerCamera != null)
         {
             playerCamera.backgroundColor = enPlanoEtereo ?
-                new Color(0.4f, 0f, 0.6f) : // Morado
-                new Color(0.1f, 0.2f, 0.4f); // Azul
+                new Color(0.4f, 0f, 0.6f) :
+                new Color(0.1f, 0.2f, 0.4f);
         }
 
-        Debug.Log("Cambiado a plano: " + (enPlanoEtereo ? "Etéreo" : "Físico"));
+        // ðŸ”¥ Notificar al GameController3
+        FindFirstObjectByType<GameController4>()?.CambiarEstadoEquilibrio(enPlanoEtereo);
+
+        Debug.Log("Cambiado a plano: " + (enPlanoEtereo ? "EtÃ©reo" : "FÃ­sico"));
     }
 
     // ============================================================
-    //   MÉTODOS DEL EQUILIBRIO TEMPORAL (Q)
+    //   MÃ‰TODOS DEL EQUILIBRIO TEMPORAL (Q)
     // ============================================================
 
     void ActivarEquilibrioTemporal()
