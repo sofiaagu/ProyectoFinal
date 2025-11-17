@@ -19,20 +19,29 @@ public class PlayerAbilities : MonoBehaviour
 
     private bool enPlanoEtereo = false;
 
+    // 🔥 Referencia opcional (para evitar Find cada vez)
+    private GameController4 UI;
+
     void Start()
     {
-        // Configuración inicial del plano
+        UI = FindFirstObjectByType<GameController4>();
+
+        // Asegurar que los planos empiecen bien
         if (planoFisico != null) planoFisico.SetActive(true);
         if (planoEtereo != null) planoEtereo.SetActive(false);
 
         // Asegurar que las estructuras temporales inicien apagadas
         if (estructurasTemporales != null)
             estructurasTemporales.SetActive(false);
+
+        // Si el jugador YA tiene equilibrio al iniciar
+        if (tieneEquilibrio)
+            UI?.ObtenerHabilidadEquilibrio();
     }
 
     void Update()
     {
-        // Habilidad de Equilibrio - Cambiar de plano con E
+        // Habilidad de Equilibrio - Cambiar de plano con R (antes era E)
         if (tieneEquilibrio && Input.GetKeyDown(KeyCode.R))
         {
             CambiarPlano();
@@ -56,6 +65,10 @@ public class PlayerAbilities : MonoBehaviour
         }
     }
 
+    // ============================================================
+    //   CAMBIO DE PLANO
+    // ============================================================
+
     void CambiarPlano()
     {
         enPlanoEtereo = !enPlanoEtereo;
@@ -70,8 +83,8 @@ public class PlayerAbilities : MonoBehaviour
                 new Color(0.1f, 0.2f, 0.4f);
         }
 
-        // 🔥 Notificar al GameController3
-        FindFirstObjectByType<GameController4>()?.CambiarEstadoEquilibrio(enPlanoEtereo);
+        // 🔥 ACTUALIZAR UI
+        UI?.CambiarEstadoEquilibrio(enPlanoEtereo);
 
         Debug.Log("Cambiado a plano: " + (enPlanoEtereo ? "Etéreo" : "Físico"));
     }
@@ -90,6 +103,9 @@ public class PlayerAbilities : MonoBehaviour
             usandoEquilibrioTemporal = true;
             timerEquilibrio = duracionEquilibrioTemporal;
 
+            // 🔥 Mostrar animación de UI como "Equilibrio Activo"
+            UI?.CambiarEstadoEquilibrio(true);
+
             Debug.Log("Equilibrio Temporal ACTIVADO por " + duracionEquilibrioTemporal + " segundos.");
         }
     }
@@ -100,6 +116,9 @@ public class PlayerAbilities : MonoBehaviour
 
         estructurasTemporales.SetActive(false);
         usandoEquilibrioTemporal = false;
+
+        // 🔥 Restaurar estado del plano
+        UI?.CambiarEstadoEquilibrio(enPlanoEtereo);
 
         Debug.Log("Equilibrio Temporal DESACTIVADO.");
     }
