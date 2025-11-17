@@ -120761,7 +120761,7 @@ GameObject:
   - component: {fileID: 534115151}
   - component: {fileID: 534115150}
   - component: {fileID: 534115149}
-  - component: {fileID: 534115148}
+  - component: {fileID: 534115152}
   m_Layer: 5
   m_Name: Canvas (1)
   m_TagString: Untagged
@@ -120794,18 +120794,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
---- !u!114 &534115148
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 534115146}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 55a18ecaaa508ad4dbfe503eab4f19f3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &534115149
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -120869,6 +120857,18 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
+--- !u!114 &534115152
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 534115146}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 55a18ecaaa508ad4dbfe503eab4f19f3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &534608940
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -327872,7 +327872,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 534115148}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: BotonVolverMenu, Assembly-CSharp
         m_MethodName: VolverALaEscena
         m_Mode: 1
@@ -382013,7 +382013,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 534115148}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: BotonVolverMenu, Assembly-CSharp
         m_MethodName: VolverAlMenuClick
         m_Mode: 1

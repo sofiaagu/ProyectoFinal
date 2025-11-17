@@ -13,6 +13,7 @@ public class GameManager : MonoBehaviour
     // ============================================================
     public Controller2 controllerActual;
     public ControllerSceneLira controllerActual2;
+    public GameController4 controllerActual3;
     // ============================================================
     // SCORE (MONEDAS)
     // ============================================================
@@ -76,7 +77,8 @@ public class GameManager : MonoBehaviour
         // Controller
         controllerActual = FindAnyObjectByType<Controller2>();
         controllerActual2 = FindAnyObjectByType<ControllerSceneLira>();
-        
+        controllerActual3 = FindAnyObjectByType<GameController4>();
+
         ActualizarUI();
     }
 
@@ -145,8 +147,8 @@ public class GameManager : MonoBehaviour
     public void ReiniciarJuego()
     {
         Time.timeScale = 1f;
-
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        ResetDatos();
     }
 
     public void VolverAlMenuYResetear()

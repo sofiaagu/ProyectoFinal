@@ -18,6 +18,9 @@ public class Coin : MonoBehaviour
                 // Si existe ControllerSceneLira
                 if (GameManager.instance.controllerActual2 != null)
                     GameManager.instance.controllerActual2.RegistrarMoneda(valorMoneda);
+
+                if (GameManager.instance.controllerActual3 != null)
+                    GameManager.instance.controllerActual3.RegistrarMoneda(valorMoneda);
             }
 
             if (sonidoMoneda != null)

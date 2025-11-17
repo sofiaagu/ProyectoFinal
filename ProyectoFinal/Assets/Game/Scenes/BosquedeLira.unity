@@ -81346,13 +81346,53 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 4617036660772024948, guid: 52c7d057cba585641bb68312c10d7791, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 967557988}
+    - targetCorrespondingSourceObject: {fileID: 4617036660772024948, guid: 52c7d057cba585641bb68312c10d7791, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 967557989}
   m_SourcePrefab: {fileID: 100100000, guid: 52c7d057cba585641bb68312c10d7791, type: 3}
 --- !u!1 &967557987 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4617036660772024948, guid: 52c7d057cba585641bb68312c10d7791, type: 3}
   m_PrefabInstance: {fileID: 967557986}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &967557988
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 967557987}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 206f45a9c1f98b44a8d32f886f5fc8ae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  escenaDestino: Aethermoor
+--- !u!65 &967557989
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 967557987}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &967659525
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -91324,7 +91364,7 @@ Transform:
   m_GameObject: {fileID: 1087959012}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 102.99, y: -3.75, z: 92.02}
+  m_LocalPosition: {x: 49.5, y: -3.75, z: 113.3}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

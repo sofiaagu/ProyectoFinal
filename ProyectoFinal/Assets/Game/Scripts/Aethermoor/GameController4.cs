@@ -399,4 +399,5 @@ public class GameController4 : MonoBehaviour
     {
         RegistrarMoneda(10);
     }
+
 }

@@ -17,6 +17,7 @@ public class PlayerRespawn : MonoBehaviour
     [Header("UI")]
     public GameObject panelPerdiste;
     public PlayerHealthUI healthUI;
+    private PlayerHealth playerHealth;
 
     [Header("Efectos opcionales")]
     public AudioClip sonidoMuerte;
@@ -26,12 +27,15 @@ public class PlayerRespawn : MonoBehaviour
     private AudioSource audioSource;
     private bool estaMuriendo = false; // 🔹 Evita muerte múltiple
 
+
     public int CurrentLives => vidasActuales;
 
     private void Awake()
     {
         controller = GetComponent<CharacterController>();
         audioSource = GetComponent<AudioSource>();
+        playerHealth = GetComponent<PlayerHealth>();
+
 
         Time.timeScale = 1f;
         vidasActuales = vidasIniciales;
@@ -73,21 +77,20 @@ public class PlayerRespawn : MonoBehaviour
 
     private void PerderVida()
     {
-        if (estaMuriendo) return; // Evitar múltiples llamadas
+        if (estaMuriendo) return;
 
         estaMuriendo = true;
-        vidasActuales--;
 
-        if (healthUI != null)
-            healthUI.UpdateHearts();
+        // 💥 Restar vida desde PlayerHealth
+        if (playerHealth != null)
+            playerHealth.TakeDamage(1);
 
-        Debug.Log("Vida perdida. Vidas restantes: " + vidasActuales);
+        Debug.Log("Vida perdida. Vidas restantes: " + playerHealth.CurrentLives);
 
-        // 🔊 Reproducir sonido de vida perdida
         if (sonidoVidaPerdida != null && audioSource != null)
             audioSource.PlayOneShot(sonidoVidaPerdida);
 
-        if (vidasActuales <= 0)
+        if (playerHealth.CurrentLives <= 0)
         {
             GameOver();
         }
@@ -96,6 +99,7 @@ public class PlayerRespawn : MonoBehaviour
             Respawn();
         }
     }
+
 
     private void Respawn()
     {
