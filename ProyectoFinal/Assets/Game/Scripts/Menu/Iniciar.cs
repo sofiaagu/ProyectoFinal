@@ -13,7 +13,8 @@ public class MenuManager : MonoBehaviour
     public GameObject menuPrincipal;
 
     [Tooltip("Panel de opciones/configuración")]
-    public GameObject panelOpciones;
+    public GameObject panelInstrucciones;
+    public GameObject panelHistoria;
 
     [Tooltip("Panel de créditos")]
     public GameObject panelCreditos;
@@ -99,14 +100,25 @@ public class MenuManager : MonoBehaviour
     /// <summary>
     /// Muestra el panel de opciones y oculta los demás
     /// </summary>
-    public void MostrarOpciones()
+    public void MostrarInstrucciones()
     {
         if (menuPrincipal != null) menuPrincipal.SetActive(false);
-        if (panelOpciones != null) panelOpciones.SetActive(true);
+        if (panelInstrucciones != null) panelInstrucciones.SetActive(true);
+        if (panelCreditos != null) panelCreditos.SetActive(false);
+        if (panelSeleccionNivel != null) panelSeleccionNivel.SetActive(false);
+        if (panelHistoria != null) panelHistoria.SetActive(false);
+
+        Debug.Log("Panel de opciones mostrado");
+    }
+    public void MostrarHistoria()
+    {
+        if (panelInstrucciones != null) panelInstrucciones.SetActive(false);
+        if (menuPrincipal != null) menuPrincipal.SetActive(false);
+        if (panelHistoria != null) panelHistoria.SetActive(true);
         if (panelCreditos != null) panelCreditos.SetActive(false);
         if (panelSeleccionNivel != null) panelSeleccionNivel.SetActive(false);
 
-        Debug.Log("Panel de opciones mostrado");
+        Debug.Log("Panel de Historia mostrado");
     }
 
     /// <summary>
@@ -115,9 +127,10 @@ public class MenuManager : MonoBehaviour
     public void MostrarCreditos()
     {
         if (menuPrincipal != null) menuPrincipal.SetActive(false);
-        if (panelOpciones != null) panelOpciones.SetActive(false);
+        if (panelInstrucciones != null) panelInstrucciones.SetActive(false);
         if (panelCreditos != null) panelCreditos.SetActive(true);
         if (panelSeleccionNivel != null) panelSeleccionNivel.SetActive(false);
+        if(panelHistoria != null) panelHistoria.SetActive(false);
 
         Debug.Log("Panel de créditos mostrado");
     }
@@ -128,9 +141,10 @@ public class MenuManager : MonoBehaviour
     public void MostrarSeleccionNivel()
     {
         if (menuPrincipal != null) menuPrincipal.SetActive(false);
-        if (panelOpciones != null) panelOpciones.SetActive(false);
+        if (panelInstrucciones != null) panelInstrucciones.SetActive(false);
         if (panelCreditos != null) panelCreditos.SetActive(false);
         if (panelSeleccionNivel != null) panelSeleccionNivel.SetActive(true);
+        if (panelHistoria != null) panelHistoria.SetActive(false);
 
         Debug.Log("Panel de selección de nivel mostrado");
     }
@@ -141,9 +155,10 @@ public class MenuManager : MonoBehaviour
     public void MostrarMenuPrincipal()
     {
         if (menuPrincipal != null) menuPrincipal.SetActive(true);
-        if (panelOpciones != null) panelOpciones.SetActive(false);
+        if (panelInstrucciones != null) panelInstrucciones.SetActive(false);
         if (panelCreditos != null) panelCreditos.SetActive(false);
         if (panelSeleccionNivel != null) panelSeleccionNivel.SetActive(false);
+        if (panelHistoria != null) panelHistoria.SetActive(false);
 
         Debug.Log("Menú principal mostrado");
     }
