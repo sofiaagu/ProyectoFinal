@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class UIestado : MonoBehaviour
 {
-    public TextMeshProUGUI textoEstado; // Asigna el TMP del panel en el inspector
+    public TextMeshProUGUI textoEstado; 
 
     // Método para actualizar el texto
     public void ActualizarEstado(string nuevoTexto)

@@ -5,30 +5,24 @@ using System.Collections.Generic;
 
 public class Controller2 : MonoBehaviour
 {
-    // ============================================================
-    // ======================= REFERENCIAS =========================
-    // ============================================================
+    // REFERENCIAS
 
-    [Header("📜 UI")]
+    [Header("UI")]
     public TextMeshProUGUI palabrasRecolectadasText;
     public TextMeshProUGUI textoMonedas;
 
-    [Header("📌 Referencias de escena")]
+    [Header("Referencias de escena")]
     public AltarMemoria altarMemoria;
     public Timer timer;
 
-    // ============================================================
-    // ==================== VARIABLES INTERNAS =====================
-    // ============================================================
+    // VARIABLES INTERNAS
 
-    private List<string> palabrasRecolectadas = new List<string>();
+    private Stack<string> pilaPalabras = new Stack<string>();
     private int monedasEscena = 0;
 
     [SerializeField] private int totalPalabras = 4;
 
-    // ============================================================
-    // ========================= START =============================
-    // ============================================================
+    //START
 
     private void Start()
     {
@@ -42,34 +36,26 @@ public class Controller2 : MonoBehaviour
     }
 
 
-    // ============================================================
-    // =================== SISTEMA DE PALABRAS =====================
-    // ============================================================
-
+    // SISTEMA DE PALABRAS
     public void AgregarPalabra(string palabra)
-    {
-        if (palabrasRecolectadas.Contains(palabra))
-            return;
+{
+    pilaPalabras.Push(palabra); 
+    ActualizarUI();
 
-        palabrasRecolectadas.Add(palabra);
-        ActualizarUI();
-
-        if (palabrasRecolectadas.Count >= totalPalabras)
-            ActivarAltar();
-    }
-
+    if (pilaPalabras.Count >= totalPalabras)
+        ActivarAltar();
+}
     private void ActivarAltar()
     {
         if (altarMemoria == null)
             return;
 
         altarMemoria.gameObject.SetActive(true);
-        Debug.Log("✨ Todas las palabras recolectadas. Altar activado.");
+        Debug.Log("Todas las palabras recolectadas. Altar activado.");
     }
 
-    // ============================================================
-    // ======================= MONEDAS =============================
-    // ============================================================
+
+    // MONEDAS
 
     public void RegistrarMoneda(int cantidad)
     {
@@ -79,16 +65,14 @@ public class Controller2 : MonoBehaviour
         if (GameManager.instance != null)
             GameManager.instance.AgregarMoneda(cantidad);
 
-        Debug.Log($"💰 Moneda recogida | Escena: {monedasEscena}");
+        Debug.Log($"Moneda recogida | Escena: {monedasEscena}");
     }
 
-    // ============================================================
-    // ===================== FINAL DE ESCENA ========================
-    // ============================================================
+    // FINAL DE ESCENA
 
     public void CompletarEscena()
     {
-        Debug.Log("🏁 Escena completada. Registrando tiempo…");
+        Debug.Log("Escena completada. Registrando tiempo…");
 
         if (timer != null)
         {
@@ -97,31 +81,25 @@ public class Controller2 : MonoBehaviour
             if (GameManager.instance != null)
                 GameManager.instance.RegistrarTiempo(timer.StopTime);
         }
-
-        // Aquí puedes cargar otro nivel si deseas:
-        // SceneManager.LoadScene("SiguienteNivel");
     }
 
-    // ============================================================
-    // ========================= UI UPDATE =========================
-    // ============================================================
+    // UI UPDATE
 
     private void ActualizarUI()
     {
         if (palabrasRecolectadasText != null)
-            palabrasRecolectadasText.text = "Palabras: " + string.Join(" - ", palabrasRecolectadas);
+            palabrasRecolectadasText.text = "Palabras: " + string.Join(" - ", pilaPalabras);
 
         if (textoMonedas != null)
             textoMonedas.text = "Monedas: " + monedasEscena;
     }
 
-    // ============================================================
-    // ===================== MÉTODOS AUXILIARES ====================
-    // ============================================================
+
+    // MÉTODOS AUXILIARES
 
     public List<string> ObtenerPalabrasRecolectadas()
     {
-        return new List<string>(palabrasRecolectadas);
+        return new List<string>(pilaPalabras); // se convierte a lista para la UI
     }
     public void ReiniciarJuego()
     {

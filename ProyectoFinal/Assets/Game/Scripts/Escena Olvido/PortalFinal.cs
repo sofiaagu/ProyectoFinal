@@ -10,7 +10,7 @@ public class PortalFinal : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            Debug.Log("🚪 Entraste al portal final.");
+            Debug.Log("Entraste al portal final.");
 
             // Registrar tiempo REAL de la escena
             ControllerSceneLira lira = FindAnyObjectByType<ControllerSceneLira>();

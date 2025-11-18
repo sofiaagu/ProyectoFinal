@@ -2,7 +2,7 @@
 
 public class PlayerZonaProhibida : MonoBehaviour
 {
-    [Header("🏁 Punto al que regresa el jugador")]
+    [Header("Punto al que regresa el jugador")]
     [Tooltip("Asigna aquí el objeto que marca el punto de reinicio.")]
     public Transform puntoReinicio;
 
@@ -16,7 +16,7 @@ public class PlayerZonaProhibida : MonoBehaviour
         // Verifica que haya un punto de reinicio asignado
         if (puntoReinicio == null)
         {
-            Debug.LogWarning("⚠️ No se asignó un punto de reinicio al jugador.");
+            Debug.LogWarning("No se asignó un punto de reinicio al jugador.");
         }
     }
 
@@ -24,7 +24,7 @@ public class PlayerZonaProhibida : MonoBehaviour
     {
         if (hit.collider.CompareTag("Prohibido"))
         {
-            Debug.Log("🚫 Zona prohibida tocada");
+            Debug.Log("Zona prohibida tocada");
             uiEstado.ActualizarEstado("Zona prohibida tocada");
 
             if (puntoReinicio != null)
@@ -33,14 +33,13 @@ public class PlayerZonaProhibida : MonoBehaviour
                 transform.position = puntoReinicio.position; // ✅ Teletransporte al punto marcado
                 controller.enabled = true;
 
-                Debug.Log($"🔄 Jugador devuelto a: {puntoReinicio.position}");
+                Debug.Log($"Jugador devuelto a: {puntoReinicio.position}");
             }
             else
             {
-                Debug.LogWarning("⚠️ No se pudo regresar porque no hay punto de reinicio asignado.");
+                Debug.LogWarning("No se pudo regresar porque no hay punto de reinicio asignado.");
             }
 
-            // (Opcional) aquí puedes reproducir un sonido o animación
         }
     }
 }

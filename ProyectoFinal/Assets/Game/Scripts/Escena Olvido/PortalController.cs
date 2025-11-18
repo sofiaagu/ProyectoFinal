@@ -2,15 +2,12 @@
 
 public class PortalController : MonoBehaviour
 {
-    [Header("🌀 Destino del portal")]
+    [Header("Destino del portal")]
     [Tooltip("Lugar al que el jugador será transportado.")]
     public Transform destino;
 
-    [Header("⚙️ Configuración del portal")]
-    [Tooltip("Si está marcado, el portal estará activo desde el inicio.")]
+    [Header("Configuración del portal")]
     public bool siempreActivo = false;
-
-    [Tooltip("Si está marcado, el portal no se desactiva tras usarse.")]
     public bool persistente = false;
 
     public UIestado uiEstado;
@@ -27,7 +24,7 @@ public class PortalController : MonoBehaviour
 
         if (other.CompareTag("Player"))
         {
-            Debug.Log($"🚪 El jugador ha entrado al portal: {gameObject.name}");
+            Debug.Log($"El jugador ha entrado al portal: {gameObject.name}");
 
             if (destino != null)
             {
@@ -39,20 +36,20 @@ public class PortalController : MonoBehaviour
                 other.transform.position = destino.position;
                 other.transform.rotation = destino.rotation;
 
-                Debug.Log($"✨ Jugador transportado a: {destino.position}");
+                Debug.Log($"Jugador transportado a: {destino.position}");
 
                 if (cc != null) cc.enabled = true;
             }
             else
             {
-                Debug.LogWarning($"⚠️ El portal {gameObject.name} no tiene destino asignado.");
+                Debug.LogWarning($"El portal {gameObject.name} no tiene destino asignado.");
             }
 
             // Si el portal no es persistente, se apaga tras usarse
             if (!persistente)
             {
                 gameObject.SetActive(false);
-                Debug.Log($"🚫 Portal {gameObject.name} desactivado tras usarse.");
+                Debug.Log($"Portal {gameObject.name} desactivado tras usarse.");
             }
         }
     }
@@ -61,7 +58,7 @@ public class PortalController : MonoBehaviour
     public void ActivarPortal()
     {
         gameObject.SetActive(true);
-        Debug.Log($"🟢 Portal activado manualmente: {gameObject.name}");
+        Debug.Log($"Portal activado manualmente: {gameObject.name}");
         uiEstado.ActualizarEstado("Portal Activado");
     }
 }

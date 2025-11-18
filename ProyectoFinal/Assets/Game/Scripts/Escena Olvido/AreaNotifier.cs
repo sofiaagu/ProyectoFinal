@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class AreaNotifier : MonoBehaviour
 {
-    public EnemyContoller targetAgent; // tu enemigo asignado
+    public EnemyContoller targetAgent; // Asignar enemigo
 
     private void OnTriggerEnter(Collider other)
     {

@@ -43,38 +43,33 @@ public class AltarMemoria : MonoBehaviour
         }
     }
 
-    public void VerificarOrdenManual(List<string> palabras)
+    public void VerificarOrdenManual(List<string> palabrasUI)
     {
-        if (palabras.Count != ordenCorrecto.Count)
+        // Convierte la lista que dio la UI en una pila para comparar correctamente
+        Stack<string> pilaJugador = new Stack<string>(palabrasUI);
+
+        Stack<string> pilaCorrecta = new Stack<string>(ordenCorrecto);
+
+        if (pilaJugador.Count != pilaCorrecta.Count)
         {
-            Debug.Log("Faltan palabras.");
+            uiEstado.ActualizarEstado("Faltan palabras.");
             return;
         }
 
-        for (int i = 0; i < palabras.Count; i++)
+        while (pilaJugador.Count > 0)
         {
-            if (palabras[i] != ordenCorrecto[i])
+            if (pilaJugador.Pop() != pilaCorrecta.Pop())
             {
-                Debug.Log("Orden incorrecto. Intenta de nuevo.");
                 uiEstado.ActualizarEstado("Orden incorrecto. Intenta de nuevo.");
                 return;
             }
         }
 
-        if (portalFinal != null)
-        {
-            portalFinal.SetActive(true);
-            Debug.Log("🌌 Portal final ahora está activo.");
-            uiEstado.ActualizarEstado("Portal final ahora está activo.");
-        }
-        else
-        {
-            Debug.LogWarning("⚠️ No se ha asignado un portal final.");
-        }
+        portalFinal?.SetActive(true);
+        uiEstado.ActualizarEstado("Portal final ahora está activo.");
 
-        // Notificar al controller que se completó la escena
         controller.CompletarEscena();
-        
     }
+
 
 }
