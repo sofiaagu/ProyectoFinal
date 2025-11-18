@@ -34,11 +34,28 @@ public class BossEnemy : MonoBehaviour
         {
             GameObject player = GameObject.FindGameObjectWithTag("Player");
             if (player != null)
+            {
                 jugador = player.transform;
+                Debug.Log("✅ Jugador encontrado: " + player.name);
+            }
+            else
+            {
+                Debug.LogError("❌ No se encontró jugador con tag 'Player'");
+            }
         }
 
         if (anim == null)
+        {
             anim = GetComponent<Animator>();
+            if (anim == null)
+            {
+                Debug.LogError("❌ No hay Animator en el Boss");
+            }
+            else
+            {
+                Debug.Log("✅ Animator encontrado");
+            }
+        }
 
         controller = GetComponent<CharacterController>();
 
