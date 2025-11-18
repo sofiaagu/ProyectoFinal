@@ -1,4 +1,4 @@
-using UnityEngine;
+Ôªøusing UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -14,6 +14,8 @@ public class Enemy : MonoBehaviour
     private float tiempoEntreAtaques = 0.5f;
     private float siguienteAtaque = 0f;
 
+    public int damageAmount = 1;
+
     void Start()
     {
         ani = GetComponent<Animator>();
@@ -27,7 +29,7 @@ public class Enemy : MonoBehaviour
 
     public void Comportamiento_Enemigo()
     {
-        // SI EST¡ ATACANDO, NO HACER NADA M¡S - dejar que termine
+        // SI EST√Å ATACANDO, NO HACER NADA M√ÅS - dejar que termine
         if (atacando)
         {
             // Opcional: seguir mirando al jugador mientras ataca
@@ -38,7 +40,7 @@ public class Enemy : MonoBehaviour
                 var rotation = Quaternion.LookRotation(lookPos);
                 transform.rotation = Quaternion.RotateTowards(transform.rotation, rotation, 3);
             }
-            return; // Sale del mÈtodo, ignora todo lo dem·s
+            return; // Sale del m√©todo, ignora todo lo dem√°s
         }
 
         float distancia = Vector3.Distance(transform.position, target.transform.position);
@@ -113,11 +115,12 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    // Este mÈtodo es llamado por el Animation Event al final de la animaciÛn
+    // Este m√©todo es llamado por el Animation Event al final de la animaci√≥n
     public void Final_Ani()
     {
         ani.SetBool("attack", false);
         atacando = false;
         siguienteAtaque = Time.time + tiempoEntreAtaques;
     }
+
 }

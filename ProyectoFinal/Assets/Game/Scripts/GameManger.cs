@@ -23,7 +23,6 @@ public class GameManager : MonoBehaviour
 
     [Header("⚔️ Enemigos")]
     public int enemigosEliminados = 0;        // Contador
-    public int puntosPorEnemigo = 5;          // Puntos por enemigo
     public TextMeshProUGUI textoEnemigos;     // Opcional si quieres mostrarlo en UI
 
     public int vidasPersistentes = -1; // -1 significa "no inicializado"
@@ -99,7 +98,6 @@ public class GameManager : MonoBehaviour
     public void EnemigoEliminado()
     {
         enemigosEliminados++;              // Suma 1 al contador
-        score += puntosPorEnemigo;         // Suma puntos
         ActualizarUI();                    // Refresca el texto del score
 
         ActualizarUIEnemigos();            // Refresca el contador (si lo usas)
