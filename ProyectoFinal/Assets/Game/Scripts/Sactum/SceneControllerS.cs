@@ -13,17 +13,20 @@ public class SceneController : MonoBehaviour
     [Header("📜 UI")]
     public TextMeshProUGUI textoFragmentos;
     public TextMeshProUGUI textoEnemigos;
+    public TextMeshProUGUI textoMonedas;
 
     [Header("📌 Referencias de escena")]
     public PuertaController puerta;
     public GameObject boss;
     public Transform bossSpawnPoint;
-    public PortalSC portalSalida;
+    public GameObject portalSalida;
+    public Timer timer;
 
     // ============================================================
     // ==================== VARIABLES INTERNAS =====================
     // ============================================================
 
+    private int monedasEscena = 0;
     private int fragmentosRecolectados = 0;
     [SerializeField] private int totalFragmentos = 3;
     [SerializeField] private int enemigosNecesarios = 10;
@@ -46,6 +49,9 @@ public class SceneController : MonoBehaviour
 
     private void Start()
     {
+        if (timer == null)
+            timer = FindFirstObjectByType<Timer>();
+
         ActualizarUI();
 
         // Boss desactivado al inicio
@@ -146,6 +152,17 @@ public class SceneController : MonoBehaviour
         }
     }
 
+    public void RegistrarMoneda(int cantidad)
+    {
+        monedasEscena += cantidad;
+        ActualizarUI();
+
+        if (GameManager.instance != null)
+            GameManager.instance.AgregarMoneda(cantidad);
+
+        Debug.Log($"Moneda recogida | Escena: {monedasEscena}");
+    }
+
     public void BossFueDerrotado()
     {
         Debug.Log("💀 Boss derrotado!");
@@ -187,6 +204,9 @@ public class SceneController : MonoBehaviour
 
         if (textoEnemigos != null && GameManager.instance != null)
             textoEnemigos.text = GameManager.instance.enemigosEliminados.ToString();
+
+        if (textoMonedas != null)
+            textoMonedas.text = "Monedas: " + monedasEscena;
     }
 
     // ============================================================
