@@ -31007,7 +31007,7 @@ MonoBehaviour:
   bossSpawnPoint: {fileID: 1658854004}
   portalSalida: {fileID: 1937456392}
   totalFragmentos: 3
-  enemigosNecesarios: 2
+  enemigosNecesarios: 10
 --- !u!4 &356585229
 Transform:
   m_ObjectHideFlags: 0
