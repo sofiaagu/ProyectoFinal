@@ -4,16 +4,22 @@ using UnityEngine;
 
 public class Fragmento : MonoBehaviour
 {
-    // Referencias a UI e icono del fragmento
-    public GameObject panelUI; // Panel que se muestra al interactuar
-    public Texture2D iconoFragmento; // Icono que se agregará al inventario
+    public GameObject panelUI;
+    public Texture2D iconoFragmento;
+
+    [Header("Sonido")]
+    public AudioClip sonidoRecoleccion;
+    private AudioSource audioSource;
 
     void Start()
     {
         if (panelUI != null)
         {
-            panelUI.SetActive(false);// Asegurarse que el panel no esté activo
+            panelUI.SetActive(false);
         }
+
+        audioSource = gameObject.AddComponent<AudioSource>();
+        audioSource.playOnAwake = false;
     }
 
     void Update()
@@ -24,14 +30,13 @@ public class Fragmento : MonoBehaviour
         }
     }
 
-    // Mostrar panel del fragmento y pausar el juego
     public void MostrarPanel()
     {
         Debug.Log("Mostrando panel del fragmento: " + gameObject.name);
         if (panelUI != null)
         {
-            panelUI.SetActive(true);// Activar panel
-            Time.timeScale = 0f;// Pausar juego
+            panelUI.SetActive(true);
+            Time.timeScale = 0f;
         }
     }
 
@@ -39,40 +44,39 @@ public class Fragmento : MonoBehaviour
     {
         if (panelUI != null)
         {
-            panelUI.SetActive(false); // Ocultar panel
+            panelUI.SetActive(false);
         }
-        Time.timeScale = 1f;// Reanudar juego
+        Time.timeScale = 1f;
         Debug.Log("Panel cerrado, juego reanudado");
     }
 
-    // Recolectar fragmento: agregar al inventario y notificar
     public void RecolectarFragmento()
     {
         Debug.Log("RecolectarFragmento llamado");
 
-        Time.timeScale = 1f;// Asegurarse de reanudar el juego
+        Time.timeScale = 1f;
 
         if (panelUI != null)
         {
-            panelUI.SetActive(false); // Cerrar panel si estaba abierto
+            panelUI.SetActive(false);
         }
 
-        // Verificar que exista el Inventory global
         if (Inventory.instance != null)
         {
             if (iconoFragmento != null)
             {
-                // Intentar agregar el fragmento al inventario
                 bool agregado = Inventory.instance.AgregarFragmento(iconoFragmento);
 
                 if (agregado)
                 {
-                    Debug.Log("¡Fragmento recolectado y agregado al inventario!");
+                    Debug.Log("Fragmento recolectado y agregado al inventario");
 
-                    // Notificar al SceneController que se recogió un fragmento
+                    if (sonidoRecoleccion != null)
+                        audioSource.PlayOneShot(sonidoRecoleccion);
+
                     SceneController.instance?.RegistrarFragmento();
 
-                    Destroy(gameObject);
+                    Destroy(gameObject, sonidoRecoleccion != null ? sonidoRecoleccion.length : 0f);
                 }
                 else
                 {
@@ -81,12 +85,12 @@ public class Fragmento : MonoBehaviour
             }
             else
             {
-                Debug.LogError("No se asignó la textura del fragmento!");
+                Debug.LogError("No se asignó la textura del fragmento");
             }
         }
         else
         {
-            Debug.LogError("No se encontró el Inventory!");
+            Debug.LogError("No se encontró el Inventory");
         }
     }
 }
