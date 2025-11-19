@@ -1,40 +1,22 @@
 using UnityEngine;
-using UnityEngine.AI;
 
 public class Caida : MonoBehaviour
 {
-    public Transform playerTarget;
-    private NavMeshAgent agent;
+    public Transform puntoRespawn;
 
-    void Start()
+    private void OnTriggerEnter(Collider other)
     {
-        agent = GetComponent<NavMeshAgent>();
-        
-        agent.enabled = false;
-    }
-
-    void Update()
-    {
-        
-        if (agent.enabled && playerTarget != null)
+        if (other.CompareTag("Player"))
         {
-            agent.SetDestination(playerTarget.position);
+            if (puntoRespawn != null)
+            {
+                other.transform.position = puntoRespawn.position;
+                Debug.Log("¡Jugador teletransportado!");
+            }
+            else
+            {
+                Debug.LogError("No se asignó un punto de respawn");
+            }
         }
-    }
-
-    public void StartChase(Vector3 playerPos)
-    {
-        if (!agent.enabled)
-        {
-            agent.enabled = true;
-            agent.SetDestination(playerPos);
-            Debug.Log(gameObject.name + " activado. Iniciando persecución.");
-        }
-    }
-
-    public void StopChase()
-    {
-        agent.enabled = false;
-        Debug.Log(gameObject.name + " detenido.");
     }
 }
