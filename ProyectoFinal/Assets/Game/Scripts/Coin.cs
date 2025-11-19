@@ -21,6 +21,9 @@ public class Coin : MonoBehaviour
 
                 if (GameManager.instance.controllerActual3 != null)
                     GameManager.instance.controllerActual3.RegistrarMoneda(valorMoneda);
+
+                if (GameManager.instance.controllerActual4 != null)
+                    GameManager.instance.controllerActual4.RegistrarMoneda(valorMoneda);
             }
 
             if (sonidoMoneda != null)

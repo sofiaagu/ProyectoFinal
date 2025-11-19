@@ -14,6 +14,7 @@ public class GameManager : MonoBehaviour
     public Controller2 controllerActual;
     public ControllerSceneLira controllerActual2;
     public GameController4 controllerActual3;
+    public SceneController controllerActual4;
     // ============================================================
     // SCORE (MONEDAS)
     // ============================================================
@@ -77,7 +78,7 @@ public class GameManager : MonoBehaviour
         controllerActual = FindAnyObjectByType<Controller2>();
         controllerActual2 = FindAnyObjectByType<ControllerSceneLira>();
         controllerActual3 = FindAnyObjectByType<GameController4>();
-
+        controllerActual4 = FindAnyObjectByType<SceneController>();
         ActualizarUI();
     }
 

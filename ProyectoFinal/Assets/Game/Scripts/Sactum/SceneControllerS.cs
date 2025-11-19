@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 public class SceneController : MonoBehaviour
 {
     public static SceneController instance;
+    public Timer timer;
 
     // ============================================================
     // ======================= REFERENCIAS =========================
@@ -19,17 +20,16 @@ public class SceneController : MonoBehaviour
     public PuertaController puerta;
     public GameObject boss;
     public Transform bossSpawnPoint;
-    public GameObject portalSalida;
-    public Timer timer;
+    public PortalSC portalSalida;
 
     // ============================================================
     // ==================== VARIABLES INTERNAS =====================
     // ============================================================
 
-    private int monedasEscena = 0;
     private int fragmentosRecolectados = 0;
     [SerializeField] private int totalFragmentos = 3;
     [SerializeField] private int enemigosNecesarios = 10;
+    private int monedasEscena = 0;
 
     private bool puertaAbierta = false;
     private bool bossActivado = false;
@@ -49,9 +49,6 @@ public class SceneController : MonoBehaviour
 
     private void Start()
     {
-        if (timer == null)
-            timer = FindFirstObjectByType<Timer>();
-
         ActualizarUI();
 
         // Boss desactivado al inicio
@@ -61,6 +58,9 @@ public class SceneController : MonoBehaviour
         // Portal de salida desactivado
         if (portalSalida != null)
             portalSalida.gameObject.SetActive(false);
+
+        if (timer == null)
+            timer = FindFirstObjectByType<Timer>();
 
         Debug.Log($"🎮 Nivel iniciado. Objetivo: Recoger {totalFragmentos} fragmentos");
     }
@@ -152,17 +152,6 @@ public class SceneController : MonoBehaviour
         }
     }
 
-    public void RegistrarMoneda(int cantidad)
-    {
-        monedasEscena += cantidad;
-        ActualizarUI();
-
-        if (GameManager.instance != null)
-            GameManager.instance.AgregarMoneda(cantidad);
-
-        Debug.Log($"Moneda recogida | Escena: {monedasEscena}");
-    }
-
     public void BossFueDerrotado()
     {
         Debug.Log("💀 Boss derrotado!");
@@ -199,14 +188,15 @@ public class SceneController : MonoBehaviour
 
     private void ActualizarUI()
     {
+        if (textoMonedas != null)
+            textoMonedas.text = "Monedas: " + monedasEscena;
         if (textoFragmentos != null)
             textoFragmentos.text = $"Fragmentos: {fragmentosRecolectados}/{totalFragmentos}";
 
         if (textoEnemigos != null && GameManager.instance != null)
             textoEnemigos.text = GameManager.instance.enemigosEliminados.ToString();
 
-        if (textoMonedas != null)
-            textoMonedas.text = "Monedas: " + monedasEscena;
+       
     }
 
     // ============================================================
@@ -221,5 +211,28 @@ public class SceneController : MonoBehaviour
     public bool NivelEstaCompletado()
     {
         return nivelCompletado;
+    }
+    public void RegistrarMoneda(int cantidad)
+    {
+        monedasEscena += cantidad;
+        ActualizarUI();
+
+        if (GameManager.instance != null)
+            GameManager.instance.AgregarMoneda(cantidad);
+
+        Debug.Log($"Moneda recogida | Escena: {monedasEscena}");
+    }
+
+    public void CompletarEscena()
+    {
+        Debug.Log("Escena completada. Registrando tiempo…");
+
+        if (timer != null)
+        {
+            timer.TimerStop();
+
+            if (GameManager.instance != null)
+                GameManager.instance.RegistrarTiempo(timer.StopTime);
+        }
     }
 }
