@@ -2,10 +2,17 @@ using UnityEngine;
 
 public class PuertaLuz : MonoBehaviour
 {
-    [Header("Contenido detrás de la puerta")]
-    public GameObject contenidoDetras; 
 
-    bool abierta = false;
+    [Header("Sonido al abrir")]
+    public AudioClip sonidoAbrir;
+
+    private AudioSource audioSource;
+    private bool abierta = false;
+
+    void Start()
+    {
+        audioSource = gameObject.AddComponent<AudioSource>();
+    }
 
     void OnMouseDown()
     {
@@ -18,6 +25,10 @@ public class PuertaLuz : MonoBehaviour
     {
         abierta = true;
 
-        gameObject.SetActive(false);
+        // Reproducir sonido si existe
+        if (sonidoAbrir != null)
+            audioSource.PlayOneShot(sonidoAbrir);
+
+        Destroy(gameObject, 0.2f);
     }
 }
