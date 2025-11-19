@@ -6359,6 +6359,7 @@ MonoBehaviour:
   controllerActual: {fileID: 0}
   controllerActual2: {fileID: 0}
   controllerActual3: {fileID: 0}
+  controllerActual4: {fileID: 0}
   score: 0
   textoScore: {fileID: 0}
   enemigosEliminados: 0
