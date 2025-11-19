@@ -423,4 +423,44 @@ public class MenuManager : MonoBehaviour
     }
 
     #endregion
+
+    #region Paneles de Misiones
+
+    [Header("Paneles de Misiones")]
+    public GameObject[] panelesMisiones; // Asignas los 5 paneles desde el inspector
+
+    public void MostrarPanelMision(int numero)
+    {
+        // Primero ocultar TODOS
+        for (int i = 0; i < panelesMisiones.Length; i++)
+        {
+            panelesMisiones[i].SetActive(false);
+        }
+
+        // Activar solo el panel solicitado
+        int index = numero - 1;
+
+        if (index >= 0 && index < panelesMisiones.Length)
+        {
+            panelesMisiones[index].SetActive(true);
+        }
+        else
+        {
+            Debug.LogError("Número de misión inválido: " + numero);
+        }
+    }
+
+    public void CerrarPanelMision(int numero)
+    {
+        int index = numero - 1;
+
+        if (index >= 0 && index < panelesMisiones.Length)
+        {
+            panelesMisiones[index].SetActive(false);
+        }
+    }
+
+    #endregion
+
+
 }
