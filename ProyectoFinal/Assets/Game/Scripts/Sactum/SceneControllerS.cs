@@ -20,7 +20,7 @@ public class SceneController : MonoBehaviour
     public GameObject puerta;
     public GameObject boss;
     public Transform bossSpawnPoint;
-    public PortalSC portalSalida;
+    public GameObject portalSalida;
 
     // ============================================================
     // ==================== VARIABLES INTERNAS =====================
