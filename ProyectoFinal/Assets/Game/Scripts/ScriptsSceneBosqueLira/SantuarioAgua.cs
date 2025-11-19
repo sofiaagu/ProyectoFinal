@@ -68,7 +68,7 @@ public class SantuarioAgua : MonoBehaviour
                 piedra.Reactivar();
         }
 
-        controller.MostrarMensaje("Secuencia incorrecta.\n\n Intenta de nuevo.");
+        controller.MostrarMensaje("Secuencia incorrecta.\n Intenta de nuevo.");
     }
 
     private void Completado()
