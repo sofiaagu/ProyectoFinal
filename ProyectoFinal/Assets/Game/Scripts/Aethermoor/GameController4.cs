@@ -353,15 +353,6 @@ public class GameController4 : MonoBehaviour
         return cristalesActivados.Count >= totalCristales;
     }
 
-    public void ReiniciarJuego()
-    {
-        Time.timeScale = 1f;
-
-        if (GameManager.instance != null)
-            GameManager.instance.ReiniciarJuego();
-        else
-            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-    }
 
     // ============================================================
     // =================== MÉTODOS DE DEBUG ========================

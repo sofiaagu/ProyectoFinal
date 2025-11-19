@@ -146,8 +146,8 @@ public class GameManager : MonoBehaviour
     public void ReiniciarJuego()
     {
         Time.timeScale = 1f;
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         ResetDatos();
+        SceneManager.LoadScene("Sactum");
     }
 
     public void VolverAlMenuYResetear()
