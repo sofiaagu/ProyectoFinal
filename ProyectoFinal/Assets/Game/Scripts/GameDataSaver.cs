@@ -121,28 +121,23 @@ public class GameDataSaver : MonoBehaviour
             Debug.LogWarning("⚠️ No se encontró el jugador");
         }
 
-        // Tiempo
+        // Tiempo TOTAL del juego (todas las escenas)
         if (timerScript != null)
         {
-            // Asegurarse de que el timer esté detenido
+            // Detener el timer de esta escena
             timerScript.TimerStop();
-
-            // Usar el StopTime que ya tiene guardado
-            float tiempoFinal = timerScript.StopTime;
-
-            int minutos = Mathf.FloorToInt(tiempoFinal / 60f);
-            int segundos = Mathf.FloorToInt(tiempoFinal % 60f);
-            int centesimas = Mathf.FloorToInt((tiempoFinal - (segundos + minutos * 60)) * 100f);
-
-            nuevaPartida.tiempo = string.Format("{0:00}:{1:00}:{2:00}", minutos, segundos, centesimas);
-
-            Debug.Log($"⏱️ Tiempo guardado: {nuevaPartida.tiempo} (desde StopTime: {tiempoFinal})");
         }
-        else
-        {
-            nuevaPartida.tiempo = "00:00:00";
-            Debug.LogWarning("⚠️ No se encontró Timer");
-        }
+
+        // Obtener tiempo total acumulado del GameManager
+        float tiempoTotal = GameManager.instance.ObtenerTiempoTotal();
+
+        int minutos = Mathf.FloorToInt(tiempoTotal / 60f);
+        int segundos = Mathf.FloorToInt(tiempoTotal % 60f);
+        int centesimas = Mathf.FloorToInt((tiempoTotal - (segundos + minutos * 60)) * 100f);
+
+        nuevaPartida.tiempo = string.Format("{0:00}:{1:00}:{2:00}", minutos, segundos, centesimas);
+
+        Debug.Log($"⏱️ Tiempo TOTAL guardado: {nuevaPartida.tiempo} (Total: {tiempoTotal}s de todas las escenas)");
 
         // Fecha y hora actual
         DateTime ahora = DateTime.Now;

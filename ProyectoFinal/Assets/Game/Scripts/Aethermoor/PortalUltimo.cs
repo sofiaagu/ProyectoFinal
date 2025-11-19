@@ -119,30 +119,30 @@ public class PortalUltimo : MonoBehaviour
             textoEnemigos.text = "Enemigos Eliminados: " + GameManager.instance.enemigosEliminados;
         }
 
-        // Tiempo - Tomar directamente del Timer
-        if (textoTiempo != null && timerScript != null)
+        // Tiempo - Mostrar tiempo TOTAL de todas las escenas
+        if (textoTiempo != null)
         {
-            // Detener el timer
-            timerScript.TimerStop();
+            // Detener el timer de esta escena y registrarlo
+            if (timerScript != null)
+            {
+                timerScript.TimerStop();
+            }
 
-            // Obtener el tiempo final desde StopTime
-            float tiempoFinal = timerScript.StopTime;
+            // Obtener el tiempo TOTAL acumulado de todas las escenas
+            float tiempoTotal = GameManager.instance.ObtenerTiempoTotal();
 
-            // Formatear el tiempo igual que en el Timer
-            int minutos = Mathf.FloorToInt(tiempoFinal / 60f);
-            int segundos = Mathf.FloorToInt(tiempoFinal % 60f);
-            int centesimas = Mathf.FloorToInt((tiempoFinal - (segundos + minutos * 60)) * 100f);
+            // Formatear el tiempo total
+            int minutos = Mathf.FloorToInt(tiempoTotal / 60f);
+            int segundos = Mathf.FloorToInt(tiempoTotal % 60f);
+            int centesimas = Mathf.FloorToInt((tiempoTotal - (segundos + minutos * 60)) * 100f);
 
-            textoTiempo.text = string.Format("Tiempo: {0:00}:{1:00}:{2:00}", minutos, segundos, centesimas);
+            textoTiempo.text = string.Format("Tiempo Total: {0:00}:{1:00}:{2:00}", minutos, segundos, centesimas);
 
-            Debug.Log($"⏱️ Tiempo mostrado: {minutos:00}:{segundos:00}:{centesimas:00} (StopTime: {tiempoFinal})");
+            Debug.Log($"⏱️ Tiempo TOTAL mostrado: {minutos:00}:{segundos:00}:{centesimas:00} (Total acumulado: {tiempoTotal}s)");
         }
         else
         {
-            if (textoTiempo == null)
-                Debug.LogWarning("⚠️ No hay TextoTiempo asignado");
-            if (timerScript == null)
-                Debug.LogWarning("⚠️ No hay Timer asignado");
+            Debug.LogWarning("⚠️ No hay TextoTiempo asignado");
         }
 
         // NUEVO: Vidas restantes (corazones)
