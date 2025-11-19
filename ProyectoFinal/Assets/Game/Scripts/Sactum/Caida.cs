@@ -1,22 +1,29 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 public class Caida : MonoBehaviour
 {
-    public Transform puntoRespawn;
+    public Transform puntoInicial;
+    private CharacterController controller;
+    private PlayerHealth playerHealth;
 
-    private void OnTriggerEnter(Collider other)
+    private void Start()
     {
-        if (other.CompareTag("Player"))
+        controller = GetComponent<CharacterController>();
+        playerHealth = GetComponent<PlayerHealth>();
+    }
+
+    private void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        if (hit.gameObject.CompareTag("Lava"))
         {
-            if (puntoRespawn != null)
-            {
-                other.transform.position = puntoRespawn.position;
-                Debug.Log("¡Jugador teletransportado!");
-            }
-            else
-            {
-                Debug.LogError("No se asignó un punto de respawn");
-            }
+            // Quitar una vida
+            if (playerHealth != null)
+                playerHealth.TakeDamage(1);
+
+            // Teletransportar
+            controller.enabled = false;
+            transform.position = puntoInicial.position;
+            controller.enabled = true;
         }
     }
 }
