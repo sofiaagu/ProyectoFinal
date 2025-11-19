@@ -20,11 +20,10 @@ public class Semilla : MonoBehaviour
 
         Debug.Log($"🌱 Semilla de {tipoSemilla} recogida");
 
-        // ✅ 1. Marcar semilla globalmente
         if (GameFlowManager.Instance != null)
             GameFlowManager.Instance.MarcarSemillaRecogida(tipoSemilla);
 
-        // ✅ 2. Mostrar mensaje y actualizar contador
+        // Mostrar mensaje y actualizar contador
         ControllerSceneLira controller = FindObjectOfType<ControllerSceneLira>();
         if (controller != null)
         {
@@ -32,10 +31,9 @@ public class Semilla : MonoBehaviour
             controller.MostrarMensaje($"Sigue el camino de luz para usar el Portal");
         }
 
-        // ✅ 3. Reproducir efectos
         ReproducirEfectos();
 
-        // ✅ 4. Activar portal del santuario correspondiente
+        // Activa portal del santuario correspondiente
         if (tipoSemilla == "Agua")
         {
             SantuarioAgua santuarioAgua = FindObjectOfType<SantuarioAgua>();
@@ -57,7 +55,6 @@ public class Semilla : MonoBehaviour
                 santuarioLuz.ActivarPortel();
         }
 
-        // ✅ 5. Desactivar semilla después del efecto
         Invoke(nameof(Desactivar), 0.2f);
     }
 

@@ -3,10 +3,10 @@
 public class SantuarioLuz : MonoBehaviour
 {
     [Header("Semilla del santuario")]
-    public GameObject semillaLuz;   // La semilla que aparecerá al completar el minijuego
+    public GameObject semillaLuz;  
 
     [Header("Portal del Santuario de Luz")]
-    public GameObject portalLuz;    // Portal que aparecerá al recoger la semilla
+    public GameObject portalLuz;    
 
     [Header("Configuración del Puzzle")]
     public int antorchasNecesarias = 3;
@@ -15,18 +15,17 @@ public class SantuarioLuz : MonoBehaviour
     private ControllerSceneLira controller;
 
     [Header("Planos a activar/desactivar al completar el minijuego")]
-    public GameObject planoDesaparecer;   // 🔴 Este plano se oculta
-    public GameObject planoAparecer;      // 🟢 Este plano aparece
+    public GameObject planoDesaparecer;   
+    public GameObject planoAparecer;      
 
     [Header("Nuevos planos que también deben aparecer")]
-    public GameObject planoAparecer2;     // 🟢 Segundo plano que aparece
-    public GameObject planoAparecer3;     // 🟢 Tercer plano que aparece
+    public GameObject planoAparecer2;     
+    public GameObject planoAparecer3;    
 
     [Header("Objetos adicionales")]
-    public GameObject objetoADesaparecer; // 🔴 Objeto que desaparece
-    public GameObject prefabAparecer;     // 🟢 Prefab u objeto que aparece
+    public GameObject objetoADesaparecer; 
+    public GameObject prefabAparecer;    
 
-    // -------------------------------------------------------------------
     void Start()
     {
         controller = FindObjectOfType<ControllerSceneLira>();
@@ -37,7 +36,6 @@ public class SantuarioLuz : MonoBehaviour
         if (portalLuz != null)
             portalLuz.SetActive(false);
 
-        // Objetos que deben iniciar ocultos
         if (planoAparecer != null)
             planoAparecer.SetActive(false);
 
@@ -51,9 +49,7 @@ public class SantuarioLuz : MonoBehaviour
             prefabAparecer.SetActive(false);
     }
 
-    // -------------------------------------------------------------------
-    // ⭐ LLAMADO desde cada antorcha cuando se enciende
-    // -------------------------------------------------------------------
+  
     public void RegistrarAntorchaEncendida()
     {
         antorchasEncendidas++;
@@ -69,9 +65,6 @@ public class SantuarioLuz : MonoBehaviour
             ActivarSemilla();
     }
 
-    // -------------------------------------------------------------------
-    // ⭐ Se activa cuando se encienden TODAS las antorchas
-    // -------------------------------------------------------------------
     void ActivarSemilla()
     {
         if (controller != null)
@@ -82,15 +75,15 @@ public class SantuarioLuz : MonoBehaviour
             );
         }
 
-        // 🌟 Activar semilla
+        
         if (semillaLuz != null)
             semillaLuz.SetActive(true);
 
-        // 🔴 Desaparecer plano principal
+      
         if (planoDesaparecer != null)
             planoDesaparecer.SetActive(false);
 
-        // 🟢 Mostrar los planos nuevos
+       
         if (planoAparecer != null)
             planoAparecer.SetActive(true);
 
@@ -100,11 +93,10 @@ public class SantuarioLuz : MonoBehaviour
         if (planoAparecer3 != null)
             planoAparecer3.SetActive(true);
 
-        // 🔴 Desaparecer objeto adicional
         if (objetoADesaparecer != null)
             objetoADesaparecer.SetActive(false);
 
-        // 🟢 Activar prefab adicional
+
         if (prefabAparecer != null)
             prefabAparecer.SetActive(true);
 
@@ -112,10 +104,6 @@ public class SantuarioLuz : MonoBehaviour
     }
 
 
-
-// -------------------------------------------------------------------
-// ⭐ Método que la semilla llama cuando se hace clic en ella
-// -------------------------------------------------------------------
 public void ActivarPortel()
     {
         if (portalLuz != null)

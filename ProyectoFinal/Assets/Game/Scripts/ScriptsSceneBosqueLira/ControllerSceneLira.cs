@@ -24,7 +24,7 @@ public class ControllerSceneLira : MonoBehaviour
 
     private bool bosqueRestaurado = false;
 
-    // 🔹 NUEVO: guardamos la corutina activa del mensaje
+    // corutina activa del mensaje
     private Coroutine mensajeCoroutine;
 
     void Start()
@@ -38,7 +38,7 @@ public class ControllerSceneLira : MonoBehaviour
         ActualizarUI();
     }
 
-    // 🔹 Llamado por Semilla al ser recogida
+    // Llamado por Semilla al ser recogida
     public void RecogerSemilla()
     {
         semillasRecolectadas++;
@@ -72,7 +72,7 @@ public class ControllerSceneLira : MonoBehaviour
         if (bosqueRestaurado) return;
 
         bosqueRestaurado = true;
-        MostrarMensaje("✨ ¡Has restaurado el Bosque de Lira! 🌿", 3f);
+        MostrarMensaje("¡Has restaurado el Bosque de Lira! \n\n Busca el Portal para pasar al siguiente nivel", 3f);
 
         if (efectoRestauracion != null) efectoRestauracion.Play();
 
@@ -90,15 +90,11 @@ public class ControllerSceneLira : MonoBehaviour
         RenderSettings.fog = false;
     }
 
-    // ============================================================
-    // 🟢 MÉTODO ARREGLADO: NO BLOQUEA A LOS SANTUARIOS
-    // ============================================================
 
     public void MostrarMensaje(string texto, float duracion = 2f)
     {
         if (mensajeUI == null) return;
 
-        // Detiene SOLO su propia corutina, NO las demás del juego
         if (mensajeCoroutine != null)
             StopCoroutine(mensajeCoroutine);
 
@@ -128,7 +124,7 @@ public class ControllerSceneLira : MonoBehaviour
     }
     public void CompletarEscena()
     {
-        Debug.Log("🏁 Escena completada. Registrando tiempo…");
+        Debug.Log("Escena completada. Registrando tiempo…");
 
         if (timer != null)
         {
@@ -138,8 +134,6 @@ public class ControllerSceneLira : MonoBehaviour
                 GameManager.instance.RegistrarTiempo(timer.StopTime);
         }
 
-        // Aquí puedes cargar otro nivel si deseas:
-        // SceneManager.LoadScene("SiguienteNivel");
     }
     public void RegistrarMoneda(int cantidad)
     {
@@ -149,6 +143,6 @@ public class ControllerSceneLira : MonoBehaviour
         if (GameManager.instance != null)
             GameManager.instance.AgregarMoneda(cantidad);
 
-        Debug.Log($"💰 Moneda recogida | Escena: {monedasEscena}");
+        Debug.Log($"Moneda recogida | Escena: {monedasEscena}");
     }
 }

@@ -3,7 +3,7 @@ using UnityEngine;
 public class PuertaLuz : MonoBehaviour
 {
     [Header("Contenido detrás de la puerta")]
-    public GameObject contenidoDetras; // Puede ser una antorcha o vacío
+    public GameObject contenidoDetras; 
 
     bool abierta = false;
 
@@ -18,11 +18,6 @@ public class PuertaLuz : MonoBehaviour
     {
         abierta = true;
 
-        // Desactivar la puerta
         gameObject.SetActive(false);
-
-        // Mostrar lo que tiene atrás
-        if (contenidoDetras != null)
-            contenidoDetras.SetActive(true);
     }
 }

@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class Tumba : MonoBehaviour
 {
-    public int id; // índice de la tumba
+    public int id; 
     private SantuarioTierra santuario;
 
     void Start()
