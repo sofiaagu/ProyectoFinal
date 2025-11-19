@@ -3,8 +3,11 @@
 public class Palabra : MonoBehaviour
 {
     public string nombrePalabra;
-    public GameObject portalAsociado; 
+    public GameObject portalAsociado;
     public UIestado uiEstado;
+
+    [Header("Sonido")]
+    public AudioClip sonidoPalabra;
 
     private void OnTriggerEnter(Collider other)
     {
@@ -18,12 +21,18 @@ public class Palabra : MonoBehaviour
                 Debug.Log("Palabra recolectada: " + nombrePalabra);
             }
 
-            // Activar el portal asociado al recoger esta palabra
+            // Reproducir sonido sin cortarse
+            if (sonidoPalabra != null)
+                AudioSource.PlayClipAtPoint(sonidoPalabra, transform.position, 1f);
+
+            // Activar el portal asociado
             if (portalAsociado != null)
             {
                 portalAsociado.SetActive(true);
                 Debug.Log("Portal activado tras recoger: " + nombrePalabra);
-                uiEstado.ActualizarEstado("Portal activado ");
+
+                if (uiEstado != null)
+                    uiEstado.ActualizarEstado("Portal activado");
             }
             else
             {

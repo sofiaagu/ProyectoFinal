@@ -11,6 +11,11 @@ public class PortalController : MonoBehaviour
     public bool persistente = false;
 
     public UIestado uiEstado;
+    [Header("Descripción del sub-juego")]
+    [TextArea(2, 5)]
+    public string descripcionSubjuego = "Descripción del sub-juego aquí.";
+
+   
     private void Start()
     {
         // Solo el primer portal estará activo desde el inicio
@@ -36,9 +41,16 @@ public class PortalController : MonoBehaviour
                 other.transform.position = destino.position;
                 other.transform.rotation = destino.rotation;
 
+
+
                 Debug.Log($"Jugador transportado a: {destino.position}");
 
                 if (cc != null) cc.enabled = true;
+                if (uiEstado != null)
+                {
+                    uiEstado.ActualizarSecundario(descripcionSubjuego);
+                    Debug.Log("Descripción mostrada: " + descripcionSubjuego);
+                }
             }
             else
             {

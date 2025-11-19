@@ -12,6 +12,11 @@ public class AltarMemoria : MonoBehaviour
     [Header("Portal final")]
     public GameObject portalFinal;
 
+    [Header("Sonidos")]
+    public AudioClip sonidoAcierto;
+    public AudioClip sonidoError;
+
+
     private Controller2 controller;
     private bool jugadorCerca = false;
 
@@ -45,14 +50,16 @@ public class AltarMemoria : MonoBehaviour
 
     public void VerificarOrdenManual(List<string> palabrasUI)
     {
-        // Convierte la lista que dio la UI en una pila para comparar correctamente
         Stack<string> pilaJugador = new Stack<string>(palabrasUI);
-
         Stack<string> pilaCorrecta = new Stack<string>(ordenCorrecto);
 
         if (pilaJugador.Count != pilaCorrecta.Count)
         {
             uiEstado.ActualizarEstado("Faltan palabras.");
+
+            if (sonidoError != null)
+                AudioSource.PlayClipAtPoint(sonidoError, transform.position);
+
             return;
         }
 
@@ -61,15 +68,24 @@ public class AltarMemoria : MonoBehaviour
             if (pilaJugador.Pop() != pilaCorrecta.Pop())
             {
                 uiEstado.ActualizarEstado("Orden incorrecto. Intenta de nuevo.");
+
+                if (sonidoError != null)
+                    AudioSource.PlayClipAtPoint(sonidoError, transform.position);
+
                 return;
             }
         }
+
+        // ✔ Orden correcto
+        if (sonidoAcierto != null)
+            AudioSource.PlayClipAtPoint(sonidoAcierto, transform.position);
 
         portalFinal?.SetActive(true);
         uiEstado.ActualizarEstado("Portal final ahora está activo.");
 
         controller.CompletarEscena();
     }
+
 
 
 }

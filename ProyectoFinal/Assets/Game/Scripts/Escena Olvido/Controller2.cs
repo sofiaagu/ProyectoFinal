@@ -15,6 +15,7 @@ public class Controller2 : MonoBehaviour
     public AltarMemoria altarMemoria;
     public Timer timer;
 
+    
     // VARIABLES INTERNAS
 
     private Stack<string> pilaPalabras = new Stack<string>();
