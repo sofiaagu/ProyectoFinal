@@ -4,28 +4,22 @@ using UnityEngine.SceneManagement;
 
 public class SceneController : MonoBehaviour
 {
-    public static SceneController instance;
-    public Timer timer;
 
-    // ============================================================
-    // ======================= REFERENCIAS =========================
-    // ============================================================
+    public static SceneController instance; // Para acceder desde otros scripts
+    public Timer timer;// Referencia al Timer de la escena
 
-    [Header("📜 UI")]
+    [Header("UI")]
     public TextMeshProUGUI textoFragmentos;
     public TextMeshProUGUI textoEnemigos;
     public TextMeshProUGUI textoMonedas;
 
-    [Header("📌 Referencias de escena")]
-    public GameObject puerta;
-    public GameObject boss;
-    public Transform bossSpawnPoint;
-    public GameObject portalSalida;
+    [Header("Referencias de escena")]
+    public GameObject puerta; // Puerta que bloquea al boss
+    public GameObject boss;// Objeto del boss
+    public Transform bossSpawnPoint;// Posición de spawn del boss
+    public GameObject portalSalida;// Portal que permite salir de la escena
 
-    // ============================================================
-    // ==================== VARIABLES INTERNAS =====================
-    // ============================================================
-
+    // Variables de control
     private int fragmentosRecolectados = 0;
     [SerializeField] private int totalFragmentos = 3;
     [SerializeField] private int enemigosNecesarios = 10;
@@ -35,9 +29,6 @@ public class SceneController : MonoBehaviour
     private bool bossActivado = false;
     private bool nivelCompletado = false;
 
-    // ============================================================
-    // ========================= START =============================
-    // ============================================================
 
     void Awake()
     {
@@ -59,10 +50,11 @@ public class SceneController : MonoBehaviour
         if (portalSalida != null)
             portalSalida.gameObject.SetActive(false);
 
+        // Buscar Timer si no está asignado
         if (timer == null)
             timer = FindFirstObjectByType<Timer>();
 
-        Debug.Log($"🎮 Nivel iniciado. Objetivo: Recoger {totalFragmentos} fragmentos");
+        Debug.Log($"Nivel iniciado. Objetivo: Recoger {totalFragmentos} fragmentos");
     }
 
     void Update()
@@ -83,31 +75,25 @@ public class SceneController : MonoBehaviour
 
     }
 
-    // ============================================================
-    // =================== SISTEMA DE FRAGMENTOS ===================
-    // ============================================================
-
+ 
     public void RegistrarFragmento()
     {
         fragmentosRecolectados++;
         ActualizarUI();
 
-        Debug.Log($"📦 Fragmento {fragmentosRecolectados}/{totalFragmentos} recolectado");
+        Debug.Log($" Fragmento {fragmentosRecolectados}/{totalFragmentos} recolectado");
 
         if (fragmentosRecolectados >= totalFragmentos)
         {
-            Debug.Log("✅ Todos los fragmentos recogidos. Dirígete a la puerta.");
+            Debug.Log("Todos los fragmentos recogidos. Dirígete a la puerta.");
         }
     }
 
-    // ============================================================
-    // ====================== SISTEMA DE PUERTA ====================
-    // ============================================================
 
     private void AbrirPuerta()
     {
         puertaAbierta = true;
-        Debug.Log($"🚪 Puerta abierta con {GameManager.instance.enemigosEliminados} enemigos eliminados");
+        Debug.Log($" Puerta abierta con {GameManager.instance.enemigosEliminados} enemigos eliminados");
 
         // Desactivar el GameObject de la puerta
         if (puerta != null)
@@ -120,76 +106,68 @@ public class SceneController : MonoBehaviour
     }
     public void PuertaSeAbrio()
     {
-        Debug.Log("🔥 PuertaSeAbrio() LLAMADO");
+        Debug.Log("PuertaSeAbrio() LLAMADO");
         puertaAbierta = true;
-        Debug.Log($"🚪 Puerta abierta. ¡Activando boss!");
+        Debug.Log($" Puerta abierta. ¡Activando boss!");
 
         ActivarBoss();
     }
 
-    // ============================================================
-    // ======================== BOSS ===============================
-    // ============================================================
-
     private void ActivarBoss()
     {
-        Debug.Log("🔥 ActivarBoss() LLAMADO");
+        Debug.Log("ActivarBoss() LLAMADO");
         bossActivado = true;
 
         if (boss != null)
         {
-            Debug.Log("✅ Boss encontrado");
+            Debug.Log(" Boss encontrado");
 
             if (bossSpawnPoint != null)
             {
                 boss.transform.position = bossSpawnPoint.position;
                 boss.transform.rotation = bossSpawnPoint.rotation;
-                Debug.Log("✅ Boss posicionado");
+                Debug.Log("Boss posicionado");
             }
 
             boss.SetActive(true);
-            Debug.Log("✅ Boss activado (SetActive)");
+            Debug.Log("Boss activado (SetActive)");
 
             BossVida bossVida = boss.GetComponent<BossVida>();
             if (bossVida != null)
             {
-                Debug.Log("✅ BossVida encontrado, inicializando...");
+                Debug.Log(" BossVida encontrado, inicializando...");
                 bossVida.InicializarVida();
             }
             else
             {
-                Debug.LogError("❌ NO SE ENCONTRÓ BossVida en el boss!");
+                Debug.LogError("NO SE ENCONTRÓ BossVida en el boss!");
             }
 
-            Debug.Log("👹 ¡BOSS ACTIVADO!");
+            Debug.Log("¡BOSS ACTIVADO!");
         }
         else
         {
-            Debug.LogError("❌ boss es NULL!");
+            Debug.LogError("boss es NULL!");
         }
     }
 
     public void BossFueDerrotado()
     {
-        Debug.Log("💀 Boss derrotado!");
+        Debug.Log("Boss derrotado!");
 
         // Activar portal de salida
         if (portalSalida != null)
         {
             portalSalida.gameObject.SetActive(true);
-            Debug.Log("🌀 Portal de salida activado");
+            Debug.Log("Portal de salida activado");
         }
 
         nivelCompletado = true;
     }
 
-    // ============================================================
-    // ===================== FINAL DE ESCENA ========================
-    // ============================================================
-
     public void CargarSiguienteNivel(string nombreEscena)
     {
-        Debug.Log($"📂 Cargando siguiente nivel: {nombreEscena}");
+        Debug.Log($"Cargando siguiente nivel: {nombreEscena}");
         SceneManager.LoadScene(nombreEscena);
     }
 
@@ -198,10 +176,6 @@ public class SceneController : MonoBehaviour
         Time.timeScale = 1f;
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
-
-    // ============================================================
-    // ========================= UI UPDATE =========================
-    // ============================================================
 
     private void ActualizarUI()
     {
@@ -216,9 +190,6 @@ public class SceneController : MonoBehaviour
        
     }
 
-    // ============================================================
-    // ===================== MÉTODOS AUXILIARES ====================
-    // ============================================================
 
     public int ObtenerFragmentosRecolectados()
     {

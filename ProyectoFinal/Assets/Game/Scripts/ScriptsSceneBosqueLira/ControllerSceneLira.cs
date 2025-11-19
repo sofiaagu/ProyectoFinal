@@ -113,15 +113,6 @@ public class ControllerSceneLira : MonoBehaviour
         if (textoMonedas != null)
             textoMonedas.text = "Monedas: " + monedasEscena;
     }
-    public void ReiniciarJuego()
-    {
-        Time.timeScale = 1f;
-
-        if (GameManager.instance != null)
-            GameManager.instance.ReiniciarJuego();
-        else
-            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-    }
     public void CompletarEscena()
     {
         Debug.Log("Escena completada. Registrando tiempo…");
