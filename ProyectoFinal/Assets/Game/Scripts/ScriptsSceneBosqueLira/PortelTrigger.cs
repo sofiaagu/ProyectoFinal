@@ -4,13 +4,13 @@
 public class PortelTrigger : MonoBehaviour
 {
     [Header("Configuración del Portel")]
-    [Tooltip("Arrastra aquí el objeto del plano actual (por ejemplo, 'SantuarioAgua')")]
+    [Tooltip("Arrastra aquí el objeto del plano actual")]
     public GameObject planoActualObj;
 
-    [Tooltip("Punto donde aparecerá el jugador al usar el portel (opcional)")]
+    [Tooltip("Punto donde aparecerá el jugador al usar el portal")]
     public Transform puntoLlegada;
 
-    [Tooltip("Efecto visual al usar el portel (opcional)")]
+    [Tooltip("Efecto visual al usar el portal")]
     public ParticleSystem efectoPortel;
 
     private void Reset()
@@ -36,7 +36,7 @@ public class PortelTrigger : MonoBehaviour
 
             if (controller != null) controller.enabled = true;
 
-            Debug.Log($"🌀 Teletransportado a {puntoLlegada.position}");
+            Debug.Log($"Teletransportado a {puntoLlegada.position}");
         }
 
         if (planoActualObj != null && GameFlowManager.Instance != null)
@@ -46,7 +46,7 @@ public class PortelTrigger : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("⚠️ No se asignó el plano actual o falta GameFlowManager.");
+            Debug.LogWarning("No se asignó el plano actual o falta GameFlowManager.");
         }
     }
 }

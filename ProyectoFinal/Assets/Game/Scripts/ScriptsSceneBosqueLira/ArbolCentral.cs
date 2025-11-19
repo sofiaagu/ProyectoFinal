@@ -16,15 +16,15 @@ public class ArbolCentral : MonoBehaviour
 
     void Start()
     {
-        // Seguridad
+    
         if (controller == null)
             controller = FindObjectOfType<ControllerSceneLira>();
 
-        // Asegurar que el portal esté apagado al inicio
+        // Asegura que el portal esté apagado al inicio
         if (portalFinal != null)
             portalFinal.SetActive(false);
 
-        // Asegurar que el objeto que aparecerá esté apagado al inicio
+        // Asegura que el objeto que aparecerá esté apagado al inicio
         if (objetoAAparecer != null)
             objetoAAparecer.SetActive(false);
     }
@@ -42,11 +42,10 @@ public class ArbolCentral : MonoBehaviour
         if (!GameFlowManager.Instance.TieneTodasLasSemillas())
         {
             controller?.MostrarMensaje("Aún te faltan semillas...", 3f);
-            Debug.Log("❌ No tienes todas las semillas");
+            Debug.Log("No tienes todas las semillas");
             return;
         }
 
-        // Si tiene las 3 → activar portal + cambiar objetos
         ActivarPortalFinal();
     }
 
@@ -57,7 +56,7 @@ public class ArbolCentral : MonoBehaviour
         {
             portalFinal.SetActive(true);
             controller?.MostrarMensaje("¡El portal final ha aparecido!", 3f);
-            Debug.Log("✨ Portal final activado");
+            Debug.Log("Portal final activado");
         }
         else
         {
@@ -68,14 +67,14 @@ public class ArbolCentral : MonoBehaviour
         if (objetoADesaparecer != null)
         {
             objetoADesaparecer.SetActive(false);
-            Debug.Log("🔻 Objeto ocultado.");
+            Debug.Log("Objeto ocultado.");
         }
 
         // Encender GameObject
         if (objetoAAparecer != null)
         {
             objetoAAparecer.SetActive(true);
-            Debug.Log("🔺 Objeto mostrado.");
+            Debug.Log("Objeto mostrado.");
         }
     }
 }

@@ -29,7 +29,7 @@ public class SantuarioClick : MonoBehaviour
     {
         posicionInicial = transform.position;
 
-        // Buscar el controller en la escena
+        // Busca el controller en la escena
         controller = FindObjectOfType<ControllerSceneLira>();
 
         if (controller == null)
@@ -65,13 +65,13 @@ public class SantuarioClick : MonoBehaviour
         switch (tipo)
         {
             case TipoSantuario.Agua:
-                return "Bienvenido al Santuario de Agua.\n\nActiva las gemas en el orden correcto para liberar la semilla.";
+                return "Bienvenido al Santuario de Agua.\n\nActiva las gemas en el orden correcto para liberar la semilla de Agua.";
 
             case TipoSantuario.Tierra:
-                return "Bienvenido al Santuario de la Tierra.\n\nLibera la semilla de Tierra haciendo clic en las tumbas encendidas de los 5 fuegos sagrados sin equivacarte.";
+                return "Bienvenido al Santuario de la Tierra.\n\nLibera la semilla de Tierra activando las tumbas encendidas de los cinco fuegos sagrados sin equivocarte.";
 
             case TipoSantuario.Luz:
-                return "Bienvenido al Santuario de la Luz.\n\nBusca, encuentra e ilumina las antorchas sagradas para purificar el altar y liberar la semilla.";
+                return "Bienvenido al Santuario de la Luz.\n\nBusca, encuentra e ilumina las antorchas sagradas para liberar la semilla de Luz.";
 
             default:
                 return "Bienvenido al Santuario.";

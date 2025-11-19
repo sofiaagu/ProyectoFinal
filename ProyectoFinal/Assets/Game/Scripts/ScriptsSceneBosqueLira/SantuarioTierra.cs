@@ -1,8 +1,6 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-// SantuarioTierra: controla el minijuego de fuegos sobre tumbas.
-// Compatible con tu script genérico "Semilla" (la semilla debe tener tipo "Tierra").
 public class SantuarioTierra : MonoBehaviour
 {
     [Header("Configuración del juego")]
@@ -15,7 +13,7 @@ public class SantuarioTierra : MonoBehaviour
     public float esperaEntreFuegos = 1f;
 
     [Header("Prefab al aparecer la semilla")]
-    public GameObject prefabAparecer;        // Prefab que aparecerá (simplemente se activa)
+    public GameObject prefabAparecer;     
 
     [Header("Control de Planos")]
     public GameObject planoDesactivar1;
@@ -55,7 +53,7 @@ public class SantuarioTierra : MonoBehaviour
         if (portalTierra != null)
             portalTierra.SetActive(false);
 
-        // 🔥 El prefab debe iniciar apagado
+
         if (prefabAparecer != null)
             prefabAparecer.SetActive(false);
 
@@ -151,7 +149,7 @@ public class SantuarioTierra : MonoBehaviour
             }
         }
 
-        // 🌱 Mostrar la semilla
+        // Mostrar la semilla
         if (semillaTierra != null)
         {
             semillaTierra.SetActive(true);
@@ -161,7 +159,6 @@ public class SantuarioTierra : MonoBehaviour
                 sem.tipoSemilla = "Tierra";
         }
       
-        // 🔥 CAMBIO DE PLANOS 🔥
         if (planoDesactivar1 != null) planoDesactivar1.SetActive(false);
         if (planoDesactivar2 != null) planoDesactivar2.SetActive(false);
 

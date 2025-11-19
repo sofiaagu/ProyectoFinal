@@ -3,18 +3,18 @@
 public class SantuarioAgua : MonoBehaviour
 {
     [Header("Referencias principales")]
-    public GameObject semillaAgua;          // 🌱 Semilla que aparece al completar el puzzle
-    public GameObject portelAgua;           // 🌀 Portel que se activa después
-    public ParticleSystem efectoAparicion;  // ✨ Efecto al aparecer la semilla
+    public GameObject semillaAgua;          
+    public GameObject portelAgua;           
+    public ParticleSystem efectoAparicion;  
 
     [Header("Prefabs a alternar")]
-    public GameObject prefabDesaparecer;    // 🔹 Prefab que se desactiva
-    public GameObject prefabAparecer;       // 🔹 Prefab que se activa
+    public GameObject prefabDesaparecer;    
+    public GameObject prefabAparecer;       
 
     [Header("Efectos de partículas")]
-    public ParticleSystem particulasDesaparecer; // 💨 Efecto que se apaga al completar el puzzle
-    public ParticleSystem particulaExtra1;       // 💧 Primer efecto adicional
-    public ParticleSystem particulaExtra2;       // 💧 Segundo efecto adicional
+    public ParticleSystem particulasDesaparecer; 
+    public ParticleSystem particulaExtra1;      
+    public ParticleSystem particulaExtra2;       
 
     [Header("Configuración del puzzle")]
     public int[] ordenCorrecto = { 1, 3, 2 };
@@ -88,14 +88,14 @@ public class SantuarioAgua : MonoBehaviour
         if (prefabAparecer != null)
             prefabAparecer.SetActive(true);
 
-        // 💨 Desactivar partículas principales
+        
         if (particulasDesaparecer != null)
         {
             particulasDesaparecer.Stop();
             particulasDesaparecer.gameObject.SetActive(false);
         }
 
-        // 💧 Desactivar partículas adicionales
+  
         if (particulaExtra1 != null)
         {
             particulaExtra1.Stop();

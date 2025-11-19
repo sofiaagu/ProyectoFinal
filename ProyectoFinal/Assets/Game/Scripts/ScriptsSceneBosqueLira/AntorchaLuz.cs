@@ -3,7 +3,7 @@ using UnityEngine;
 public class AntorchaLuz : MonoBehaviour
 {
     [Header("Partículas de la antorcha")]
-    public ParticleSystem fuegoEncendido;   // Sistema de partículas de fuego (apagado al inicio)
+    public ParticleSystem fuegoEncendido;   
 
     [Header("Opcional")]
     public AudioSource sonidoEncender;
@@ -13,10 +13,10 @@ public class AntorchaLuz : MonoBehaviour
 
     void Start()
     {
-        // Buscar el script del santuario
+        // Busca el script del SantuarioLuz
         santuario = FindObjectOfType<SantuarioLuz>();
 
-        // Asegurar que la antorcha empieza apagada
+        // Asegura que la antorcha empieza apagada
         if (fuegoEncendido != null)
         {
             fuegoEncendido.Stop();
@@ -38,7 +38,7 @@ public class AntorchaLuz : MonoBehaviour
             fuegoEncendido.Play();
         }
 
-        // Sonido opcional
+        // Sonido
         if (sonidoEncender != null)
             sonidoEncender.Play();
 
