@@ -154456,7 +154456,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 15ffec08c236cd0408de436ad21c3121, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -26.15
+      value: 62.5
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 15ffec08c236cd0408de436ad21c3121, type: 3}
       propertyPath: m_LocalPosition.y
@@ -154464,7 +154464,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 15ffec08c236cd0408de436ad21c3121, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 18.25
+      value: -11.49
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 15ffec08c236cd0408de436ad21c3121, type: 3}
       propertyPath: m_LocalRotation.w
@@ -210100,11 +210100,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mensajes:
-  - "\xA1Hola! Bienvenido a la Ciudad de Aethermoor"
-  - Deberas recorrer los santuarios
-  - Para recuperar tus poderes
-  - Y derrotar a Mnemosyne
-  - "\xA1Adelante\xA1\nAethermoor te espera"
+  - "El guardi\xE1n ancestral se alza ante ti: sus ataques son lentos, pero su fuerza
+    es temible."
+  - "No subestimes su lentitud: un golpe suyo basta para aplastar incluso al m\xE1s
+    preparado."
+  - "Busca la corona en su trono: su ca\xEDda y tu victoria son una sola promesa."
+  - "Al alzar la corona sobre su cabeza, el tirano caer\xE1\u2026 su reinado se quebrar\xE1."
+  - "Cuando la corona reine en ti, el portal sellado se abrir\xE1\u2026 y tu destino
+    te llamar\xE1."
   tiempoEntreMensajes: 2
   "tama\xF1oFuente": 24
   colorTexto: {r: 1, g: 1, b: 1, a: 1}
@@ -266659,12 +266662,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mensajes:
-  - "La energ\xEDa dormida de estos cristales espera ser despertada en el orden correcto..."
-  - El altar muestra la clave. Presiona [E] para revelar su secreto
-  - 'En las alturas donde la luz nace,
-
-    el poder de la Luminiscencia aguarda.'
-  - "Los cristales cantan su canci\xF3n ancestral... memoriza su danza"
+  - "El sendero oculto solo existe entre mundos\u2026 cambia de plano para encontrarte
+    con \xE9l."
+  - "Lo visible enga\xF1a. Aquello que salva se revela en el otro lado."
+  - "La lava reclama a los impacientes\u2026 observa ambos planos antes de dar un
+    paso."
+  - "Entre la luz y la sombra, el camino toma forma. Mira m\xE1s all\xE1 del velo."
   tiempoEntreMensajes: 2
   "tama\xF1oFuente": 24
   colorTexto: {r: 1, g: 1, b: 1, a: 1}
@@ -279743,7 +279746,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1319996463
 Transform:
   m_ObjectHideFlags: 0
