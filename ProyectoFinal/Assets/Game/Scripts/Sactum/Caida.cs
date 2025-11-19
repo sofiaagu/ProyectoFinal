@@ -1,40 +1,29 @@
-using UnityEngine;
-using UnityEngine.AI;
+ï»¿using UnityEngine;
 
 public class Caida : MonoBehaviour
 {
-    public Transform playerTarget;
-    private NavMeshAgent agent;
+    public Transform puntoInicial;
+    private CharacterController controller;
+    private PlayerHealth playerHealth;
 
-    void Start()
+    private void Start()
     {
-        agent = GetComponent<NavMeshAgent>();
-        
-        agent.enabled = false;
+        controller = GetComponent<CharacterController>();
+        playerHealth = GetComponent<PlayerHealth>();
     }
 
-    void Update()
+    private void OnControllerColliderHit(ControllerColliderHit hit)
     {
-        
-        if (agent.enabled && playerTarget != null)
+        if (hit.gameObject.CompareTag("Lava"))
         {
-            agent.SetDestination(playerTarget.position);
-        }
-    }
+            // Quitar una vida
+            if (playerHealth != null)
+                playerHealth.TakeDamage(1);
 
-    public void StartChase(Vector3 playerPos)
-    {
-        if (!agent.enabled)
-        {
-            agent.enabled = true;
-            agent.SetDestination(playerPos);
-            Debug.Log(gameObject.name + " activado. Iniciando persecución.");
+            // Teletransportar
+            controller.enabled = false;
+            transform.position = puntoInicial.position;
+            controller.enabled = true;
         }
-    }
-
-    public void StopChase()
-    {
-        agent.enabled = false;
-        Debug.Log(gameObject.name + " detenido.");
     }
 }
