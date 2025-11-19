@@ -44361,6 +44361,7 @@ PrefabInstance:
     m_RemovedGameObjects:
     - {fileID: 1372814800615594, guid: 7ba2845aa97948a4b8bee3a62a942ab2, type: 3}
     - {fileID: 1320670845559922, guid: 7ba2845aa97948a4b8bee3a62a942ab2, type: 3}
+    - {fileID: 1936325203959362, guid: 7ba2845aa97948a4b8bee3a62a942ab2, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 1909615710894222, guid: 7ba2845aa97948a4b8bee3a62a942ab2, type: 3}
@@ -145885,10 +145886,10 @@ MonoBehaviour:
   anim: {fileID: 646562379}
   rangoDeteccion: 15
   rangoAtaque1: 3
-  rangoAtaque2: 8
+  rangoAtaque2: 4
   tiempoEntreAtaques: 2
-  velocidadMovimiento: 3
-  velocidadRotacion: 5
+  velocidadMovimiento: 6
+  velocidadRotacion: 6
   distanciaMinima: 2
   estaVivo: 1
 --- !u!1001 &647562058
@@ -347412,7 +347413,7 @@ Transform:
   m_GameObject: {fileID: 1488192040}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -26.92, y: 1005.58, z: 29.52}
+  m_LocalPosition: {x: 31.18, y: 1007.22, z: 31.42}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -462452,8 +462453,8 @@ Transform:
   m_GameObject: {fileID: 2146515223}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.331, y: 0.44, z: -0.368}
-  m_LocalScale: {x: 2, y: 2, z: 2}
+  m_LocalPosition: {x: -0.001, y: 0.024, z: -0.452}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1488192042}
