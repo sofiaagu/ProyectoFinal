@@ -7,13 +7,14 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
 
+
     // ============================================================
     // CONTROLLER DE LA ESCENA
     // ============================================================
     public Controller2 controllerActual;
     public ControllerSceneLira controllerActual2;
     public GameController4 controllerActual3;
-
+    public SceneController controllerActual4;
     // ============================================================
     // SCORE (MONEDAS)
     // ============================================================
@@ -22,10 +23,11 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI textoScore;
 
     [Header("⚔️ Enemigos")]
-    public int enemigosEliminados = 0;
-    public TextMeshProUGUI textoEnemigos;
+    public int enemigosEliminados = 0;        // Contador
+    public TextMeshProUGUI textoEnemigos;     // Opcional si quieres mostrarlo en UI
 
-    public int vidasPersistentes = -1;
+    public int vidasPersistentes = -1; // -1 significa "no inicializado"
+
 
     // ============================================================
     // GAME OVER
@@ -38,25 +40,6 @@ public class GameManager : MonoBehaviour
     // ============================================================
     private Dictionary<string, float> tiemposPorEscena = new Dictionary<string, float>();
     private float tiempoTotal = 0f;
-
-    // ============================================================
-    // 🎵 MUSICA GLOBAL (UN SOLO AUDIOSOURCE)
-    // ============================================================
-    [Header("🎵 Música")]
-    public AudioSource audioSource;
-
-    public AudioClip musicaMenu;
-    public AudioClip musicaSactum;
-    public AudioClip musicaOlvido;
-    public AudioClip musicaBosqueLira;
-    public AudioClip musicaAethermoor;
-
-    [Range(0f, 1f)]
-    public float volumenMaximo = 0.8f;
-
-    public float fadeDuration = 1.5f;
-
-    private bool isFading = false;
 
     // ============================================================
     // INICIO
@@ -73,6 +56,7 @@ public class GameManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+
     }
 
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
@@ -94,13 +78,8 @@ public class GameManager : MonoBehaviour
         controllerActual = FindAnyObjectByType<Controller2>();
         controllerActual2 = FindAnyObjectByType<ControllerSceneLira>();
         controllerActual3 = FindAnyObjectByType<GameController4>();
-
+        controllerActual4 = FindAnyObjectByType<SceneController>();
         ActualizarUI();
-
-        // ============================================================
-        // 🎵 Música según la escena
-        // ============================================================
-        ReproducirMusicaPorEscena(scene.name);
     }
 
     // ============================================================
@@ -117,16 +96,15 @@ public class GameManager : MonoBehaviour
         if (textoScore != null)
             textoScore.text = "x " + score;
     }
-
     public void EnemigoEliminado()
     {
-        enemigosEliminados++;
-        ActualizarUI();
-        ActualizarUIEnemigos();
+        enemigosEliminados++;              // Suma 1 al contador
+        ActualizarUI();                    // Refresca el texto del score
+
+        ActualizarUIEnemigos();            // Refresca el contador (si lo usas)
 
         Debug.Log("✔ Enemigo eliminado. Total: " + enemigosEliminados);
     }
-
     private void ActualizarUIEnemigos()
     {
         if (textoEnemigos != null)
@@ -176,24 +154,27 @@ public class GameManager : MonoBehaviour
     {
         Time.timeScale = 1f;
 
-        ResetDatos();
+        ResetDatos(); // Reinicia score, tiempo y UI
 
+        // Mostrar cursor
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
 
+        // Apagar panel game over si está presente
         if (panelGameOver != null)
             panelGameOver.SetActive(false);
 
+        // Cargar escena del menú
         SceneManager.LoadScene("Menu");
 
         Debug.Log("🏠 Volviendo al menú principal con reset global.");
     }
-
     public void ResetDatos()
     {
         score = 0;
         vidasPersistentes = -1;
 
+        // Reset de tiempo
         tiemposPorEscena.Clear();
         tiempoTotal = 0f;
 
@@ -201,71 +182,4 @@ public class GameManager : MonoBehaviour
     }
 
 
-    // ============================================================
-    // 🎵 MUSICA SEGÚN ESCENA + FADE
-    // ============================================================
-
-    public void ReproducirMusicaPorEscena(string escena)
-    {
-        AudioClip nuevaMusica = null;
-
-        switch (escena)
-        {
-            case "Menu":
-                nuevaMusica = musicaMenu;
-                break;
-
-            case "Sactum":
-                nuevaMusica = musicaSactum;
-                break;
-
-            case "EscenaOlvido":
-                nuevaMusica = musicaOlvido;
-                break;
-
-            case "BosqueDeLira":
-                nuevaMusica = musicaBosqueLira;
-                break;
-
-            case "Aethermoor":
-                nuevaMusica = musicaAethermoor;
-                break;
-        }
-
-        if (nuevaMusica != null)
-            StartCoroutine(CambiarMusicaConFade(nuevaMusica));
-    }
-
-    private System.Collections.IEnumerator CambiarMusicaConFade(AudioClip nuevaMusica)
-    {
-        if (isFading) yield break;
-        isFading = true;
-
-        // 🔻 Fade Out
-        float t = 0f;
-        float volumenInicial = audioSource.volume;
-
-        while (t < fadeDuration)
-        {
-            t += Time.unscaledDeltaTime;
-            audioSource.volume = Mathf.Lerp(volumenInicial, 0f, t / fadeDuration);
-            yield return null;
-        }
-
-        audioSource.Stop();
-        audioSource.clip = nuevaMusica;
-        audioSource.Play();
-
-        // 🔺 Fade In
-        t = 0f;
-        while (t < fadeDuration)
-        {
-            t += Time.unscaledDeltaTime;
-            audioSource.volume = Mathf.Lerp(0f, volumenMaximo, t / fadeDuration);
-            yield return null;
-        }
-
-        audioSource.volume = volumenMaximo;
-        isFading = false;
-    }
 }

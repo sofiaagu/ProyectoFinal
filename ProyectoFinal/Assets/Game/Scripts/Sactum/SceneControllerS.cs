@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 public class SceneController : MonoBehaviour
 {
     public static SceneController instance;
+    public Timer timer;
 
     // ============================================================
     // ======================= REFERENCIAS =========================
@@ -13,9 +14,10 @@ public class SceneController : MonoBehaviour
     [Header("📜 UI")]
     public TextMeshProUGUI textoFragmentos;
     public TextMeshProUGUI textoEnemigos;
+    public TextMeshProUGUI textoMonedas;
 
     [Header("📌 Referencias de escena")]
-    public PuertaController puerta;
+    public GameObject puerta;
     public GameObject boss;
     public Transform bossSpawnPoint;
     public PortalSC portalSalida;
@@ -27,6 +29,7 @@ public class SceneController : MonoBehaviour
     private int fragmentosRecolectados = 0;
     [SerializeField] private int totalFragmentos = 3;
     [SerializeField] private int enemigosNecesarios = 10;
+    private int monedasEscena = 0;
 
     private bool puertaAbierta = false;
     private bool bossActivado = false;
@@ -56,22 +59,28 @@ public class SceneController : MonoBehaviour
         if (portalSalida != null)
             portalSalida.gameObject.SetActive(false);
 
+        if (timer == null)
+            timer = FindFirstObjectByType<Timer>();
+
         Debug.Log($"🎮 Nivel iniciado. Objetivo: Recoger {totalFragmentos} fragmentos");
     }
 
     void Update()
     {
-      
-        if (puertaAbierta && !bossActivado && GameManager.instance != null)
-        {
-            if (GameManager.instance.enemigosEliminados >= enemigosNecesarios)
-            {
-                ActivarBoss();
-            }
-        }
-        
 
-        ActualizarUI();
+        {
+            // Verificar si se pueden abrir la puerta automáticamente
+            if (!puertaAbierta && GameManager.instance != null)
+            {
+                if (GameManager.instance.enemigosEliminados >= enemigosNecesarios)
+                {
+                    AbrirPuerta();
+                }
+            }
+
+            ActualizarUI();
+        }
+
     }
 
     // ============================================================
@@ -95,6 +104,20 @@ public class SceneController : MonoBehaviour
     // ====================== SISTEMA DE PUERTA ====================
     // ============================================================
 
+    private void AbrirPuerta()
+    {
+        puertaAbierta = true;
+        Debug.Log($"🚪 Puerta abierta con {GameManager.instance.enemigosEliminados} enemigos eliminados");
+
+        // Desactivar el GameObject de la puerta
+        if (puerta != null)
+        {
+            puerta.gameObject.SetActive(false);
+        }
+
+        // Activar el boss inmediatamente
+        ActivarBoss();
+    }
     public void PuertaSeAbrio()
     {
         Debug.Log("🔥 PuertaSeAbrio() LLAMADO");
@@ -182,11 +205,15 @@ public class SceneController : MonoBehaviour
 
     private void ActualizarUI()
     {
+        if (textoMonedas != null)
+            textoMonedas.text = "Monedas: " + monedasEscena;
         if (textoFragmentos != null)
             textoFragmentos.text = $"Fragmentos: {fragmentosRecolectados}/{totalFragmentos}";
 
         if (textoEnemigos != null && GameManager.instance != null)
             textoEnemigos.text = GameManager.instance.enemigosEliminados.ToString();
+
+       
     }
 
     // ============================================================
@@ -201,5 +228,28 @@ public class SceneController : MonoBehaviour
     public bool NivelEstaCompletado()
     {
         return nivelCompletado;
+    }
+    public void RegistrarMoneda(int cantidad)
+    {
+        monedasEscena += cantidad;
+        ActualizarUI();
+
+        if (GameManager.instance != null)
+            GameManager.instance.AgregarMoneda(cantidad);
+
+        Debug.Log($"Moneda recogida | Escena: {monedasEscena}");
+    }
+
+    public void CompletarEscena()
+    {
+        Debug.Log("Escena completada. Registrando tiempo…");
+
+        if (timer != null)
+        {
+            timer.TimerStop();
+
+            if (GameManager.instance != null)
+                GameManager.instance.RegistrarTiempo(timer.StopTime);
+        }
     }
 }
