@@ -1,56 +1,22 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-public class PuertaController : MonoBehaviour
+public class PuertaRompible : MonoBehaviour
 {
-    public int enemigosRequeridosParaAbrir = 10;
-    private bool puertaAbierta = false;
+    public int golpesNecesarios = 5;
+    private int golpesRecibidos = 0;
 
-    void Start()
+    private void OnTriggerEnter(Collider other)
     {
-        Debug.Log("🚪 PuertaController iniciado en: " + gameObject.name);
-
-        if (GameManager.instance == null)
+        if (other.CompareTag("arma"))
         {
-            Debug.LogError("❌ GameManager.instance es NULL!");
-        }
-        else
-        {
-            Debug.Log("✅ GameManager encontrado. Enemigos eliminados: " + GameManager.instance.enemigosEliminados);
-        }
-    }
+            golpesRecibidos++;
+            Debug.Log($"Puerta golpeada: {golpesRecibidos}/{golpesNecesarios}");
 
-    void Update()
-    {
-        if (puertaAbierta) return; // Ya se abrió, no verificar más
-
-        if (GameManager.instance != null)
-        {
-            // Verificar si ya llegó al número requerido
-            if (GameManager.instance.enemigosEliminados >= enemigosRequeridosParaAbrir)
+            if (golpesRecibidos >= golpesNecesarios)
             {
-                AbrirPuerta();
+                Debug.Log("¡Puerta destruida!");
+                gameObject.SetActive(false);
             }
         }
-    }
-
-    void AbrirPuerta()
-    {
-        puertaAbierta = true;
-        Debug.Log("🎉 ¡Puerta abierta! Enemigos eliminados: " + GameManager.instance.enemigosEliminados);
-
-        // ⭐ AÑADE ESTOS DEBUGS ⭐
-        if (SceneController.instance != null)
-        {
-            Debug.Log("✅ SceneController encontrado, llamando a PuertaSeAbrio()");
-            SceneController.instance.PuertaSeAbrio();
-        }
-        else
-        {
-            Debug.LogError("❌ SceneController.instance es NULL!");
-        }
-
-        gameObject.SetActive(false);
     }
 }

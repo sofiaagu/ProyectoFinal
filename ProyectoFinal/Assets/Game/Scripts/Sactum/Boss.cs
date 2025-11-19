@@ -27,18 +27,10 @@ public class Boss : MonoBehaviour
 
     public void Comportamiento_Enemigo()
     {
-        // SI ESTÁ ATACANDO, NO HACER NADA MÁS - dejar que termine
+        // SI ESTÁ ATACANDO, NO HACER NADA - mantener posición fija
         if (atacando)
         {
-            // Opcional: seguir mirando al jugador mientras ataca
-            var lookPos = target.transform.position - transform.position;
-            lookPos.y = 0;
-            if (lookPos != Vector3.zero)
-            {
-                var rotation = Quaternion.LookRotation(lookPos);
-                transform.rotation = Quaternion.RotateTowards(transform.rotation, rotation, 3);
-            }
-            return; // Sale del método, ignora todo lo demás
+            return; // ✅ Sale inmediatamente, SIN rotar
         }
 
         float distancia = Vector3.Distance(transform.position, target.transform.position);
@@ -95,13 +87,13 @@ public class Boss : MonoBehaviour
             ani.SetBool("walk", false);
             ani.SetBool("run", false);
 
-            // Mirar hacia el jugador
+            // ✅ Mirar hacia el jugador SOLO antes de atacar
             var lookPos = target.transform.position - transform.position;
             lookPos.y = 0;
             if (lookPos != Vector3.zero)
             {
                 var rotation = Quaternion.LookRotation(lookPos);
-                transform.rotation = Quaternion.RotateTowards(transform.rotation, rotation, 3);
+                transform.rotation = Quaternion.RotateTowards(transform.rotation, rotation, 5); // Velocidad aumentada
             }
 
             // Iniciar ataque si es posible
