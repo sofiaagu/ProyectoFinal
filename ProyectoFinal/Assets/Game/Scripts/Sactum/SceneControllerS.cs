@@ -17,7 +17,7 @@ public class SceneController : MonoBehaviour
     public TextMeshProUGUI textoMonedas;
 
     [Header("📌 Referencias de escena")]
-    public PuertaController puerta;
+    public GameObject puerta;
     public GameObject boss;
     public Transform bossSpawnPoint;
     public PortalSC portalSalida;
@@ -67,17 +67,20 @@ public class SceneController : MonoBehaviour
 
     void Update()
     {
-      
-        if (puertaAbierta && !bossActivado && GameManager.instance != null)
-        {
-            if (GameManager.instance.enemigosEliminados >= enemigosNecesarios)
-            {
-                ActivarBoss();
-            }
-        }
-        
 
-        ActualizarUI();
+        {
+            // Verificar si se pueden abrir la puerta automáticamente
+            if (!puertaAbierta && GameManager.instance != null)
+            {
+                if (GameManager.instance.enemigosEliminados >= enemigosNecesarios)
+                {
+                    AbrirPuerta();
+                }
+            }
+
+            ActualizarUI();
+        }
+
     }
 
     // ============================================================
@@ -101,6 +104,20 @@ public class SceneController : MonoBehaviour
     // ====================== SISTEMA DE PUERTA ====================
     // ============================================================
 
+    private void AbrirPuerta()
+    {
+        puertaAbierta = true;
+        Debug.Log($"🚪 Puerta abierta con {GameManager.instance.enemigosEliminados} enemigos eliminados");
+
+        // Desactivar el GameObject de la puerta
+        if (puerta != null)
+        {
+            puerta.gameObject.SetActive(false);
+        }
+
+        // Activar el boss inmediatamente
+        ActivarBoss();
+    }
     public void PuertaSeAbrio()
     {
         Debug.Log("🔥 PuertaSeAbrio() LLAMADO");
