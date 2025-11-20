@@ -35,17 +35,5 @@ public class PlataformaMovimiento : MonoBehaviour
             yendoAlDestino = !yendoAlDestino;
     }
 
-    void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.yellow;
-        Vector3 destinoPreview = transform.position;
-
-        if (moverHorizontal)
-            destinoPreview += Vector3.right * distancia;
-        else if (moverVertical)
-            destinoPreview += Vector3.up * distancia;
-
-        Gizmos.DrawLine(transform.position, destinoPreview);
-        Gizmos.DrawSphere(destinoPreview, 0.1f);
-    }
+  
 }

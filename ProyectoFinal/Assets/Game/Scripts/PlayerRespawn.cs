@@ -5,14 +5,14 @@
 public class PlayerRespawn : MonoBehaviour
 {
     [Header("Respawn Settings")]
-    public Transform respawnPoint; // 🔹 PÚBLICO para que los cubos lo puedan cambiar
+    public Transform respawnPoint; // PÚBLICO para que los cubos lo puedan cambiar
 
     [Header("Vida")]
     public int vidasIniciales = 3;
     private int vidasActuales;
 
     [Header("Death Zone")]
-    public float alturaMinima = -10f; // 🔹 Altura por debajo de la cual el jugador muere
+    public float alturaMinima = -10f; // Altura por debajo de la cual el jugador muere
 
     [Header("UI")]
     public GameObject panelPerdiste;
@@ -25,7 +25,7 @@ public class PlayerRespawn : MonoBehaviour
 
     private CharacterController controller;
     private AudioSource audioSource;
-    private bool estaMuriendo = false; // 🔹 Evita muerte múltiple
+    private bool estaMuriendo = false; // Evita muerte múltiple
 
 
     public int CurrentLives => vidasActuales;
@@ -59,7 +59,7 @@ public class PlayerRespawn : MonoBehaviour
 
     private void Update()
     {
-        // 🔹 DETECTAR CAÍDA (Death Zone por altura)
+        //  DETECTAR CAÍDA (Death Zone por altura)
         if (!estaMuriendo && transform.position.y < alturaMinima)
         {
             PerderVida();
@@ -68,7 +68,7 @@ public class PlayerRespawn : MonoBehaviour
 
     private void OnControllerColliderHit(ControllerColliderHit hit)
     {
-        // 🔹 DETECTAR COLISIÓN con objetos etiquetados como "DeathZone"
+        // DETECTAR COLISIÓN con objetos etiquetados como "DeathZone"
         if (!estaMuriendo && hit.gameObject.CompareTag("DeathZone"))
         {
             PerderVida();
@@ -81,7 +81,7 @@ public class PlayerRespawn : MonoBehaviour
 
         estaMuriendo = true;
 
-        // 💥 Restar vida desde PlayerHealth
+        // Restar vida desde PlayerHealth
         if (playerHealth != null)
             playerHealth.TakeDamage(1);
 
@@ -105,7 +105,7 @@ public class PlayerRespawn : MonoBehaviour
     {
         controller.enabled = false;
 
-        // 🔹 Resetear velocidad si hay Rigidbody
+        // Resetear velocidad si hay Rigidbody
         Rigidbody rb = GetComponent<Rigidbody>();
         if (rb != null)
         {
@@ -116,7 +116,7 @@ public class PlayerRespawn : MonoBehaviour
         transform.position = respawnPoint.position;
         controller.enabled = true;
 
-        estaMuriendo = false; // 🔹 Permitir detectar muerte nuevamente
+        estaMuriendo = false; // Permitir detectar muerte nuevamente
         Debug.Log("Respawn en: " + respawnPoint.position);
     }
 
@@ -124,21 +124,21 @@ public class PlayerRespawn : MonoBehaviour
     {
         Debug.Log("¡Game Over!");
 
-        // 🔊 Reproducir sonido de muerte
+        // Reproducir sonido de muerte
         if (sonidoMuerte != null && audioSource != null)
             audioSource.PlayOneShot(sonidoMuerte);
 
         if (panelPerdiste != null)
             panelPerdiste.SetActive(true);
 
-        // 🔹 Pausa del juego
+        //  Pausa del juego
         Time.timeScale = 0f;
 
-        // 🔹 Desactivar controles del jugador (opcional)
+        // Desactivar controles del jugador (opcional)
         controller.enabled = false;
     }
 
-    // 🔹 MÉTODO PÚBLICO para reiniciar el juego
+    //  MÉTODO PÚBLICO para reiniciar el juego
     public void ReiniciarJuego()
     {
         Time.timeScale = 1f;

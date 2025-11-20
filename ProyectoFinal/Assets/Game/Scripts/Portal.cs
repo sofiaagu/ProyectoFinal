@@ -26,14 +26,14 @@ public class PortalTrigger : MonoBehaviour
 
         if (puntoLlegada == null)
         {
-            Debug.LogWarning("⚠️ PortalTrigger: No se ha asignado el punto de llegada.");
+            Debug.LogWarning("PortalTrigger: No se ha asignado el punto de llegada.");
             return;
         }
 
         // Intenta obtener el CharacterController
         CharacterController controller = other.GetComponent<CharacterController>();
 
-        // 🔄 Desactiva temporalmente el CharacterController para evitar conflictos
+        // Desactiva temporalmente el CharacterController para evitar conflictos
         if (controller != null)
             controller.enabled = false;
 
@@ -48,6 +48,6 @@ public class PortalTrigger : MonoBehaviour
         if (efectoPortal != null)
             efectoPortal.Play();
 
-        Debug.Log($"🌀 Jugador teletransportado a: {puntoLlegada.position}");
+        Debug.Log($"Jugador teletransportado a: {puntoLlegada.position}");
     }
 }

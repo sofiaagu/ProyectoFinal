@@ -11,12 +11,15 @@ public class Palabra : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        // Detecta si el jugador entra al trigger
         if (other.CompareTag("Player"))
         {
+            // Busca el Controller2 para registrar la palabra
             Controller2 controller = FindFirstObjectByType<Controller2>();
 
             if (controller != null)
             {
+                // Añade la palabra al sistema del jugador
                 controller.AgregarPalabra(nombrePalabra);
                 Debug.Log("Palabra recolectada: " + nombrePalabra);
             }
