@@ -5,7 +5,7 @@ using UnityEngine;
 public class BossEnemy : MonoBehaviour
 {
     [Header("Referencias")]
-    public Transform jugador;
+    public Transform jugador;  //jugador a atacar
     public Transform objetoADefender; // El objeto que el jefe defiende
     public Animator anim;
 
@@ -27,7 +27,7 @@ public class BossEnemy : MonoBehaviour
     public AudioClip sonidoDeteccion; // Sonido cuando detecta al jugador
     public AudioClip sonidoAtaque1; // Sonido del primer ataque
     public AudioClip sonidoAtaque2; // Sonido del segundo ataque
-    public AudioClip sonidoPersecucion; // Sonido mientras persigue (opcional)
+    public AudioClip sonidoPersecucion; // Sonido mientras persigue 
     [Range(0f, 1f)]
     public float volumenSonidos = 0.7f;
 
@@ -46,11 +46,11 @@ public class BossEnemy : MonoBehaviour
             if (player != null)
             {
                 jugador = player.transform;
-                Debug.Log("✅ Jugador encontrado: " + player.name);
+                Debug.Log("Jugador encontrado: " + player.name);
             }
             else
             {
-                Debug.LogError("❌ No se encontró jugador con tag 'Player'");
+                Debug.LogError("No se encontró jugador con tag 'Player'");
             }
         }
 
@@ -59,11 +59,11 @@ public class BossEnemy : MonoBehaviour
             anim = GetComponent<Animator>();
             if (anim == null)
             {
-                Debug.LogError("❌ No hay Animator en el Boss");
+                Debug.LogError("No hay Animator en el Boss");
             }
             else
             {
-                Debug.Log("✅ Animator encontrado");
+                Debug.Log("Animator encontrado");
             }
         }
 
@@ -132,7 +132,7 @@ public class BossEnemy : MonoBehaviour
             if (jugadorDetectado)
             {
                 jugadorDetectado = false;
-                Debug.Log("😶 Jugador fuera de rango, boss vuelve a patrullar");
+                Debug.Log("Jugador fuera de rango, boss vuelve a patrullar");
             }
 
             // Patrullar cerca del objeto
@@ -183,7 +183,7 @@ public class BossEnemy : MonoBehaviour
     {
         if (objetoADefender == null)
         {
-            Debug.LogWarning("⚠️ No hay objeto asignado para defender");
+            Debug.LogWarning("No hay objeto asignado para defender");
             return;
         }
 
@@ -257,7 +257,7 @@ public class BossEnemy : MonoBehaviour
         {
             anim.SetBool("corriendo", false);
             anim.SetTrigger("ataque2");
-            Debug.Log("⚡ Boss ejecutando Ataque 2");
+            Debug.Log("Boss ejecutando Ataque 2");
         }
 
         // Reproducir sonido de ataque 2
@@ -284,7 +284,7 @@ public class BossEnemy : MonoBehaviour
         {
             // Instakill: quitar todas las vidas
             playerHealth.TakeDamage(playerHealth.CurrentLives);
-            Debug.Log("💀 ¡El jefe mató al jugador!");
+            Debug.Log("¡El jefe mató al jugador!");
         }
     }
 
@@ -304,7 +304,7 @@ public class BossEnemy : MonoBehaviour
             GameManager.instance.EnemigoEliminado();
         }
 
-        Debug.Log("💀 ¡El jefe ha sido derrotado por el objeto sagrado!");
+        Debug.Log("¡El jefe ha sido derrotado por el objeto sagrado!");
 
         // Desactivar el jefe después de la animación
         StartCoroutine(DesactivarDespuesDeMorir());
@@ -322,29 +322,6 @@ public class BossEnemy : MonoBehaviour
         if (clip != null && audioSource != null)
         {
             audioSource.PlayOneShot(clip, volumenSonidos);
-        }
-    }
-
-    // Visualizar rangos en el editor
-    void OnDrawGizmosSelected()
-    {
-        // Rango de detección (amarillo)
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, rangoDeteccion);
-
-        // Rango ataque 1 (rojo)
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, rangoAtaque1);
-
-        // Rango ataque 2 (naranja)
-        Gizmos.color = new Color(1f, 0.5f, 0f);
-        Gizmos.DrawWireSphere(transform.position, rangoAtaque2);
-
-        // Línea al objeto a defender (verde)
-        if (objetoADefender != null)
-        {
-            Gizmos.color = Color.green;
-            Gizmos.DrawLine(transform.position, objetoADefender.position);
         }
     }
 }
