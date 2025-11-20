@@ -23,9 +23,19 @@ public class BossEnemy : MonoBehaviour
     [Header("Estado")]
     public bool estaVivo = true;
 
+    [Header("Sonidos")]
+    public AudioClip sonidoDeteccion; // Sonido cuando detecta al jugador
+    public AudioClip sonidoAtaque1; // Sonido del primer ataque
+    public AudioClip sonidoAtaque2; // Sonido del segundo ataque
+    public AudioClip sonidoPersecucion; // Sonido mientras persigue (opcional)
+    [Range(0f, 1f)]
+    public float volumenSonidos = 0.7f;
+
     private float tiempoUltimoAtaque;
     private bool estaAtacando = false;
     private CharacterController controller;
+    private AudioSource audioSource;
+    private bool jugadorDetectado = false; // Para reproducir sonido solo una vez
 
     void Start()
     {
@@ -59,6 +69,16 @@ public class BossEnemy : MonoBehaviour
 
         controller = GetComponent<CharacterController>();
 
+        // Crear AudioSource para los sonidos
+        audioSource = gameObject.GetComponent<AudioSource>();
+        if (audioSource == null)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+        }
+        audioSource.playOnAwake = false;
+        audioSource.spatialBlend = 1f; // Sonido 3D
+        audioSource.volume = volumenSonidos;
+
         tiempoUltimoAtaque = Time.time;
     }
 
@@ -77,6 +97,14 @@ public class BossEnemy : MonoBehaviour
         // Si el jugador está cerca, atacar
         if (distanciaAlJugador <= rangoDeteccion)
         {
+            // Reproducir sonido de detección solo la primera vez
+            if (!jugadorDetectado)
+            {
+                jugadorDetectado = true;
+                ReproducirSonido(sonidoDeteccion);
+                Debug.Log("👁️ ¡Boss detectó al jugador!");
+            }
+
             MirarAlJugador();
 
             // Verificar si puede atacar
@@ -100,6 +128,13 @@ public class BossEnemy : MonoBehaviour
         }
         else
         {
+            // Si el jugador sale del rango, resetear la detección
+            if (jugadorDetectado)
+            {
+                jugadorDetectado = false;
+                Debug.Log("😶 Jugador fuera de rango, boss vuelve a patrullar");
+            }
+
             // Patrullar cerca del objeto
             PatrullarCercaDelObjeto();
         }
@@ -108,7 +143,17 @@ public class BossEnemy : MonoBehaviour
     void MoverHaciaJugador()
     {
         if (anim != null)
+        {
             anim.SetBool("corriendo", true);
+        }
+
+        // Reproducir sonido de persecución (loop)
+        if (sonidoPersecucion != null && !audioSource.isPlaying)
+        {
+            audioSource.clip = sonidoPersecucion;
+            audioSource.loop = true;
+            audioSource.Play();
+        }
 
         Vector3 direccion = (jugador.position - transform.position).normalized;
 
@@ -136,7 +181,17 @@ public class BossEnemy : MonoBehaviour
 
     void PatrullarCercaDelObjeto()
     {
-        if (objetoADefender == null) return;
+        if (objetoADefender == null)
+        {
+            Debug.LogWarning("⚠️ No hay objeto asignado para defender");
+            return;
+        }
+
+        // Detener sonido de persecución si está sonando
+        if (audioSource.isPlaying && audioSource.loop)
+        {
+            audioSource.Stop();
+        }
 
         float distanciaAlObjeto = Vector3.Distance(transform.position, objetoADefender.position);
 
@@ -173,7 +228,11 @@ public class BossEnemy : MonoBehaviour
         {
             anim.SetBool("corriendo", false);
             anim.SetTrigger("ataque1");
+            Debug.Log("🗡️ Boss ejecutando Ataque 1");
         }
+
+        // Reproducir sonido de ataque 1
+        ReproducirSonido(sonidoAtaque1);
 
         // Esperar a que la animación llegue al momento del golpe
         yield return new WaitForSeconds(0.5f);
@@ -198,7 +257,11 @@ public class BossEnemy : MonoBehaviour
         {
             anim.SetBool("corriendo", false);
             anim.SetTrigger("ataque2");
+            Debug.Log("⚡ Boss ejecutando Ataque 2");
         }
+
+        // Reproducir sonido de ataque 2
+        ReproducirSonido(sonidoAtaque2);
 
         // Esperar a que la animación llegue al momento del ataque
         yield return new WaitForSeconds(0.7f);
@@ -251,6 +314,15 @@ public class BossEnemy : MonoBehaviour
     {
         yield return new WaitForSeconds(3f);
         gameObject.SetActive(false);
+    }
+
+    // Método auxiliar para reproducir sonidos
+    void ReproducirSonido(AudioClip clip)
+    {
+        if (clip != null && audioSource != null)
+        {
+            audioSource.PlayOneShot(clip, volumenSonidos);
+        }
     }
 
     // Visualizar rangos en el editor
