@@ -44,8 +44,11 @@ public class SantuarioAgua : MonoBehaviour
     {
         if (completado || piedra == null) return;
 
+      
         if (id == ordenCorrecto[indiceActual])
         {
+            piedra.ReproducirResultado(true); 
+
             piedra.Desactivar();
             indiceActual++;
             controller.MostrarMensaje("Orden correcto");
@@ -55,6 +58,8 @@ public class SantuarioAgua : MonoBehaviour
         }
         else
         {
+            piedra.ReproducirResultado(false); 
+
             ReiniciarPuzzle();
         }
     }
