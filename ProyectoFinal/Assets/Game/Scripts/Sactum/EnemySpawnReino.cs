@@ -5,27 +5,31 @@ using System.Collections.Generic;
 public class EnemySpawner : MonoBehaviour
 {
     [Header("Configuración de Enemigos")]
-    public GameObject enemigoPrefab; // Arrastra aquí el prefab del enemigo
+    public GameObject enemigoPrefab; 
     public int cantidadEnemigos = 5; // Cuántos enemigos spawnar
 
     [Header("Puntos de Spawn")]
     public Transform[] puntosDeSpawn; // Arrastra aquí los puntos de spawn
 
     [Header("Opciones de Spawn")]
-    public bool spawnearAlInicio = true;
-    public bool spawnContinuo = false; // Si quieres que sigan spawneando
-    public float tiempoEntreSpawns = 10f; // Tiempo entre spawns continuos
+    public bool spawnearAlInicio = true; // Si true, spawnea enemigos al inicio de la escena
+    public bool spawnContinuo = false; // Si true, seguirá spawnando enemigos con tiempo
+    public float tiempoEntreSpawns = 10f; // Tiempo entre cada spawn continuo
     public int maximoEnemigosEnMapa = 10; // Máximo de enemigos simultáneos
 
+    // Lista para llevar control de enemigos activos en la escena
     private List<GameObject> enemigosActivos = new List<GameObject>();
 
     void Start()
     {
+
+        // Spawnear todos los enemigos iniciales
         if (spawnearAlInicio)
         {
             SpawnearEnemigos();
         }
 
+        // Si spawn continuo está activado, invoca SpawnEnemigoContinuo repetidamente
         if (spawnContinuo)
         {
             InvokeRepeating("SpawnEnemigoContinuo", tiempoEntreSpawns, tiempoEntreSpawns);
@@ -40,6 +44,7 @@ public class EnemySpawner : MonoBehaviour
 
     public void SpawnearEnemigos()
     {
+        // Validaciones de seguridad
         if (puntosDeSpawn.Length == 0)
         {
             Debug.LogError("No hay puntos de spawn asignados!");
@@ -51,13 +56,14 @@ public class EnemySpawner : MonoBehaviour
             Debug.LogError("No hay prefab de enemigo asignado!");
             return;
         }
-
+        // Instancia la cantidad definida de enemigos
         for (int i = 0; i < cantidadEnemigos; i++)
         {
             SpawnEnemigo();
         }
     }
 
+    // SPAWN DE UN ENEMIGO INDIVIDUAL
     void SpawnEnemigo()
     {
         // Selecciona un punto aleatorio

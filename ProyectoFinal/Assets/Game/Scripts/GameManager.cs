@@ -7,43 +7,32 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
 
-
-    // ============================================================
     // CONTROLLER DE LA ESCENA
-    // ============================================================
     public Controller2 controllerActual;
     public ControllerSceneLira controllerActual2;
     public GameController4 controllerActual3;
     public SceneController controllerActual4;
-    // ============================================================
+
     // SCORE (MONEDAS)
-    // ============================================================
-    [Header("💰 Score Total (monedas globales)")]
+    [Header("Score Total (monedas globales)")]
     public int score = 0;
     public TextMeshProUGUI textoScore;
 
-    [Header("⚔️ Enemigos")]
+    [Header("Enemigos")]
     public int enemigosEliminados = 0;        // Contador
     public TextMeshProUGUI textoEnemigos;     // Opcional si quieres mostrarlo en UI
 
     public int vidasPersistentes = -1; // -1 significa "no inicializado"
 
-
-    // ============================================================
     // GAME OVER
-    // ============================================================
-    [Header("💀 Game Over")]
+    [Header("Game Over")]
     public GameObject panelGameOver;
 
-    // ============================================================
     // TIEMPO
-    // ============================================================
     private Dictionary<string, float> tiemposPorEscena = new Dictionary<string, float>();
     private float tiempoTotal = 0f;
 
-    // ============================================================
     // INICIO
-    // ============================================================
     void Awake()
     {
         if (instance == null)
@@ -82,9 +71,7 @@ public class GameManager : MonoBehaviour
         ActualizarUI();
     }
 
-    // ============================================================
     // SCORE
-    // ============================================================
     public void AgregarMoneda(int cantidad = 1)
     {
         score += cantidad;
@@ -103,7 +90,7 @@ public class GameManager : MonoBehaviour
 
         ActualizarUIEnemigos();            // Refresca el contador (si lo usas)
 
-        Debug.Log("✔ Enemigo eliminado. Total: " + enemigosEliminados);
+        Debug.Log("Enemigo eliminado. Total: " + enemigosEliminados);
     }
     private void ActualizarUIEnemigos()
     {
@@ -111,9 +98,7 @@ public class GameManager : MonoBehaviour
             textoEnemigos.text = "Enemigos: " + enemigosEliminados;
     }
 
-    // ============================================================
     // TIEMPO
-    // ============================================================
     public void RegistrarTiempo(float tiempoEscena)
     {
         string escena = SceneManager.GetActiveScene().name;
@@ -129,9 +114,7 @@ public class GameManager : MonoBehaviour
 
     public float ObtenerTiempoTotal() => tiempoTotal;
 
-    // ============================================================
     // GAME OVER
-    // ============================================================
     public void MostrarGameOver()
     {
         if (panelGameOver != null)
@@ -140,14 +123,12 @@ public class GameManager : MonoBehaviour
         Time.timeScale = 0f;
     }
 
-    // ============================================================
     // REINICIAR JUEGO
-    // ============================================================
     public void ReiniciarJuego()
     {
         Time.timeScale = 1f;
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         ResetDatos();
+        SceneManager.LoadScene("Sactum");
     }
 
     public void VolverAlMenuYResetear()
@@ -167,7 +148,7 @@ public class GameManager : MonoBehaviour
         // Cargar escena del menú
         SceneManager.LoadScene("Menu");
 
-        Debug.Log("🏠 Volviendo al menú principal con reset global.");
+        Debug.Log("Volviendo al menú principal con reset global.");
     }
     public void ResetDatos()
     {

@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections;
 
 public class PiedraPuzzle : MonoBehaviour
 {
@@ -10,6 +11,7 @@ public class PiedraPuzzle : MonoBehaviour
     public AudioClip sonidoIncorrecto;
 
     private SantuarioAgua santuario;
+    private AudioSource audioSource;
 
     private Vector3 posicionInicial;
     private Quaternion rotacionInicial;
@@ -20,6 +22,12 @@ public class PiedraPuzzle : MonoBehaviour
         santuario = FindObjectOfType<SantuarioAgua>();
         posicionInicial = transform.position;
         rotacionInicial = transform.rotation;
+
+        audioSource = gameObject.AddComponent<AudioSource>();
+        audioSource.spatialBlend = 0f; 
+        audioSource.playOnAwake = false;
+        audioSource.loop = false;
+        audioSource.volume = 1f;
     }
 
     void OnMouseDown()
@@ -30,14 +38,12 @@ public class PiedraPuzzle : MonoBehaviour
         }
     }
 
-    // Llamar desde SantuarioAgua cuando la piedra debe desactivarse permanentemente
     public void Desactivar()
     {
         activa = false;
         gameObject.SetActive(false);
     }
 
-    // Llamar desde SantuarioAgua cuando la piedra debe reactivarse
     public void Reactivar()
     {
         activa = true;
@@ -46,15 +52,23 @@ public class PiedraPuzzle : MonoBehaviour
         transform.rotation = rotacionInicial;
     }
 
+
     public void ReproducirResultado(bool correcto)
     {
-        if (correcto && sonidoCorrecto != null)
+        AudioClip clip = correcto ? sonidoCorrecto : sonidoIncorrecto;
+
+        if (clip != null)
         {
-            AudioSource.PlayClipAtPoint(sonidoCorrecto, transform.position);
+            audioSource.PlayOneShot(clip);
+
+            if (correcto)
+                StartCoroutine(DesactivarLuego(clip.length));
         }
-        else if (!correcto && sonidoIncorrecto != null)
-        {
-            AudioSource.PlayClipAtPoint(sonidoIncorrecto, transform.position);
-        }
+    }
+
+    IEnumerator DesactivarLuego(float t)
+    {
+        yield return new WaitForSeconds(t);
+        Desactivar();
     }
 }

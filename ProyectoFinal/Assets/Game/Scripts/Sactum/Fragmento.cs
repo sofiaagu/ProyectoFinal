@@ -7,12 +7,19 @@ public class Fragmento : MonoBehaviour
     public GameObject panelUI;
     public Texture2D iconoFragmento;
 
+    [Header("Sonido")]
+    public AudioClip sonidoRecoleccion;
+    private AudioSource audioSource;
+
     void Start()
     {
         if (panelUI != null)
         {
             panelUI.SetActive(false);
         }
+
+        audioSource = gameObject.AddComponent<AudioSource>();
+        audioSource.playOnAwake = false;
     }
 
     void Update()
@@ -62,12 +69,14 @@ public class Fragmento : MonoBehaviour
 
                 if (agregado)
                 {
-                    Debug.Log("¡Fragmento recolectado y agregado al inventario!");
+                    Debug.Log("Fragmento recolectado y agregado al inventario");
 
-                    // ⭐ SOLO NOTIFICAR AL SCENECONTROLLER
+                    if (sonidoRecoleccion != null)
+                        audioSource.PlayOneShot(sonidoRecoleccion);
+
                     SceneController.instance?.RegistrarFragmento();
 
-                    Destroy(gameObject);
+                    Destroy(gameObject, sonidoRecoleccion != null ? sonidoRecoleccion.length : 0f);
                 }
                 else
                 {
@@ -76,12 +85,12 @@ public class Fragmento : MonoBehaviour
             }
             else
             {
-                Debug.LogError("❌ No se asignó la textura del fragmento!");
+                Debug.LogError("No se asignó la textura del fragmento");
             }
         }
         else
         {
-            Debug.LogError("No se encontró el Inventory!");
+            Debug.LogError("No se encontró el Inventory");
         }
     }
 }

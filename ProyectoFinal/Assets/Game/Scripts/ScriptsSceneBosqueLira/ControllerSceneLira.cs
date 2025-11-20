@@ -32,6 +32,8 @@ public class ControllerSceneLira : MonoBehaviour
         textoSemillas.text = "Semillas recolectadas: 0/" + semillasTotales;
         mensajeUI.text = "";
 
+        MostrarMensaje("Bienvenido al Bosque de Lira\n\nDeberás completar un minijuego en cada Santuario para recolectar las tres semillas y así restaurar por completo el bosque.", 6f);
+
         if (timer == null)
             timer = FindFirstObjectByType<Timer>();
 
@@ -112,15 +114,6 @@ public class ControllerSceneLira : MonoBehaviour
 
         if (textoMonedas != null)
             textoMonedas.text = "Monedas: " + monedasEscena;
-    }
-    public void ReiniciarJuego()
-    {
-        Time.timeScale = 1f;
-
-        if (GameManager.instance != null)
-            GameManager.instance.ReiniciarJuego();
-        else
-            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
     public void CompletarEscena()
     {

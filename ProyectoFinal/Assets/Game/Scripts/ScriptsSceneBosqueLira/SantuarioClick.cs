@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Audio;
 
 public enum TipoSantuario
 {
@@ -15,6 +16,11 @@ public class SantuarioClick : MonoBehaviour
     [Header("Duración del mensaje")]
     public float duracion = 6f;
 
+    [Header("Sonido al hacer clic")]
+    public AudioClip sonidoClick;
+
+    private AudioSource audioSource;
+
     [Header("Animación del Objeto")]
     public float alturaMovimiento = 0.2f;
     public float velocidadMovimiento = 2f;
@@ -29,11 +35,12 @@ public class SantuarioClick : MonoBehaviour
     {
         posicionInicial = transform.position;
 
-        // Busca el controller en la escena
         controller = FindObjectOfType<ControllerSceneLira>();
 
         if (controller == null)
             Debug.LogError("ERROR: No se encontró ControllerSceneLira en la escena.");
+
+        audioSource = gameObject.AddComponent<AudioSource>();
     }
 
     void Update()
@@ -54,6 +61,11 @@ public class SantuarioClick : MonoBehaviour
 
     void OnMouseDown()
     {
+       
+        if (sonidoClick != null)
+            audioSource.PlayOneShot(sonidoClick);
+
+     
         if (controller != null)
         {
             controller.MostrarMensaje(ObtenerMensajePorTipo(), duracion);

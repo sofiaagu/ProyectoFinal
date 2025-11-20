@@ -43,7 +43,7 @@ public class PlayerHealth : MonoBehaviour
         if (currentLives < 0)
             currentLives = 0;
 
-        // 🔊 Sonido de daño
+        // Sonido de daño
         if (sonidoDaño != null)
             audioSource.PlayOneShot(sonidoDaño);
 
@@ -65,7 +65,7 @@ public class PlayerHealth : MonoBehaviour
 
     void Die()
     {
-        // 🔊 Sonido de muerte
+        // Sonido de muerte
         if (sonidoMuerte != null)
             audioSource.PlayOneShot(sonidoMuerte);
 

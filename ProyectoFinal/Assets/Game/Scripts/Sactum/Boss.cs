@@ -30,7 +30,7 @@ public class Boss : MonoBehaviour
         // SI ESTÁ ATACANDO, NO HACER NADA - mantener posición fija
         if (atacando)
         {
-            return; // ✅ Sale inmediatamente, SIN rotar
+            return; // Sale inmediatamente, SIN rotar
         }
 
         float distancia = Vector3.Distance(transform.position, target.transform.position);
@@ -87,7 +87,7 @@ public class Boss : MonoBehaviour
             ani.SetBool("walk", false);
             ani.SetBool("run", false);
 
-            // ✅ Mirar hacia el jugador SOLO antes de atacar
+            // Mirar hacia el jugador SOLO antes de atacar
             var lookPos = target.transform.position - transform.position;
             lookPos.y = 0;
             if (lookPos != Vector3.zero)

@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class ArmaCollision : MonoBehaviour
 {
+    // Se ejecuta automáticamente cuando otro collider entra en el trigger del arma
     private void OnTriggerEnter(Collider other)
     {
         // Verificar si es el BOSS
@@ -19,12 +20,12 @@ public class ArmaCollision : MonoBehaviour
         if (other.CompareTag("Enemy"))
         {
             Debug.Log("¡Golpeaste al enemigo!");
-
+            // Si existe el GameManager global, actualizar contador de enemigos eliminados
             if (GameManager.instance != null)
             {
                 GameManager.instance.EnemigoEliminado();
             }
-
+            // Destruye el enemigo de la escena
             Destroy(other.gameObject);
         }
     }

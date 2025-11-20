@@ -29,6 +29,7 @@ public class PlayerZonaProhibida : MonoBehaviour
 
     void OnControllerColliderHit(ControllerColliderHit hit)
     {
+        // Solo reaccionar si el objeto tocado es zona prohibida
         if (!hit.collider.CompareTag("Prohibido"))
             return;
 
