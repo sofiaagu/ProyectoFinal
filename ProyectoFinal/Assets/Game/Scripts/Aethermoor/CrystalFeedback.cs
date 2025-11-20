@@ -189,7 +189,7 @@ public class CrystalFeedbackSystem : MonoBehaviour
         if (cristal.lineRenderer != null && cristal.lineRenderer.enabled)
         {
             Vector3 destino = cristal.lineRenderer.GetPosition(1);
-            float duracion = 2f; // MÁS LENTO (antes 1.5s)
+            float duracion = 2f; /
             float tiempo = 0f;
 
             while (tiempo < duracion && helix != null)
