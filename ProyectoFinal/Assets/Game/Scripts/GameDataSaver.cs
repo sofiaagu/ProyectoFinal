@@ -53,7 +53,7 @@ public class GameDataSaver : MonoBehaviour
     {
         // Ruta donde se guardará el JSON (en la carpeta de la aplicación)
         rutaArchivo = Path.Combine(Application.persistentDataPath, "HistorialPartidas.json");
-        Debug.Log("📁 Ruta del archivo: " + rutaArchivo);
+        Debug.Log("Ruta del archivo: " + rutaArchivo);
 
         // Cargar historial existente
         CargarHistorial();
@@ -71,12 +71,12 @@ public class GameDataSaver : MonoBehaviour
         {
             string json = File.ReadAllText(rutaArchivo);
             historial = JsonUtility.FromJson<HistorialPartidas>(json);
-            Debug.Log($"📂 Historial cargado: {historial.partidas.Count} partidas guardadas");
+            Debug.Log($"Historial cargado: {historial.partidas.Count} partidas guardadas");
         }
         else
         {
             historial = new HistorialPartidas();
-            Debug.Log("📝 Creando nuevo historial");
+            Debug.Log("Creando nuevo historial");
         }
     }
 
@@ -84,7 +84,7 @@ public class GameDataSaver : MonoBehaviour
     {
         if (GameManager.instance == null)
         {
-            Debug.LogError("❌ No se encontró GameManager");
+            Debug.LogError("No se encontró GameManager");
             MostrarMensaje("Error: No hay GameManager", Color.red);
             return;
         }
@@ -112,13 +112,13 @@ public class GameDataSaver : MonoBehaviour
             else
             {
                 nuevaPartida.vidasRestantes = 0;
-                Debug.LogWarning("⚠️ No se encontró PlayerHealth");
+                Debug.LogWarning("No se encontró PlayerHealth");
             }
         }
         else
         {
             nuevaPartida.vidasRestantes = 0;
-            Debug.LogWarning("⚠️ No se encontró el jugador");
+            Debug.LogWarning("No se encontró el jugador");
         }
 
         // Tiempo TOTAL del juego (todas las escenas)
@@ -137,7 +137,7 @@ public class GameDataSaver : MonoBehaviour
 
         nuevaPartida.tiempo = string.Format("{0:00}:{1:00}:{2:00}", minutos, segundos, centesimas);
 
-        Debug.Log($"⏱️ Tiempo TOTAL guardado: {nuevaPartida.tiempo} (Total: {tiempoTotal}s de todas las escenas)");
+        Debug.Log($"Tiempo TOTAL guardado: {nuevaPartida.tiempo} (Total: {tiempoTotal}s de todas las escenas)");
 
         // Fecha y hora actual
         DateTime ahora = DateTime.Now;
@@ -153,8 +153,8 @@ public class GameDataSaver : MonoBehaviour
             string json = JsonUtility.ToJson(historial, true); // true = formato legible
             File.WriteAllText(rutaArchivo, json);
 
-            Debug.Log("✅ Partida guardada exitosamente");
-            Debug.Log($"📊 Datos guardados - Score: {nuevaPartida.score}, Enemigos: {nuevaPartida.enemigosEliminados}, Tiempo: {nuevaPartida.tiempo}, Vidas: {nuevaPartida.vidasRestantes}");
+            Debug.Log("Partida guardada exitosamente");
+            Debug.Log($"Datos guardados - Score: {nuevaPartida.score}, Enemigos: {nuevaPartida.enemigosEliminados}, Tiempo: {nuevaPartida.tiempo}, Vidas: {nuevaPartida.vidasRestantes}");
 
             MostrarMensaje("¡Partida guardada exitosamente!", Color.green);
 
@@ -165,7 +165,7 @@ public class GameDataSaver : MonoBehaviour
         }
         catch (Exception e)
         {
-            Debug.LogError("❌ Error al guardar: " + e.Message);
+            Debug.LogError("Error al guardar: " + e.Message);
             MostrarMensaje("Error al guardar", Color.red);
         }
     }
@@ -197,22 +197,22 @@ public class GameDataSaver : MonoBehaviour
     {
         if (historial.partidas.Count == 0)
         {
-            Debug.Log("📋 No hay partidas guardadas");
+            Debug.Log("No hay partidas guardadas");
             return;
         }
 
         Debug.Log("═══════════════════════════════════════");
-        Debug.Log($"📋 HISTORIAL DE PARTIDAS ({historial.partidas.Count} partidas)");
+        Debug.Log($"HISTORIAL DE PARTIDAS ({historial.partidas.Count} partidas)");
         Debug.Log("═══════════════════════════════════════");
 
         foreach (PartidaData partida in historial.partidas)
         {
-            Debug.Log($"\n🎮 {partida.nombreJugador}");
-            Debug.Log($"   📅 Fecha: {partida.fecha} - {partida.hora}");
-            Debug.Log($"   💰 Score: {partida.score}");
-            Debug.Log($"   ⚔️ Enemigos: {partida.enemigosEliminados}");
-            Debug.Log($"   ⏱️ Tiempo: {partida.tiempo}");
-            Debug.Log($"   ❤️ Vidas: {partida.vidasRestantes}");
+            Debug.Log($"\n{partida.nombreJugador}");
+            Debug.Log($"Fecha: {partida.fecha} - {partida.hora}");
+            Debug.Log($"Score: {partida.score}");
+            Debug.Log($"Enemigos: {partida.enemigosEliminados}");
+            Debug.Log($"Tiempo: {partida.tiempo}");
+            Debug.Log($"Vidas: {partida.vidasRestantes}");
         }
 
         Debug.Log("═══════════════════════════════════════");

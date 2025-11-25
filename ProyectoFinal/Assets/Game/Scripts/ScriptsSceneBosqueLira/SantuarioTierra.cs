@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using UnityEngine;
+using UnityEngine.Audio;
 
 public class SantuarioTierra : MonoBehaviour
 {
@@ -11,6 +12,11 @@ public class SantuarioTierra : MonoBehaviour
     public int fuegosNecesarios = 5;
     public float duracionFuego = 2f;
     public float esperaEntreFuegos = 1f;
+    [Header("Sonidos")]
+    public AudioClip sonidoCorrecto;
+    public AudioClip sonidoIncorrecto;
+
+    private AudioSource audioSource;
 
     [Header("Prefab al aparecer la semilla")]
     public GameObject prefabAparecer;     
@@ -30,6 +36,9 @@ public class SantuarioTierra : MonoBehaviour
 
     void Start()
     {
+        controller = FindObjectOfType<ControllerSceneLira>();
+
+        audioSource = gameObject.AddComponent<AudioSource>();
         controller = FindObjectOfType<ControllerSceneLira>();
 
         if (tumbas == null || fuegos == null || tumbas.Length != fuegos.Length)
@@ -117,6 +126,10 @@ public class SantuarioTierra : MonoBehaviour
 
         if (fuegoActivo && id == indiceActivo)
         {
+           
+            if (sonidoCorrecto != null)
+                audioSource.PlayOneShot(sonidoCorrecto);
+
             aciertos++;
             controller?.MostrarMensaje($"¡{aciertos} de {fuegosNecesarios} fuegos necesarios!", 2f);
 
@@ -129,6 +142,10 @@ public class SantuarioTierra : MonoBehaviour
         }
         else
         {
+        
+            if (sonidoIncorrecto != null)
+                audioSource.PlayOneShot(sonidoIncorrecto);
+
             aciertos = Mathf.Max(0, aciertos - 1);
             controller?.MostrarMensaje($"Tumba incorrecta\n\n¡{aciertos} de {fuegosNecesarios} fuegos necesarios!", 2f);
         }

@@ -4,16 +4,23 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
+    //  CONFIGURACIÓN DE MOVIMIENTO
     public float velocidadMovimiento = 5.0f;
     public float velocidadRotacion = 200.0f;
     public float fuerzaSalto = 8.0f;
     public float gravedad = 20.0f;
 
+    // CONTROL DE LA CÁMARA 
     [Header("Rotación de Cámara")]
-    public Transform camaraTransform; // Arrastra aquí la cámara en el Inspector
-    public float sensibilidadRaton = 3.0f;
-    public float limiteVerticalMin = -40f;
-    public float limiteVerticalMax = 80f;
+    public Transform camaraTransform; // Cámara en primera/tercera persona
+    public float sensibilidadRaton = 3.0f;// Sensibilidad del mouse
+    public float limiteVerticalMin = -40f;  // Límite al mirar hacia abajo
+    public float limiteVerticalMax = 80f; // Límite al mirar hacia arriba
+
+ // SISTEMA DE VIDAS
+    [Header("Vida del jugador")]
+    public float tiempoInvulnerable = 2f;
+    private bool invulnerable = false;
 
     private CharacterController controller;
     private Animator anim;
@@ -29,7 +36,7 @@ public class PlayerMovement : MonoBehaviour
         controller = GetComponent<CharacterController>();
         anim = GetComponent<Animator>();
 
-        // Si no se asigna la cámara manualmente, buscarla automáticamente
+      // Si no asignas la cámara manualmente, la busca automáticamente
         if (camaraTransform == null)
         {
             Camera cam = Camera.main;
@@ -112,6 +119,7 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    // Detectar contacto con el suelo mediante el collider del CharacterController
     private void OnControllerColliderHit(ControllerColliderHit hit)
     {
         if (hit.collider.CompareTag("Ground"))
@@ -123,11 +131,7 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    // --- SISTEMA DE VIDAS ---
-    [Header("Vida del jugador")]
-    public float tiempoInvulnerable = 2f;
-    private bool invulnerable = false;
-
+   
     void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("arma") && !invulnerable)
@@ -141,13 +145,13 @@ public class PlayerMovement : MonoBehaviour
             }
         }
     }
-
+    // Método para recibir daño desde otros scripts
     public void TomarDaño()
     {
         PlayerHealth health = GetComponent<PlayerHealth>();
         if (health == null)
         {
-            Debug.LogError("❌ No se encontró PlayerHealth en el jugador");
+            Debug.LogError(" No se encontró PlayerHealth en el jugador");
             return;
         }
 

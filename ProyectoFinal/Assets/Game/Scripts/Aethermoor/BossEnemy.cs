@@ -5,7 +5,7 @@ using UnityEngine;
 public class BossEnemy : MonoBehaviour
 {
     [Header("Referencias")]
-    public Transform jugador;
+    public Transform jugador;  //jugador a atacar
     public Transform objetoADefender; // El objeto que el jefe defiende
     public Animator anim;
 
@@ -23,9 +23,19 @@ public class BossEnemy : MonoBehaviour
     [Header("Estado")]
     public bool estaVivo = true;
 
+    [Header("Sonidos")]
+    public AudioClip sonidoDeteccion; // Sonido cuando detecta al jugador
+    public AudioClip sonidoAtaque1; // Sonido del primer ataque
+    public AudioClip sonidoAtaque2; // Sonido del segundo ataque
+    public AudioClip sonidoPersecucion; // Sonido mientras persigue 
+    [Range(0f, 1f)]
+    public float volumenSonidos = 0.7f;
+
     private float tiempoUltimoAtaque;
     private bool estaAtacando = false;
     private CharacterController controller;
+    private AudioSource audioSource;
+    private bool jugadorDetectado = false; // Para reproducir sonido solo una vez
 
     void Start()
     {
@@ -36,11 +46,11 @@ public class BossEnemy : MonoBehaviour
             if (player != null)
             {
                 jugador = player.transform;
-                Debug.Log("✅ Jugador encontrado: " + player.name);
+                Debug.Log("Jugador encontrado: " + player.name);
             }
             else
             {
-                Debug.LogError("❌ No se encontró jugador con tag 'Player'");
+                Debug.LogError("No se encontró jugador con tag 'Player'");
             }
         }
 
@@ -49,15 +59,25 @@ public class BossEnemy : MonoBehaviour
             anim = GetComponent<Animator>();
             if (anim == null)
             {
-                Debug.LogError("❌ No hay Animator en el Boss");
+                Debug.LogError("No hay Animator en el Boss");
             }
             else
             {
-                Debug.Log("✅ Animator encontrado");
+                Debug.Log("Animator encontrado");
             }
         }
 
         controller = GetComponent<CharacterController>();
+
+        // Crear AudioSource para los sonidos
+        audioSource = gameObject.GetComponent<AudioSource>();
+        if (audioSource == null)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+        }
+        audioSource.playOnAwake = false;
+        audioSource.spatialBlend = 1f; // Sonido 3D
+        audioSource.volume = volumenSonidos;
 
         tiempoUltimoAtaque = Time.time;
     }
@@ -77,6 +97,14 @@ public class BossEnemy : MonoBehaviour
         // Si el jugador está cerca, atacar
         if (distanciaAlJugador <= rangoDeteccion)
         {
+            // Reproducir sonido de detección solo la primera vez
+            if (!jugadorDetectado)
+            {
+                jugadorDetectado = true;
+                ReproducirSonido(sonidoDeteccion);
+                Debug.Log("👁️ ¡Boss detectó al jugador!");
+            }
+
             MirarAlJugador();
 
             // Verificar si puede atacar
@@ -100,6 +128,13 @@ public class BossEnemy : MonoBehaviour
         }
         else
         {
+            // Si el jugador sale del rango, resetear la detección
+            if (jugadorDetectado)
+            {
+                jugadorDetectado = false;
+                Debug.Log("Jugador fuera de rango, boss vuelve a patrullar");
+            }
+
             // Patrullar cerca del objeto
             PatrullarCercaDelObjeto();
         }
@@ -108,7 +143,17 @@ public class BossEnemy : MonoBehaviour
     void MoverHaciaJugador()
     {
         if (anim != null)
+        {
             anim.SetBool("corriendo", true);
+        }
+
+        // Reproducir sonido de persecución (loop)
+        if (sonidoPersecucion != null && !audioSource.isPlaying)
+        {
+            audioSource.clip = sonidoPersecucion;
+            audioSource.loop = true;
+            audioSource.Play();
+        }
 
         Vector3 direccion = (jugador.position - transform.position).normalized;
 
@@ -136,7 +181,17 @@ public class BossEnemy : MonoBehaviour
 
     void PatrullarCercaDelObjeto()
     {
-        if (objetoADefender == null) return;
+        if (objetoADefender == null)
+        {
+            Debug.LogWarning("No hay objeto asignado para defender");
+            return;
+        }
+
+        // Detener sonido de persecución si está sonando
+        if (audioSource.isPlaying && audioSource.loop)
+        {
+            audioSource.Stop();
+        }
 
         float distanciaAlObjeto = Vector3.Distance(transform.position, objetoADefender.position);
 
@@ -173,7 +228,11 @@ public class BossEnemy : MonoBehaviour
         {
             anim.SetBool("corriendo", false);
             anim.SetTrigger("ataque1");
+            Debug.Log("🗡️ Boss ejecutando Ataque 1");
         }
+
+        // Reproducir sonido de ataque 1
+        ReproducirSonido(sonidoAtaque1);
 
         // Esperar a que la animación llegue al momento del golpe
         yield return new WaitForSeconds(0.5f);
@@ -198,7 +257,11 @@ public class BossEnemy : MonoBehaviour
         {
             anim.SetBool("corriendo", false);
             anim.SetTrigger("ataque2");
+            Debug.Log("Boss ejecutando Ataque 2");
         }
+
+        // Reproducir sonido de ataque 2
+        ReproducirSonido(sonidoAtaque2);
 
         // Esperar a que la animación llegue al momento del ataque
         yield return new WaitForSeconds(0.7f);
@@ -221,7 +284,7 @@ public class BossEnemy : MonoBehaviour
         {
             // Instakill: quitar todas las vidas
             playerHealth.TakeDamage(playerHealth.CurrentLives);
-            Debug.Log("💀 ¡El jefe mató al jugador!");
+            Debug.Log("¡El jefe mató al jugador!");
         }
     }
 
@@ -241,7 +304,7 @@ public class BossEnemy : MonoBehaviour
             GameManager.instance.EnemigoEliminado();
         }
 
-        Debug.Log("💀 ¡El jefe ha sido derrotado por el objeto sagrado!");
+        Debug.Log("¡El jefe ha sido derrotado por el objeto sagrado!");
 
         // Desactivar el jefe después de la animación
         StartCoroutine(DesactivarDespuesDeMorir());
@@ -253,26 +316,12 @@ public class BossEnemy : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    // Visualizar rangos en el editor
-    void OnDrawGizmosSelected()
+    // Método auxiliar para reproducir sonidos
+    void ReproducirSonido(AudioClip clip)
     {
-        // Rango de detección (amarillo)
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, rangoDeteccion);
-
-        // Rango ataque 1 (rojo)
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, rangoAtaque1);
-
-        // Rango ataque 2 (naranja)
-        Gizmos.color = new Color(1f, 0.5f, 0f);
-        Gizmos.DrawWireSphere(transform.position, rangoAtaque2);
-
-        // Línea al objeto a defender (verde)
-        if (objetoADefender != null)
+        if (clip != null && audioSource != null)
         {
-            Gizmos.color = Color.green;
-            Gizmos.DrawLine(transform.position, objetoADefender.position);
+            audioSource.PlayOneShot(clip, volumenSonidos);
         }
     }
 }

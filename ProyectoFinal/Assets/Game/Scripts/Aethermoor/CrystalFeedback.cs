@@ -34,17 +34,17 @@ public class CrystalFeedbackSystem : MonoBehaviour
 
     [Header("Referencias de Cristales")]
     [Tooltip("Todos los cristales interactuables del puzzle")]
-    public CristalNode[] cristales;
+    public CristalNode[] cristales; // Todos los cristales del puzzle
 
     [Tooltip("Manager de secuencia (para escuchar eventos)")]
-    public CrystalSequenceManager sequenceManager;
+    public CrystalSequenceManager sequenceManager; // Controla el orden correcto
 
     [Header("Torre Final")]
     [Tooltip("Torre distante que se activa al completar")]
-    public GameObject torreFinal;
+    public GameObject torreFinal; // Objeto de la torre que se activa
 
     [Tooltip("Luz/Beacon de la torre")]
-    public Light luzTorre;
+    public Light luzTorre; // Luz que se enciende al final
 
     [Tooltip("Partículas de la torre")]
     public ParticleSystem particulasTorre;
